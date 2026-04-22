@@ -1,0 +1,4 @@
+data/org.altlinux.Tailor.metainfo.xml.in
+data/ui/main-window.blp
+src/main.vala
+src/application.vala

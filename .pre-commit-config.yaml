@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: vala-lint
+        name: Vala Lint
+        entry: vala-lint
+        language: system
+        files: \.(vala|vapi|vala.in)$
+        args: ["--config=vala-lint.conf"]
+

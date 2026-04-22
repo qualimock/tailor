@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<component type="desktop-application">
+	<id>org.altlinux.Tailor</id>
+
+	<name>Tailor</name>
+	<developer id="org.altlinux.Tailor">
+		<name>Alexey Volkov</name>
+	</developer>
+	<summary>Create bootable drives</summary>
+
+	<metadata_license>CC0-1.0</metadata_license>
+	<project_license>GPL-3.0-or-later</project_license>
+
+	<description>
+		<p>
+			TODO
+		</p>
+	</description>
+
+	<translation type="gettext">tailor</translation>
+
+	<requires>
+		<display_length compare="ge">360</display_length>
+	</requires>
+
+	<supports>
+		<internet>offline-only</internet>
+	</supports>
+
+	<recommends>
+		<control>pointing</control>
+		<control>keyboard</control>
+		<control>touch</control>
+	</recommends>
+
+	<screenshots>
+		<!-- TODO -->
+		<screenshot type="default">
+			<image>todo</image>
+			<caption>todo</caption>
+		</screenshot>
+	</screenshots>
+
+	<branding>
+		<!-- TODO -->
+		<color type="primary" scheme_preference="light">#ffb63f</color>
+		<color type="primary" scheme_preference="dark">#c54400</color>
+	</branding>
+
+	<launchable type="desktop-id">org.altlinux.Tailor.desktop</launchable>
+
+	<url type="homepage">https://qualimock.space/Tailor/</url>
+	<url type="bugtracker">https://altlinux.space/qualimock/Tailor/-/issues</url>
+	<url type="translate">https://altlinux.space/qualimock/Tailor/-/tree/main/po</url>
+	<url type="help">https://altlinux.space/qualimock/Tailor/-/issues</url>
+	<url type="vcs-browser">https://altlinux.space/qualimock/Tailor</url>
+	<url type="contribute">https://altlinux.space/qualimock/Tailor</url>
+	<url type="contact">https://matrix.to/#/@qualimock:alt-gnome.ru</url>
+
+	<update_contact>qualimock@yandex.ru</update_contact>
+
+	<content_rating type="oars-1.1" />
+
+	<releases>
+		<!-- TODO: No releases yet :) -->
+	</releases>
+</component>
+
