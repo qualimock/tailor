@@ -55,6 +55,7 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 
 							Button {
 								styles [ "card" ]
+								clicked => $create_device_card();
 
 								tooltip-text: _("Install From File");
 
@@ -132,10 +133,15 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 				title: _("Devices");
 				icon-name: "settings-symbolic";
 
-				child: Adw.StatusPage {
-					title: _("Here are your devices!");
-					description: _("Some describable text.");
-					icon-name: "image-missing-symbolic";
+				child: ScrolledWindow {
+					Box devices {
+						orientation: vertical;
+						margin-top: 12;
+						margin-bottom: 12;
+						margin-start: 12;
+						margin-end: 12;
+						spacing: 12;
+					}
 				};
 			}
 		};

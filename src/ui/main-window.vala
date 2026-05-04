@@ -23,8 +23,22 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
 	public class MainWindow : Adw.ApplicationWindow {
 
+		[GtkChild]
+		private unowned Gtk.Box devices;
+
 		public MainWindow (Adw.Application app) {
 			Object (application: app);
+
+			create_device_card ();
+		}
+
+		[GtkCallback]
+		private void create_device_card () {
+			var device_card = new DeviceCard ();
+			device_card.device_name = "UASSBEE";
+			device_card.size = 300;
+
+			devices.append (device_card);
 		}
 	}
 }

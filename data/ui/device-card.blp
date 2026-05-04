@@ -1,0 +1,82 @@
+using Gtk 4.0;
+
+template $TailorDeviceCard: Box {
+	styles [ "card" ]
+
+	Box {
+		orientation: vertical;
+		margin-top: 12;
+		margin-bottom: 12;
+		margin-start: 12;
+		margin-end: 12;
+		spacing: 12;
+
+		Box {
+			orientation: horizontal;
+			spacing: 12;
+
+			Image icon {
+				pixel-size: 16;
+			}
+
+			Label name_label {
+				styles [ "title-4" ]
+			}
+
+			Label size_label {
+				styles [ "title-4", "dim-label" ]
+				halign: end;
+				hexpand: true;
+			}
+		}
+
+		Separator {}
+
+		Box {
+			orientation: horizontal;
+			spacing: 12;
+
+			Label {
+				styles [ "dim-label" ]
+				label: _("Device address");
+			}
+
+			Label address_label {
+				styles [ "dim-label" ]
+				halign: end;
+				hexpand: true;
+			}
+		}
+
+		Box {
+			orientation: horizontal;
+			spacing: 12;
+
+			Label {
+				styles [ "dim-label" ]
+				label: _("Device type");
+			}
+
+			Label type_label {
+				styles [ "dim-label" ]
+				halign: end;
+				hexpand: true;
+			}
+		}
+
+		Box {
+			orientation: vertical;
+			margin-top: 12;
+			spacing: 12;
+
+			Button details_button {
+				label: _("More in “Disks”");
+			}
+
+			Button restore_button {
+				styles [ "destructive-action" ]
+				label: _("Restore");
+			}
+		}
+	}
+}

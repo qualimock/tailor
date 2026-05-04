@@ -2,6 +2,7 @@
 <gresources>
 	<gresource prefix="/org/altlinux/Tailor">
 		<file alias="main-window.ui" preprocess="xml-stripblanks">ui/main-window.ui</file>
+		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
 		<file>org.altlinux.Tailor.metainfo.xml</file>
 	</gresource>
 
@@ -10,5 +11,7 @@
 		<file alias="org.altlinux.Tailor-symbolic.svg">icons/hicolor/symbolic/apps/org.altlinux.Tailor-symbolic.svg</file>
 		<file alias="download-symbolic.svg">icons/hicolor/symbolic/actions/download-symbolic.svg</file>
 		<file alias="drawer-symbolic.svg">icons/hicolor/symbolic/actions/drawer-symbolic.svg</file>
+		<file alias="cd-symbolic.svg">icons/hicolor/symbolic/actions/cd-symbolic.svg</file>
+		<file alias="usb-stick-symbolic.svg">icons/hicolor/symbolic/actions/usb-stick-symbolic.svg</file>
 	</gresource>
 </gresources>
