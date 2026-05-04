@@ -1,6 +1,148 @@
 using Gtk 4.0;
 using Adw 1;
 
-template $TailorMainWindow : Adw.ApplicationWindow {
+template $TailorMainWindow: Adw.ApplicationWindow {
+	default-width: 600;
+	default-height: 800;
+	title: _("Tailor");
 
+	Adw.Breakpoint {
+		condition ("max-width: 600px")
+
+		setters {
+			switcher_bar.reveal: true;
+			header_bar.title-widget: null;
+			cards_box.orientation: vertical;
+			cards_box.homogeneous: false;
+		}
+	}
+
+	content: Adw.ToolbarView {
+		[top]
+		Adw.HeaderBar header_bar {
+			title-widget: Adw.ViewSwitcher {
+				stack: stack;
+				policy: wide;
+			};
+
+			[end]
+			Button {
+				styles [ "flat" ]
+
+				tooltip-text: _("About");
+				icon-name: "help-about-symbolic";
+			}
+		}
+
+		content: Adw.ViewStack stack {
+			Adw.ViewStackPage {
+				name: "write";
+				title: _("Write");
+				icon-name: "settings-symbolic";
+
+				child: Adw.StatusPage {
+					title: _("Welcome to Tailor!");
+					description: _("Select image source to start.");
+					icon-name: "org.altlinux.Tailor-symbolic";
+
+					Adw.Clamp {
+						maximum-size: 1024;
+
+						Box cards_box {
+							homogeneous: true;
+							halign: center;
+							spacing: 24;
+
+							Button {
+								styles [ "card" ]
+
+								tooltip-text: _("Install From File");
+
+								child: Box {
+									orientation: vertical;
+									margin-top: 24;
+									margin-bottom: 24;
+									margin-start: 24;
+									margin-end: 24;
+									spacing: 6;
+
+									Image {
+										pixel-size: 128;
+										icon-name: "drawer-symbolic";
+										accessible-role: presentation;
+									}
+
+									Label {
+										styles [ "title-4" ]
+
+										label: _("Install From a File");
+									}
+
+									Label {
+										styles [ "dim-label" ]
+
+										wrap: true;
+										justify: center;
+										label: _("Load an .iso image from your device");
+									}
+								};
+							}
+
+							Button {
+								styles [ "card" ]
+
+								tooltip-text: _("Download and Write");
+
+								child: Box {
+									orientation: vertical;
+									margin-top: 24;
+									margin-bottom: 24;
+									margin-start: 24;
+									margin-end: 24;
+									spacing: 6;
+
+									Image {
+										pixel-size: 128;
+										icon-name: "download-symbolic";
+										accessible-role: presentation;
+									}
+
+									Label {
+										styles [ "title-4" ]
+
+										label: _("Download and Write");
+									}
+
+									Label {
+										styles [ "dim-label" ]
+
+										wrap: true;
+										justify: center;
+										label: _("Download the required OS image directly in the application");
+									}
+								};
+							}
+						}
+					}
+				};
+			}
+
+			Adw.ViewStackPage {
+				name: "devices";
+				title: _("Devices");
+				icon-name: "settings-symbolic";
+
+				child: Adw.StatusPage {
+					title: _("Here are your devices!");
+					description: _("Some describable text.");
+					icon-name: "image-missing-symbolic";
+				};
+			}
+		};
+
+		[bottom]
+		Adw.ViewSwitcherBar switcher_bar {
+			stack: stack;
+		}
+	};
 }

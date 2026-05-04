@@ -30,6 +30,9 @@ namespace Tailor {
 		}
 
 		public override void activate () {
+			Gtk.IconTheme.get_for_display (Gdk.Display.get_default ())
+				.add_resource_path ("/org/altlinux/Tailor/icons");
+
 			if (main_window != null) {
 				main_window.present ();
 				return;

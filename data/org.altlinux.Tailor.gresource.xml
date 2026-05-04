@@ -2,11 +2,13 @@
 <gresources>
 	<gresource prefix="/org/altlinux/Tailor">
 		<file alias="main-window.ui" preprocess="xml-stripblanks">ui/main-window.ui</file>
-		<file alias="style.css">ui/style.css</file>
 		<file>org.altlinux.Tailor.metainfo.xml</file>
 	</gresource>
+
 	<gresource prefix="/org/altlinux/Tailor/icons">
 		<file alias="org.altlinux.Tailor.svg">icons/hicolor/scalable/apps/org.altlinux.Tailor.svg</file>
 		<file alias="org.altlinux.Tailor-symbolic.svg">icons/hicolor/symbolic/apps/org.altlinux.Tailor-symbolic.svg</file>
+		<file alias="download-symbolic.svg">icons/hicolor/symbolic/actions/download-symbolic.svg</file>
+		<file alias="drawer-symbolic.svg">icons/hicolor/symbolic/actions/drawer-symbolic.svg</file>
 	</gresource>
 </gresources>
