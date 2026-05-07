@@ -17,10 +17,14 @@ template $TailorDeviceCard: Box {
 
 			Image icon {
 				pixel-size: 16;
+				accessibility {
+					label: _("Drive icon");
+				}
 			}
 
 			Label name_label {
 				styles [ "title-4" ]
+				label: _("Drive name");
 			}
 
 			Label size_label {
