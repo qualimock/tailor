@@ -22,11 +22,24 @@ namespace Tailor {
 
 	public class Application : Adw.Application {
 
+		private const ActionEntry[] APP_ENTRIES = {
+			{ "open-app-page", open_app_page },
+			{ "about", about_activated },
+			{ "quit", quit }
+		};
+
 		private MainWindow main_window;
 
 		public Application () {
 			Object (application_id: Tailor.ID,
 			        resource_base_path: "/org/altlinux/Tailor");
+		}
+
+		public override void startup () {
+			base.startup ();
+
+			add_action_entries (APP_ENTRIES, this);
+			set_accels_for_action ("app.quit", { "<Ctrl>Q" });
 		}
 
 		public override void activate () {
@@ -41,6 +54,33 @@ namespace Tailor {
 			main_window = new MainWindow (this);
 
 			main_window.present ();
+		}
+
+		private void open_app_page () {
+			var launcher = new Gtk.UriLauncher ("appstream://org.altlinux.Tailor");
+
+			launcher.launch.begin (null, null, (obj, res) => {
+				try {
+					launcher.launch.end (res);
+				} catch (Error e) {
+					warning ("Failed to open app page: %s", e.message);
+				}
+			});
+		}
+
+		private void about_activated () {
+			if (main_window == null) return;
+
+			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/org.altlinux.Tailor.metainfo.xml", VERSION) {
+				copyright = "© 2026 ALT Linux Team",
+				developers = {
+					"Alexey \"qualimock\" Volkov <qualimock@altlinux.org>",
+				},
+				artists = { "Viktoria \"gingercat\" Zubacheva" },
+				translator_credits = _("translator-credits")
+			};
+
+			dialog.present (main_window);
 		}
 	}
 }
