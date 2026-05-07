@@ -45,10 +45,10 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 					description: _("Select image source to start.");
 					icon-name: "org.altlinux.Tailor-symbolic";
 
-					Adw.Clamp {
+					child: Adw.Clamp {
 						maximum-size: 1024;
 
-						Box cards_box {
+						child: Box cards_box {
 							homogeneous: true;
 							halign: center;
 							spacing: 24;
@@ -123,8 +123,8 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 									}
 								};
 							}
-						}
-					}
+						};
+					};
 				};
 			}
 
@@ -134,14 +134,15 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 				icon-name: "settings-symbolic";
 
 				child: ScrolledWindow {
-					Box devices {
+					child: Box devices {
 						orientation: vertical;
 						margin-top: 12;
 						margin-bottom: 12;
 						margin-start: 12;
 						margin-end: 12;
 						spacing: 12;
-					}
+						visible: false;
+					};
 				};
 			}
 		};
