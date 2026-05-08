@@ -66,10 +66,14 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 									margin-bottom: 24;
 									margin-start: 24;
 									margin-end: 24;
-									spacing: 6;
+									spacing: 12;
 
 									Image {
-										pixel-size: 128;
+										styles [ "dim-label" ]
+
+										margin-bottom: 6;
+
+										pixel-size: 64;
 										icon-name: "drawer-symbolic";
 										accessible-role: presentation;
 									}
@@ -77,7 +81,7 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 									Label {
 										styles [ "title-4" ]
 
-										label: _("Install From a File");
+										label: _("Install From File");
 									}
 
 									Label {
@@ -101,10 +105,14 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 									margin-bottom: 24;
 									margin-start: 24;
 									margin-end: 24;
-									spacing: 6;
+									spacing: 12;
 
 									Image {
-										pixel-size: 128;
+										styles [ "dim-label" ]
+
+										margin-bottom: 6;
+
+										pixel-size: 64;
 										icon-name: "download-symbolic";
 										accessible-role: presentation;
 									}
