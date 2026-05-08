@@ -1,0 +1,24 @@
+name: Lint
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  lint-vala:
+    name: Lint vala files
+    runs-on: alt-sisyphus
+    container:
+      image: altlinux.space/actions/runner/containers:sisyphus
+
+    steps:
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y vala-lint
+
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Lint files
+        run: vala-lint -d src --config vala-lint.conf
