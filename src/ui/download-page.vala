@@ -1,4 +1,4 @@
-/* mainwindow.vala
+/* download-page.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,16 +20,8 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
-	public class MainWindow : Adw.ApplicationWindow {
+	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
+	public class DownloadPage : Adw.NavigationPage {
 
-		static construct {
-			typeof (MainPage).ensure ();
-			typeof (DownloadPage).ensure ();
-		}
-
-		public MainWindow (Adw.Application app) {
-			Object (application: app);
-		}
 	}
 }

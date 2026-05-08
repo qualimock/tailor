@@ -1,0 +1,109 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorDownloadPage : Adw.NavigationPage {
+	title: _("Download Image");
+	tag: "download-page";
+
+	child: Adw.BreakpointBin {
+		width-request: 1;
+		height-request: 1;
+
+		Adw.Breakpoint {
+			condition ("max-width: 599")
+
+			setters {
+				search_box.orientation: vertical;
+			}
+		}
+
+		child: Adw.ToolbarView {
+			[top]
+			Adw.HeaderBar {
+				[end]
+				Button {
+					styles [ "flat" ]
+
+					tooltip-text: _("");
+					icon-name: "open-menu-symbolic";
+				}
+			}
+
+			content: Box {
+				orientation: vertical;
+				hexpand: true;
+
+				Box search_box {
+					orientation: horizontal;
+					homogeneous: true;
+					margin-top: 8;
+					margin-bottom: 12;
+					margin-start: 12;
+					margin-end: 12;
+					spacing: 6;
+
+					Entry search_entry {
+						placeholder-text: _("Search");
+						primary-icon-name: "system-search";
+					}
+					Box combos {
+						spacing: 6;
+						DropDown {
+							hexpand: true;
+						}
+						DropDown {
+							hexpand: true;
+						}
+					}
+				}
+
+				ScrolledWindow {
+					vexpand: true;
+
+					child: Box {
+						orientation: vertical;
+						margin-top: 12;
+						margin-bottom: 12;
+						margin-start: 12;
+						margin-end: 12;
+						spacing: 24;
+
+						Box {
+							orientation: vertical;
+							spacing: 12;
+
+							Label {
+								styles [ "title-4" ]
+								halign: start;
+
+								label: _("Primary OS");
+							}
+
+							ListBox primary_os_list {
+								styles [ "boxed-list" ]
+								hexpand: true;
+							}
+						}
+
+						Box {
+							orientation: vertical;
+							spacing: 12;
+
+							Label {
+								styles [ "title-4" ]
+								halign: start;
+
+								label: _("Other operating systems");
+							}
+
+							ListBox other_os_list {
+								styles [ "boxed-list" ]
+								hexpand: true;
+							}
+						}
+					};
+				}
+			};
+		};
+	};
+}

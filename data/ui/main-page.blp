@@ -98,6 +98,8 @@ template $TailorMainPage : Adw.NavigationPage {
 									styles [ "card" ]
 
 									tooltip-text: _("Download and Write");
+									action-name: "navigation.push";
+									action-target: "'download-page'";
 
 									child: Box {
 										orientation: vertical;
