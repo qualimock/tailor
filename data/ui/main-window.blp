@@ -135,14 +135,24 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 				icon-name: "settings-symbolic";
 
 				child: ScrolledWindow {
-					child: Box devices {
-						orientation: vertical;
-						margin-top: 12;
-						margin-bottom: 12;
-						margin-start: 12;
-						margin-end: 12;
-						spacing: 12;
-						visible: false;
+					child: Box {
+						halign: center;
+
+						Box devices {
+							orientation: vertical;
+							margin-top: 12;
+							margin-bottom: 12;
+							margin-start: 12;
+							margin-end: 12;
+							spacing: 12;
+							visible: false;
+						}
+
+						Adw.StatusPage {
+							icon-name: "drive-removable-media-symbolic";
+							title: _("No Devices Found");
+							visible: bind devices.visible inverted;
+						}
 					};
 				};
 			}
