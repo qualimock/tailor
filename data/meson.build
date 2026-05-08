@@ -33,6 +33,7 @@ endif
 
 subdir('ui')
 
+blueprint_compiler = find_program('blueprint-compiler')
 app_resources = gnome.compile_resources(
 	'app_resources',
 	id + '.gresource.xml',
@@ -42,11 +43,18 @@ app_resources = gnome.compile_resources(
 			'blueprints',
 			input: blueprints,
 			output: '.',
-			command: [ find_program('blueprint-compiler'), 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@' ]
+			command: [ blueprint_compiler, 'batch-compile', '@OUTPUT@', '@CURRENT_SOURCE_DIR@', '@INPUT@' ]
 		),
 		appstream_file,
 	]
 )
+if blueprint_compiler.found()
+	test(
+		'Lint blueprints',
+		blueprint_compiler,
+		args: ['lint', blueprints]
+	)
+endif
 
 install_data(
 	id + '.gschema.xml',
