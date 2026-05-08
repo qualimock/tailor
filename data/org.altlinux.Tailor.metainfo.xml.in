@@ -50,9 +50,9 @@
 	<launchable type="desktop-id">org.altlinux.Tailor.desktop</launchable>
 
 	<url type="homepage">https://qualimock.space/projects/Tailor</url>
-	<url type="bugtracker">https://altlinux.space/qualimock/Tailor/-/issues</url>
+	<url type="bugtracker">https://altlinux.space/qualimock/Tailor/issues</url>
 	<url type="translate">https://altlinux.space/qualimock/Tailor/-/tree/main/po</url>
-	<url type="help">https://altlinux.space/qualimock/Tailor/-/issues</url>
+	<url type="help">https://altlinux.space/qualimock/Tailor/issues</url>
 	<url type="vcs-browser">https://altlinux.space/qualimock/Tailor</url>
 	<url type="contribute">https://altlinux.space/qualimock/Tailor</url>
 	<url type="contact">https://matrix.to/#/@qualimock:alt-gnome.ru</url>
