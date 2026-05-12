@@ -28,9 +28,11 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.Entry search_entry;
 
+		[GtkChild] private unowned Gtk.Box primary_os_box;
 		[GtkChild] private unowned Gtk.Label primary_os_label;
 		[GtkChild] private unowned Gtk.ListBox primary_os_list;
 
+		[GtkChild] private unowned Gtk.Box other_os_box;
 		[GtkChild] private unowned Gtk.ListBox other_os_list;
 
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
@@ -124,6 +126,9 @@ namespace Tailor {
 				else
 					other_os_list.append (row);
 			}
+
+			primary_os_box.visible = primary_os_list.get_row_at_index (0) != null;
+			other_os_box.visible = other_os_list.get_row_at_index (0) != null;
 		}
 
 		private void populate_dropdown (
