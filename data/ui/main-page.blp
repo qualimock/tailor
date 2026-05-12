@@ -58,6 +58,8 @@ template $TailorMainPage : Adw.NavigationPage {
 
 								Button {
 									styles [ "card" ]
+									clicked => $open_select_image_dialog();
+
 									tooltip-text: _("Install From File");
 
 									child: Box {
