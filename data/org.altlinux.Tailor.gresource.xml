@@ -18,5 +18,6 @@
 		<file alias="drawer-symbolic.svg">icons/hicolor/symbolic/actions/drawer-symbolic.svg</file>
 		<file alias="cd-symbolic.svg">icons/hicolor/symbolic/actions/cd-symbolic.svg</file>
 		<file alias="usb-stick-symbolic.svg">icons/hicolor/symbolic/actions/usb-stick-symbolic.svg</file>
+		<file alias="sad-computer-symbolic.svg">icons/hicolor/symbolic/actions/sad-computer-symbolic.svg</file>
 	</gresource>
 </gresources>
