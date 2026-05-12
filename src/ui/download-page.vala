@@ -39,14 +39,13 @@ namespace Tailor {
 
 		private Gee.ArrayList<Osinfo.Os> os_list;
 		private string primary_distro;
-		private Gee.HashMap<string, OsFilter> filters;
+		private string arch_filter;
 
 		construct {
 			var application = (Tailor.Application) GLib.Application.get_default ();
 
 			primary_distro = application.settings.get_string ("primary-os");
 			primary_os_label.label = application.settings.get_string ("primary-os-title");
-			filters = new Gee.HashMap<string, OsFilter> ();
 
 			var future = Dex.thread_spawn ("osinfo-loader", () => {
 				try {
@@ -62,23 +61,8 @@ namespace Tailor {
 				message ("OS database loaded");
 
 				spinner.visible = false;
+				populate_arch_dropdown ();
 				populate_os_list ();
-
-				var filter_name = "Architecture";
-				filters[filter_name] = new OsFilter ();
-				populate_dropdown (
-					arch_dropdown,
-					OsinfoLoader.get_arch_list (os_list),
-					_(filter_name)
-				);
-
-				filter_name = "Distribution";
-				filters[filter_name] = new OsFilter ();
-				populate_dropdown (
-					distro_dropdown,
-					OsinfoLoader.get_distro_list (os_list),
-					_(filter_name)
-				);
 
 				return new Dex.Future.for_boolean (true);
 			});
@@ -108,13 +92,25 @@ namespace Tailor {
 			return a || b;
 		}
 
+		private bool os_has_arch (Osinfo.Os os, string? arch) {
+			if (arch == null) return true;
+
+			foreach (var entity in os.get_media_list ().get_elements ()) {
+				var a = ((Osinfo.Media) entity).get_architecture ();
+
+				if (a == arch || a == "all") return true;
+			}
+
+			return false;
+		}
+
 		private void populate_os_list () {
 			primary_os_list.remove_all ();
 			other_os_list.remove_all ();
 
-			Gee.ArrayList<Osinfo.Os> filtered = os_list;
-			foreach (var filter in filters.values)
-				filtered = filter.filter (filtered);
+			var filtered = new Gee.ArrayList<Osinfo.Os> ();
+			foreach (var os in os_list)
+				if (os_has_arch (os, arch_filter)) filtered.add (os);
 
 			foreach (var os in filtered) {
 				var row = new Adw.ActionRow ();
@@ -131,25 +127,30 @@ namespace Tailor {
 			other_os_box.visible = other_os_list.get_row_at_index (0) != null;
 		}
 
-		private void populate_dropdown (
-			Gtk.DropDown widget,
-			Gee.TreeSet<string> items,
-			string title
-		) {
-			var string_list = new Gtk.StringList (null);
-			string_list.append (title);
-			foreach (var item in items)
-				string_list.append (item);
+		private void populate_arch_dropdown () {
+			var model = new Gtk.StringList (null);
+			var arches = OsinfoLoader.get_arch_list (os_list);
 
-			widget.model = string_list;
-			widget.notify["selected"].connect (() => {
-				var index = widget.selected;
-				if (index == 0) {
-					filters[title] = new OsFilter ();
-				} else {
-					filters[title].title = title;
-					filters[title].filter_str = items.to_array ()[index - 1];
+			foreach (var arch in arches)
+				model.append (arch);
+
+			arch_dropdown.model = model;
+
+			uint default_index = 0;
+			var arr = arches.to_array ();
+			for (uint i = 0; i < arr.length; i++) {
+				if (arr[i] == Posix.utsname ().machine) {
+					default_index = i;
+					break;
 				}
+			}
+
+			arch_filter = arr.length > 0 ? arr[default_index] : null;
+			arch_dropdown.selected = default_index;
+
+			arch_dropdown.notify["selected"].connect (() => {
+				var index = arch_dropdown.selected;
+				arch_filter = arches.to_array ()[index];
 				populate_os_list ();
 			});
 		}

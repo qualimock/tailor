@@ -2,7 +2,6 @@ app_sources = files(
 	'main.vala',
 	'application.vala',
 	'osinfo-loader.vala',
-	'os-filter.vala'
 ) + configure_file(
 	input: 'build.vala.in',
 	output: 'build.vala',
@@ -22,5 +21,6 @@ executable(
 	basename,
 	sources: app_sources,
 	dependencies: app_dependencies,
+	vala_args: ['--pkg=posix'],
 	install: true
 )

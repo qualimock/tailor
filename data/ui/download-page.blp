@@ -60,26 +60,20 @@ template $TailorDownloadPage : Adw.NavigationPage {
 					) as <bool>;
 
 					Box search_box {
+						styles [ "linked" ]
+
 						orientation: horizontal;
-						homogeneous: true;
 						margin-top: 8;
 						margin-bottom: 12;
 						margin-start: 12;
 						margin-end: 12;
-						spacing: 6;
 
 						Entry search_entry {
 							placeholder-text: _("Search");
 							primary-icon-name: "system-search";
+							hexpand: true;
 						}
-						Box combos {
-							spacing: 6;
-							DropDown arch_dropdown {
-								hexpand: true;
-							}
-							DropDown distro_dropdown {
-								hexpand: true;
-							}
+						DropDown arch_dropdown {
 						}
 					}
 
