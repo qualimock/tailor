@@ -30,78 +30,105 @@ template $TailorDownloadPage : Adw.NavigationPage {
 			}
 
 			content: Box {
-				orientation: vertical;
-				hexpand: true;
 
-				Box search_box {
-					orientation: horizontal;
-					homogeneous: true;
-					margin-top: 8;
-					margin-bottom: 12;
-					margin-start: 12;
-					margin-end: 12;
-					spacing: 6;
+				Adw.StatusPage spinner {
+					hexpand: true;
 
-					Entry search_entry {
-						placeholder-text: _("Search");
-						primary-icon-name: "system-search";
-					}
-					Box combos {
-						spacing: 6;
-						DropDown {
-							hexpand: true;
-						}
-						DropDown {
-							hexpand: true;
-						}
-					}
+					child: Adw.Spinner {
+						height-request: 64;
+						width-request: 64;
+					};
+
+					title: _("Loading");
+					description: _("Loading OS database…");
+
+					visible: bind download_error.visible inverted;
 				}
 
-				ScrolledWindow {
-					vexpand: true;
+				Adw.StatusPage download_error {
+					icon-name: "sad-computer-symbolic";
+					title: _("Loading Failed");
+					description: _("OS database failed to load");
+					visible: false;
+				}
 
-					child: Box {
-						orientation: vertical;
-						margin-top: 12;
+				Box {
+					orientation: vertical;
+					hexpand: true;
+					visible: bind $logical_not(
+						$logical_or(download_error.visible, spinner.visible) as <bool>
+					) as <bool>;
+
+					Box search_box {
+						orientation: horizontal;
+						homogeneous: true;
+						margin-top: 8;
 						margin-bottom: 12;
 						margin-start: 12;
 						margin-end: 12;
-						spacing: 24;
+						spacing: 6;
 
-						Box {
-							orientation: vertical;
-							spacing: 12;
-
-							Label {
-								styles [ "title-4" ]
-								halign: start;
-
-								label: _("Primary OS");
+						Entry search_entry {
+							placeholder-text: _("Search");
+							primary-icon-name: "system-search";
+						}
+						Box combos {
+							spacing: 6;
+							DropDown arch_dropdown {
+								hexpand: true;
 							}
-
-							ListBox primary_os_list {
-								styles [ "boxed-list" ]
+							DropDown distro_dropdown {
 								hexpand: true;
 							}
 						}
+					}
 
-						Box {
+					ScrolledWindow {
+						vexpand: true;
+
+						child: Box {
 							orientation: vertical;
-							spacing: 12;
+							margin-top: 12;
+							margin-bottom: 12;
+							margin-start: 12;
+							margin-end: 12;
+							spacing: 24;
 
-							Label {
-								styles [ "title-4" ]
-								halign: start;
+							Box {
+								orientation: vertical;
+								spacing: 12;
 
-								label: _("Other operating systems");
+								Label {
+									styles [ "title-4" ]
+									halign: start;
+
+									label: _("Primary OS");
+								}
+
+								ListBox primary_os_list {
+									styles [ "boxed-list" ]
+									hexpand: true;
+								}
 							}
 
-							ListBox other_os_list {
-								styles [ "boxed-list" ]
-								hexpand: true;
+							Box {
+								orientation: vertical;
+								spacing: 12;
+
+								Label {
+									styles [ "title-4" ]
+									halign: start;
+
+									label: _("Other operating systems");
+								}
+
+								ListBox other_os_list {
+									styles [ "boxed-list" ]
+									hexpand: true;
+								}
 							}
-						}
-					};
+						};
+					}
 				}
 			};
 		};

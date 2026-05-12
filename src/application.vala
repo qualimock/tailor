@@ -38,6 +38,8 @@ namespace Tailor {
 		public override void startup () {
 			base.startup ();
 
+			Dex.init ();
+
 			add_action_entries (APP_ENTRIES, this);
 			set_accels_for_action ("app.quit", { "<Ctrl>Q" });
 		}
