@@ -48,11 +48,32 @@ app_resources = gnome.compile_resources(
 		appstream_file,
 	]
 )
+
+blueprint_lint_rules = [
+  'adjustment_prop_order',
+  'avoid_all_caps',
+  'gtk_switch_state',
+  'missing_descriptive_text',
+  'missing_user_facing_text',
+  'number_of_children',
+  'translate_display_string',
+  'unused_widget',
+  'use_adw_bin',
+  'use_styles',
+  'use_unicode',
+  'wrong_parent',
+  'visible_true',
+]
+
 if blueprint_compiler.found()
 	test(
 		'Lint blueprints',
 		blueprint_compiler,
-		args: ['lint', blueprints]
+		args: [
+			'lint',
+			'--rules=' + ','.join(blueprint_lint_rules),
+			blueprints
+		]
 	)
 endif
 
