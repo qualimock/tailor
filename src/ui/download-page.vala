@@ -32,6 +32,8 @@ namespace Tailor {
 		[GtkChild]
 		private unowned Gtk.ListBox primary_os_list;
 		[GtkChild]
+		private unowned Gtk.Label primary_os_label;
+		[GtkChild]
 		private unowned Gtk.ListBox other_os_list;
 		[GtkChild]
 		private unowned Gtk.DropDown arch_dropdown;
@@ -43,7 +45,10 @@ namespace Tailor {
 		private Gee.HashMap<string, OsFilter> filters;
 
 		construct {
-			primary_distro = "alt";
+			var application = (Tailor.Application) GLib.Application.get_default ();
+
+			primary_distro = application.settings.get_string ("primary-os");
+			primary_os_label.label = application.settings.get_string ("primary-os-title");
 			filters = new Gee.HashMap<string, OsFilter> ();
 
 			var future = Dex.thread_spawn ("osinfo-loader", () => {

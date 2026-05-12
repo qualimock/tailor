@@ -30,6 +30,8 @@ namespace Tailor {
 
 		private MainWindow main_window;
 
+		public Settings settings { get; private set; }
+
 		public Application () {
 			Object (application_id: Tailor.ID,
 			        resource_base_path: "/org/altlinux/Tailor");
@@ -38,6 +40,7 @@ namespace Tailor {
 		public override void startup () {
 			base.startup ();
 
+			settings = new Settings (Tailor.ID);
 			Dex.init ();
 
 			add_action_entries (APP_ENTRIES, this);
