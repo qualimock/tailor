@@ -23,22 +23,17 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
-		[GtkChild]
-		private unowned Adw.StatusPage spinner;
-		[GtkChild]
-		private unowned Adw.StatusPage download_error;
-		[GtkChild]
-		private unowned Gtk.Entry search_entry;
-		[GtkChild]
-		private unowned Gtk.ListBox primary_os_list;
-		[GtkChild]
-		private unowned Gtk.Label primary_os_label;
-		[GtkChild]
-		private unowned Gtk.ListBox other_os_list;
-		[GtkChild]
-		private unowned Gtk.DropDown arch_dropdown;
-		[GtkChild]
-		private unowned Gtk.DropDown distro_dropdown;
+		[GtkChild] private unowned Adw.StatusPage spinner;
+		[GtkChild] private unowned Adw.StatusPage download_error;
+
+		[GtkChild] private unowned Gtk.Entry search_entry;
+
+		[GtkChild] private unowned Gtk.Label primary_os_label;
+		[GtkChild] private unowned Gtk.ListBox primary_os_list;
+
+		[GtkChild] private unowned Gtk.ListBox other_os_list;
+
+		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
 		private Gee.ArrayList<Osinfo.Os> os_list;
 		private string primary_distro;
