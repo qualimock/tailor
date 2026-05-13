@@ -1,0 +1,49 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorHomePage : Adw.NavigationPage {
+	title: _("Home page");
+
+	child: Adw.ToolbarView {
+		[top]
+		Adw.HeaderBar header_bar {
+			title-widget: Adw.ViewSwitcher {
+				stack: stack;
+				policy: wide;
+			};
+
+			[end]
+			Button {
+				styles [ "flat" ]
+
+				tooltip-text: _("About");
+				icon-name: "help-about-symbolic";
+				action-name: "app.about";
+			}
+		}
+
+		content: Adw.ViewStack stack {
+			Adw.ViewStackPage {
+				name: "write";
+				title: _("Write");
+				icon-name: "settings-symbolic";
+
+				child: $TailorWritePage write_page {};
+			}
+
+			Adw.ViewStackPage {
+				name: "devices";
+				title: _("Devices");
+				icon-name: "settings-symbolic";
+
+				child: $TailorDevicesPage devices_page {};
+			}
+		};
+
+		[bottom]
+		Adw.ViewSwitcherBar switcher_bar {
+			stack: stack;
+		}
+	};
+}
+

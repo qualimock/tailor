@@ -1,4 +1,4 @@
-/* main-page.vala
+/* welcome-page.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,8 +20,8 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/main-page.ui")]
-	public class MainPage : Adw.NavigationPage {
+	[GtkTemplate (ui = "/org/altlinux/Tailor/write-page.ui")]
+	public class WritePage : Adw.Bin {
 
 		[GtkCallback]
 		private void open_select_image_dialog () {

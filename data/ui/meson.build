@@ -1,6 +1,8 @@
 blueprints = files(
 	'main-window.blp',
-	'main-page.blp',
+	'home-page.blp',
+	'write-page.blp',
+	'devices-page.blp',
 	'download-page.blp',
 	'device-card.blp',
 )

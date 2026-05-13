@@ -1,0 +1,101 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorWritePage : Adw.Bin {
+	child: Adw.StatusPage {
+		title: _("Welcome to Tailor!");
+		description: _("Select image source to start.");
+		icon-name: "org.altlinux.Tailor-symbolic";
+
+		child: Adw.Clamp {
+			maximum-size: 1024;
+
+			child: Box cards_box {
+				homogeneous: true;
+				halign: center;
+				spacing: 24;
+
+				Button {
+					styles [ "card" ]
+					clicked => $open_select_image_dialog();
+
+					tooltip-text: _("Install From File");
+
+					child: Box {
+						orientation: vertical;
+						margin-top: 24;
+						margin-bottom: 24;
+						margin-start: 24;
+						margin-end: 24;
+						spacing: 12;
+
+						Image {
+							styles [ "dim-label" ]
+
+							margin-bottom: 6;
+
+							pixel-size: 64;
+							icon-name: "drawer-symbolic";
+							accessible-role: presentation;
+						}
+
+						Label {
+							styles [ "title-4" ]
+
+							label: _("Install From File");
+						}
+
+						Label {
+							styles [ "dim-label" ]
+
+							wrap: true;
+							justify: center;
+							label: _("Load an .iso image from your device");
+						}
+					};
+				}
+
+				Button {
+					styles [ "card" ]
+
+					tooltip-text: _("Download and Write");
+					action-name: "navigation.push";
+					action-target: "'download-page'";
+
+					child: Box {
+						orientation: vertical;
+						margin-top: 24;
+						margin-bottom: 24;
+						margin-start: 24;
+						margin-end: 24;
+						spacing: 12;
+
+						Image {
+							styles [ "dim-label" ]
+
+							margin-bottom: 6;
+
+							pixel-size: 64;
+							icon-name: "download-symbolic";
+							accessible-role: presentation;
+						}
+
+						Label {
+							styles [ "title-4" ]
+
+							label: _("Download and Write");
+						}
+
+						Label {
+							styles [ "dim-label" ]
+
+							wrap: true;
+							justify: center;
+							label: _("Download the required OS image directly in the application");
+						}
+					};
+				}
+			};
+		};
+	};
+}
