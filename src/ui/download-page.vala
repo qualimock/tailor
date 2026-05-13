@@ -127,25 +127,11 @@ namespace Tailor {
 			update_box_visibility ();
 		}
 
-		private bool os_has_arch (Osinfo.Os os, string? arch) {
-			if (arch == null) return true;
-
-			foreach (var entity in os.get_media_list ().get_elements ()) {
-				var a = ((Osinfo.Media) entity).get_architecture ();
-
-				if (a == arch || a == "all") return true;
-			}
-
-			return false;
-		}
-
 		private void populate_os_list () {
 			primary_os_list.remove_all ();
 			other_os_list.remove_all ();
 
-			var filtered = new Gee.ArrayList<Osinfo.Os> ();
-			foreach (var os in os_list)
-				if (os_has_arch (os, arch_filter)) filtered.add (os);
+			var filtered = OsinfoLoader.filter_by_arch (os_list, arch_filter);
 
 			foreach (var os in filtered) {
 				var row = new Adw.ActionRow ();

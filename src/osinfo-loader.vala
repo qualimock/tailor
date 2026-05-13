@@ -81,5 +81,26 @@ namespace Tailor {
 			distros_list.add_all (distros);
 			return distros_list;
 		}
+
+		private static bool os_has_arch (Osinfo.Os os, string? arch) {
+			if (arch == null) return true;
+
+			foreach (var entity in os.get_media_list ().get_elements ()) {
+				var a = ((Osinfo.Media) entity).get_architecture ();
+
+				if (a == arch || a == "all") return true;
+			}
+
+			return false;
+		}
+
+		public static Gee.ArrayList<Osinfo.Os> filter_by_arch (Gee.ArrayList<Osinfo.Os> list, string? filter) {
+			var filtered = new Gee.ArrayList<Osinfo.Os> ();
+
+			foreach (var os in list)
+				if (os_has_arch (os, filter)) filtered.add (os);
+
+			return filtered;
+		}
 	}
 }
