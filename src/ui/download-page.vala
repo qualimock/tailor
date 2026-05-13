@@ -49,41 +49,26 @@ namespace Tailor {
 			primary_distro = application.settings.get_string ("primary-os");
 			primary_os_label.label = application.settings.get_string ("primary-os-title");
 
-			var future = Dex.thread_spawn ("osinfo-loader", () => {
-				try {
-					var db = OsinfoLoader.load_db ();
-					os_list = OsinfoLoader.get_os_list (db);
-					return new Dex.Future.for_boolean (true);
-				} catch (Error e) {
-					return new Dex.Future.for_error (e);
-				}
-			});
-
-			var chain = new Dex.Future.then (future, (f) => {
-				init ();
-				return new Dex.Future.for_boolean (true);
-			});
-
-			chain = new Dex.Future.catch (chain, (f) => {
-				try {
-					f.get_value ();
-				} catch (Error e) {
-					warning ("Failed to load OS database: %s", e.message);
-				}
-
-				spinner.visible = false;
-				download_error.visible = true;
-				return new Dex.Future.for_boolean (false);
-			});
-
+			var future = Dex.thread_spawn ("osinfo-loader", load_db);
+			var chain = new Dex.Future.then (future, init);
+			chain = new Dex.Future.catch (chain, load_error);
 			chain.disown ();
 		}
 
 		[GtkCallback] private bool logical_not (bool value) { return !value; }
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-		private void init () {
+		private Dex.Future load_db () {
+			try {
+				var db = OsinfoLoader.load_db ();
+				os_list = OsinfoLoader.get_os_list (db);
+				return new Dex.Future.for_boolean (true);
+			} catch (Error e) {
+				return new Dex.Future.for_error (e);
+			}
+		}
 
+		private Dex.Future init () {
 			spinner.visible = false;
 
 			populate_arch_dropdown ();
@@ -93,6 +78,20 @@ namespace Tailor {
 			other_os_list.set_filter_func (search_filter_cb);
 
 			search_entry.changed.connect (on_search_changed);
+
+			return new Dex.Future.for_boolean (true);
+		}
+
+		private Dex.Future load_error (Dex.Future future) {
+			try {
+				future.get_value ();
+			} catch (Error e) {
+				warning ("Failed to load OS database: %s", e.message);
+			}
+
+			spinner.visible = false;
+			download_error.visible = true;
+			return new Dex.Future.for_boolean (false);
 		}
 
 		private bool search_filter_cb (Gtk.ListBoxRow row) {
