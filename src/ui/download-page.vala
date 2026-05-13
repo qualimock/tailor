@@ -164,8 +164,13 @@ namespace Tailor {
 
 			if (arches.contains (host_arch))
 				arch_filter = arches.get (arches.index_of (host_arch));
-			else
-				critical ("Cannot find host arch: %s", host_arch);
+			else {
+				critical (
+					"Cannot find host arch: %s. Defaulting to %s",
+					host_arch, arches[0]
+				);
+				arch_filter = arches[0];
+			}
 
 			arch_dropdown.selected = arches.index_of (arch_filter);
 
