@@ -1,15 +1,23 @@
 app_sources = files(
 	'main.vala',
 	'application.vala',
+
+	'ui' / 'main-window.vala',
+	'ui' / 'home-page.vala',
+	'ui' / 'write-page.vala',
+	'ui' / 'devices-page.vala',
+	'ui' / 'download-page.vala',
+	'ui' / 'device-card.vala',
+
 	'repository' / 'osinfo-repository.vala',
+
 	'service' / 'osinfo-service.vala',
+
 ) + configure_file(
 	input: 'build.vala.in',
 	output: 'build.vala',
 	configuration: config
 ) + app_resources
-
-subdir('ui')
 
 app_dependencies = [
 	dependency('libadwaita-1'),
