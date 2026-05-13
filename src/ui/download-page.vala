@@ -105,8 +105,7 @@ namespace Tailor {
 		private bool list_has_visible_rows (Gtk.ListBox list) {
 			var row = list.get_row_at_index (0);
 
-			int i = 0;
-			while (row != null) {
+			for (int i = 0; row != null; ) {
 				if (row.get_child_visible ()) return true;
 				row = list.get_row_at_index (++i);
 			}
