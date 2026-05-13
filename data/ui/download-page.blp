@@ -77,8 +77,23 @@ template $TailorDownloadPage : Adw.NavigationPage {
 						}
 					}
 
-					ScrolledWindow {
+					Adw.StatusPage search_error {
+						valign: center;
 						vexpand: true;
+
+						icon-name: "edit-find-symbolic";
+						title: _("No results");
+						description: _("Try to search for something else");
+
+						visible: bind os_window.visible inverted;
+					}
+
+					ScrolledWindow os_window {
+						vexpand: true;
+						visible: bind $logical_or(
+							primary_os_box.visible,
+							other_os_box.visible
+						) as <bool>;
 
 						child: Box {
 							orientation: vertical;
