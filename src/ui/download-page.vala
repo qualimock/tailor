@@ -38,9 +38,9 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
 		private Gee.ArrayList<Osinfo.Os> os_list;
-		private string primary_distro;
-		private string arch_filter;
 
+		private string primary_distro = "";
+		private string? arch_filter = null;
 
 		construct {
 			var future = Dex.thread_spawn ("osinfo-loader", () => {
