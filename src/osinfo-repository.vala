@@ -1,4 +1,4 @@
-/* osinfo-loader.vala
+/* osinfo-repository.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
