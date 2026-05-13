@@ -170,17 +170,14 @@ namespace Tailor {
 
 			arch_dropdown.model = model;
 
-			uint default_index = 0;
-			var arr = arches.to_array ();
-			for (uint i = 0; i < arr.length; i++) {
-				if (arr[i] == Posix.utsname ().machine) {
-					default_index = i;
-					break;
-				}
-			}
+			string host_arch = Posix.utsname ().machine;
 
-			arch_filter = arr.length > 0 ? arr[default_index] : null;
-			arch_dropdown.selected = default_index;
+			if (arches.contains (host_arch))
+				arch_filter = arches.get (arches.index_of (host_arch));
+			else
+				critical ("Cannot find host arch: %s", host_arch);
+
+			arch_dropdown.selected = arches.index_of (arch_filter);
 
 			arch_dropdown.notify["selected"].connect (() => {
 				var index = arch_dropdown.selected;

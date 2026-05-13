@@ -54,8 +54,9 @@ namespace Tailor {
 			return result;
 		}
 
-		public static Gee.TreeSet<string> get_arch_list (Gee.ArrayList<Osinfo.Os> os_list) {
+		public static Gee.ArrayList<string> get_arch_list (Gee.ArrayList<Osinfo.Os> os_list) {
 			var arches = new Gee.TreeSet<string> ();
+			var arches_list = new Gee.ArrayList<string> ();
 
 			foreach (var os in os_list)
 				foreach (var entity in os.get_media_list ().get_elements ()) {
@@ -64,18 +65,21 @@ namespace Tailor {
 					if (arch != null && arch != "all") arches.add (arch);
 				}
 
-			return arches;
+			arches_list.add_all (arches);
+			return arches_list;
 		}
 
-		public static Gee.TreeSet<string> get_distro_list (Gee.ArrayList<Osinfo.Os> os_list) {
+		public static Gee.ArrayList<string> get_distro_list (Gee.ArrayList<Osinfo.Os> os_list) {
 			var distros = new Gee.TreeSet<string> ();
+			var distros_list = new Gee.ArrayList<string> ();
 
 			foreach (var os in os_list) {
 				var distro = os.get_distro ();
 				if (distro != null) distros.add (distro);
 			}
 
-			return distros;
+			distros_list.add_all (distros);
+			return distros_list;
 		}
 	}
 }
