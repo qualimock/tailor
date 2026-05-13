@@ -73,15 +73,8 @@ namespace Tailor {
 			chain.disown ();
 		}
 
-		[GtkCallback]
-		private bool logical_not (bool value) {
-			return !value;
-		}
-
-		[GtkCallback]
-		private bool logical_or (bool a, bool b) {
-			return a || b;
-		}
+		[GtkCallback] private bool logical_not (bool value) { return !value; }
+		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
 		private void init () {
 			var application = (Tailor.Application) GLib.Application.get_default ();
