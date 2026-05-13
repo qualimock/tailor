@@ -127,13 +127,8 @@ namespace Tailor {
 			update_box_visibility ();
 		}
 
-		private void populate_os_list () {
-			primary_os_list.remove_all ();
-			other_os_list.remove_all ();
-
-			var filtered = OsinfoLoader.filter_by_arch (os_list, arch_filter);
-
-			foreach (var os in filtered) {
+		private void build_os_listboxes (Gee.ArrayList<Osinfo.Os> oses) {
+			foreach (var os in oses) {
 				var row = new Adw.ActionRow ();
 				row.title = os.get_name () ?? os.get_short_id ();
 				row.subtitle = os.get_vendor () ?? "";
@@ -143,6 +138,14 @@ namespace Tailor {
 				else
 					other_os_list.append (row);
 			}
+		}
+
+		private void populate_os_list () {
+			primary_os_list.remove_all ();
+			other_os_list.remove_all ();
+
+			var filtered = OsinfoLoader.filter_by_arch (os_list, arch_filter);
+			build_os_listboxes (filtered);
 
 			update_box_visibility ();
 		}
