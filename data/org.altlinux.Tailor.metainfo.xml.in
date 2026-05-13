@@ -13,7 +13,7 @@
 
 	<description>
 		<p>
-			TODO
+			TODO: description
 		</p>
 	</description>
 
@@ -34,7 +34,7 @@
 	</recommends>
 
 	<screenshots>
-		<!-- TODO -->
+		<!-- TODO: screenshots -->
 		<screenshot type="default">
 			<image>todo</image>
 			<caption>todo</caption>
@@ -42,7 +42,7 @@
 	</screenshots>
 
 	<branding>
-		<!-- TODO -->
+		<!-- TODO: branding -->
 		<color type="primary" scheme_preference="light">#ffb63f</color>
 		<color type="primary" scheme_preference="dark">#c54400</color>
 	</branding>
@@ -62,7 +62,7 @@
 	<content_rating type="oars-1.1" />
 
 	<releases>
-		<!-- TODO: No releases yet :) -->
+		<!-- TODO: releases -->
 	</releases>
 </component>
 
