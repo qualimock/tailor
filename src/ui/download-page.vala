@@ -44,6 +44,11 @@ namespace Tailor {
 		private string search_query = "";
 
 		construct {
+			var application = (Tailor.Application) GLib.Application.get_default ();
+
+			primary_distro = application.settings.get_string ("primary-os");
+			primary_os_label.label = application.settings.get_string ("primary-os-title");
+
 			var future = Dex.thread_spawn ("osinfo-loader", () => {
 				try {
 					var db = OsinfoLoader.load_db ();
@@ -78,10 +83,6 @@ namespace Tailor {
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
 		private void init () {
-			var application = (Tailor.Application) GLib.Application.get_default ();
-
-			primary_distro = application.settings.get_string ("primary-os");
-			primary_os_label.label = application.settings.get_string ("primary-os-title");
 
 			spinner.visible = false;
 
