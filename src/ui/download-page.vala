@@ -41,6 +41,7 @@ namespace Tailor {
 
 		private string primary_distro = "";
 		private string? arch_filter = null;
+		private string search_query = "";
 
 		construct {
 			var future = Dex.thread_spawn ("osinfo-loader", () => {
@@ -86,6 +87,29 @@ namespace Tailor {
 
 			populate_arch_dropdown ();
 			populate_os_list ();
+
+			primary_os_list.set_filter_func (search_filter_cb);
+			other_os_list.set_filter_func (search_filter_cb);
+
+			search_entry.changed.connect (on_search_changed);
+		}
+
+		private bool search_filter_cb (Gtk.ListBoxRow row) {
+			var row_title = ((Adw.ActionRow) row).title.down ();
+			if (row_title.contains (search_query.down ()))
+				return true;
+
+			return false;
+		}
+
+		private void on_search_changed () {
+			search_query = search_entry.text;
+
+			primary_os_list.invalidate_filter ();
+			other_os_list.invalidate_filter ();
+
+           primary_os_box.visible = primary_os_list.get_row_at_index (0) != null;
+           other_os_box.visible = other_os_list.get_row_at_index (0) != null;
 		}
 
 		private bool os_has_arch (Osinfo.Os os, string? arch) {
