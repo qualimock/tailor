@@ -60,8 +60,7 @@ namespace Tailor {
 
 		private Dex.Future load_db () {
 			try {
-				var db = OsinfoRepository.load_db ();
-				os_list = OsinfoRepository.get_os_list (db);
+				os_list = OsinfoService.load_os_list ();
 				return new Dex.Future.for_boolean (true);
 			} catch (Error e) {
 				return new Dex.Future.for_error (e);
@@ -141,12 +140,12 @@ namespace Tailor {
 			primary_os_list.remove_all ();
 			other_os_list.remove_all ();
 
-			var filtered = OsinfoRepository.filter_by_arch (os_list, arch_filter);
+			var filtered = OsinfoService.filter_by_arch (os_list, arch_filter);
 
 			Gee.ArrayList<Osinfo.Os> primary;
 			Gee.ArrayList<Osinfo.Os> other;
-			OsinfoRepository.split_by_distro (filtered, primary_distro,
-			                                  out primary, out other);
+			OsinfoService.split_by_distro (filtered, primary_distro,
+			                               out primary, out other);
 
 			build_os_listbox (primary_os_list, primary);
 			build_os_listbox (other_os_list, other);
@@ -156,7 +155,7 @@ namespace Tailor {
 
 		private void populate_arch_dropdown () {
 			var model = new Gtk.StringList (null);
-			var arches = OsinfoRepository.get_arch_list (os_list);
+			var arches = OsinfoService.get_arch_list (os_list);
 
 			foreach (var arch in arches)
 				model.append (arch);

@@ -1,7 +1,8 @@
 app_sources = files(
 	'main.vala',
 	'application.vala',
-	'osinfo-repository.vala',
+	'repository' / 'osinfo-repository.vala',
+	'service' / 'osinfo-service.vala',
 ) + configure_file(
 	input: 'build.vala.in',
 	output: 'build.vala',

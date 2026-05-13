@@ -1,4 +1,4 @@
-/* osinfo-repository.vala
+/* osinfo-service.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,16 +20,13 @@
 
 namespace Tailor {
 
-	public class OsinfoRepository {
+	public class OsinfoService {
 
-		public static Osinfo.Db load_db () throws Error {
-			var loader = new Osinfo.Loader ();
-			loader.process_default_path ();
-
-			return loader.get_db ();
+		public static Gee.ArrayList<Osinfo.Os> load_os_list () throws Error {
+			return get_os_list (OsinfoRepository.load_db ());
 		}
 
-		public static Gee.ArrayList<Osinfo.Os> get_os_list (Osinfo.Db db) {
+		private static Gee.ArrayList<Osinfo.Os> get_os_list (Osinfo.Db db) {
 			var elements = db.get_os_list ().get_elements ();
 
 			var superseded = new Gee.HashSet<string> ();
@@ -82,18 +79,6 @@ namespace Tailor {
 			return distros_list;
 		}
 
-		private static bool os_has_arch (Osinfo.Os os, string? arch) {
-			if (arch == null) return true;
-
-			foreach (var entity in os.get_media_list ().get_elements ()) {
-				var a = ((Osinfo.Media) entity).get_architecture ();
-
-				if (a == arch || a == "all") return true;
-			}
-
-			return false;
-		}
-
 		public static Gee.ArrayList<Osinfo.Os> filter_by_arch (Gee.ArrayList<Osinfo.Os> list, string? filter) {
 			var filtered = new Gee.ArrayList<Osinfo.Os> ();
 
@@ -118,6 +103,19 @@ namespace Tailor {
 				else
 					other.add (os);
 			}
+		}
+
+		// TODO: rename: os_matches_arch
+		private static bool os_has_arch (Osinfo.Os os, string? arch) {
+			if (arch == null) return true;
+
+			foreach (var entity in os.get_media_list ().get_elements ()) {
+				var a = ((Osinfo.Media) entity).get_architecture ();
+
+				if (a == arch || a == "all") return true;
+			}
+
+			return false;
 		}
 	}
 }
