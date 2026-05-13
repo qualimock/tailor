@@ -102,5 +102,22 @@ namespace Tailor {
 
 			return filtered;
 		}
+
+		public static void split_by_distro (
+			Gee.ArrayList<Osinfo.Os> list,
+			string distro,
+			out Gee.ArrayList<Osinfo.Os> primary,
+			out Gee.ArrayList<Osinfo.Os> other
+		) {
+			primary = new Gee.ArrayList<Osinfo.Os> ();
+			other = new Gee.ArrayList<Osinfo.Os> ();
+
+			foreach (var os in list) {
+				if (os.get_distro () == distro)
+					primary.add (os);
+				else
+					other.add (os);
+			}
+		}
 	}
 }

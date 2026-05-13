@@ -127,16 +127,13 @@ namespace Tailor {
 			update_box_visibility ();
 		}
 
-		private void build_os_listboxes (Gee.ArrayList<Osinfo.Os> oses) {
+		private void build_os_listbox (Gtk.ListBox list, Gee.ArrayList<Osinfo.Os> oses) {
 			foreach (var os in oses) {
 				var row = new Adw.ActionRow ();
 				row.title = os.get_name () ?? os.get_short_id ();
 				row.subtitle = os.get_vendor () ?? "";
 
-				if (os.get_distro () == primary_distro)
-					primary_os_list.append (row);
-				else
-					other_os_list.append (row);
+				list.append (row);
 			}
 		}
 
@@ -145,7 +142,14 @@ namespace Tailor {
 			other_os_list.remove_all ();
 
 			var filtered = OsinfoLoader.filter_by_arch (os_list, arch_filter);
-			build_os_listboxes (filtered);
+
+			Gee.ArrayList<Osinfo.Os> primary;
+			Gee.ArrayList<Osinfo.Os> other;
+			OsinfoLoader.split_by_distro (filtered, primary_distro,
+			                                  out primary, out other);
+
+			build_os_listbox (primary_os_list, primary);
+			build_os_listbox (other_os_list, other);
 
 			update_box_visibility ();
 		}
