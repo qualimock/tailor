@@ -23,13 +23,17 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
 	public class MainWindow : Adw.ApplicationWindow {
 
+		[GtkChild] private unowned DownloadPage download_page;
+
 		static construct {
 			typeof (HomePage).ensure ();
 			typeof (DownloadPage).ensure ();
 		}
 
-		public MainWindow (Adw.Application app) {
+		public MainWindow (Tailor.Application app) {
 			Object (application: app);
+			download_page.primary_distro = app.settings.get_string ("primary-os");
+			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
 		}
 	}
 }

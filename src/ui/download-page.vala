@@ -39,16 +39,13 @@ namespace Tailor {
 
 		private Gee.ArrayList<Osinfo.Os> os_list;
 
-		private string primary_distro = "";
 		private string? arch_filter = null;
 		private string search_query = "";
 
+		public string primary_distro { get; construct set; default = ""; }
+		public string primary_os_title { get; construct set; default = ""; }
+
 		construct {
-			var application = (Tailor.Application) GLib.Application.get_default ();
-
-			primary_distro = application.settings.get_string ("primary-os");
-			primary_os_label.label = application.settings.get_string ("primary-os-title");
-
 			var future = Dex.thread_spawn ("osinfo-loader", load_db);
 			var chain = new Dex.Future.then (future, init);
 			chain = new Dex.Future.catch (chain, load_error);
@@ -68,6 +65,7 @@ namespace Tailor {
 		}
 
 		private Dex.Future init () {
+			primary_os_label.label = primary_os_title;
 
 			populate_arch_dropdown ();
 			populate_os_list ();
