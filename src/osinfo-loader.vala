@@ -20,7 +20,7 @@
 
 namespace Tailor {
 
-	public class OsinfoLoader {
+	public class OsinfoRepository {
 
 		public static Osinfo.Db load_db () throws Error {
 			var loader = new Osinfo.Loader ();
