@@ -102,14 +102,30 @@ namespace Tailor {
 			return false;
 		}
 
+		private bool list_has_visible_rows (Gtk.ListBox list) {
+			var row = list.get_row_at_index (0);
+
+			int i = 0;
+			while (row != null) {
+				if (row.get_child_visible ()) return true;
+				row = list.get_row_at_index (++i);
+			}
+
+			return false;
+		}
+
+		private void update_box_visibility () {
+			primary_os_box.visible = list_has_visible_rows (primary_os_list);
+			other_os_box.visible = list_has_visible_rows (other_os_list);
+		}
+
 		private void on_search_changed () {
 			search_query = search_entry.text;
 
 			primary_os_list.invalidate_filter ();
 			other_os_list.invalidate_filter ();
 
-           primary_os_box.visible = primary_os_list.get_row_at_index (0) != null;
-           other_os_box.visible = other_os_list.get_row_at_index (0) != null;
+			update_box_visibility ();
 		}
 
 		private bool os_has_arch (Osinfo.Os os, string? arch) {
@@ -143,8 +159,7 @@ namespace Tailor {
 					other_os_list.append (row);
 			}
 
-			primary_os_box.visible = primary_os_list.get_row_at_index (0) != null;
-			other_os_box.visible = other_os_list.get_row_at_index (0) != null;
+			update_box_visibility ();
 		}
 
 		private void populate_arch_dropdown () {
