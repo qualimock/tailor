@@ -41,12 +41,8 @@ namespace Tailor {
 		private string primary_distro;
 		private string arch_filter;
 
+
 		construct {
-			var application = (Tailor.Application) GLib.Application.get_default ();
-
-			primary_distro = application.settings.get_string ("primary-os");
-			primary_os_label.label = application.settings.get_string ("primary-os-title");
-
 			var future = Dex.thread_spawn ("osinfo-loader", () => {
 				try {
 					var db = OsinfoLoader.load_db ();
@@ -58,12 +54,7 @@ namespace Tailor {
 			});
 
 			var chain = new Dex.Future.then (future, (f) => {
-				message ("OS database loaded");
-
-				spinner.visible = false;
-				populate_arch_dropdown ();
-				populate_os_list ();
-
+				init ();
 				return new Dex.Future.for_boolean (true);
 			});
 
@@ -90,6 +81,18 @@ namespace Tailor {
 		[GtkCallback]
 		private bool logical_or (bool a, bool b) {
 			return a || b;
+		}
+
+		private void init () {
+			var application = (Tailor.Application) GLib.Application.get_default ();
+
+			primary_distro = application.settings.get_string ("primary-os");
+			primary_os_label.label = application.settings.get_string ("primary-os-title");
+
+			spinner.visible = false;
+
+			populate_arch_dropdown ();
+			populate_os_list ();
 		}
 
 		private bool os_has_arch (Osinfo.Os os, string? arch) {
