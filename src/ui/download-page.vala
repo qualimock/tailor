@@ -23,7 +23,7 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
-		[GtkChild] private unowned Adw.StatusPage spinner;
+		[GtkChild] private unowned Gtk.Box os_box;
 		[GtkChild] private unowned Adw.StatusPage download_error;
 
 		[GtkChild] private unowned Gtk.Entry search_entry;
@@ -69,7 +69,6 @@ namespace Tailor {
 		}
 
 		private Dex.Future init () {
-			spinner.visible = false;
 
 			populate_arch_dropdown ();
 			populate_os_list ();
@@ -78,6 +77,8 @@ namespace Tailor {
 			other_os_list.set_filter_func (search_filter_cb);
 
 			search_entry.changed.connect (on_search_changed);
+
+			os_box.visible = true;
 
 			return new Dex.Future.for_boolean (true);
 		}
@@ -89,7 +90,6 @@ namespace Tailor {
 				warning ("Failed to load OS database: %s", e.message);
 			}
 
-			spinner.visible = false;
 			download_error.visible = true;
 			return new Dex.Future.for_boolean (false);
 		}

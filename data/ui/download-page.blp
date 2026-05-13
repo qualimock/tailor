@@ -41,8 +41,9 @@ template $TailorDownloadPage : Adw.NavigationPage {
 
 					title: _("Loading");
 					description: _("Loading OS database…");
-
-					visible: bind download_error.visible inverted;
+					visible: bind $logical_not(
+						$logical_or(download_error.visible, os_box.visible) as <bool>
+					) as <bool>;
 				}
 
 				Adw.StatusPage download_error {
@@ -52,12 +53,10 @@ template $TailorDownloadPage : Adw.NavigationPage {
 					visible: false;
 				}
 
-				Box {
+				Box os_box {
 					orientation: vertical;
 					hexpand: true;
-					visible: bind $logical_not(
-						$logical_or(download_error.visible, spinner.visible) as <bool>
-					) as <bool>;
+					visible: false;
 
 					Box search_box {
 						styles [ "linked" ]
