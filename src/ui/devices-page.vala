@@ -23,5 +23,44 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/devices-page.ui")]
 	public class DevicesPage : Adw.Bin {
 
+		[GtkChild] private unowned Gtk.Box devices_box;
+
+		private UsbService usb_service = new UsbService ();
+		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
+
+		construct {
+			usb_service.device_added.connect (add_device);
+			usb_service.device_removed.connect (remove_device);
+			usb_service.init_async.begin ((obj, res) => {
+				try {
+					usb_service.init_async.end (res);
+				} catch (Error e) {
+					warning ("USB init failed: %s", e.message);
+				}
+			});
+		}
+
+		public void add_device (UsbDevice device) {
+			var card = new DeviceCard ();
+			card.device_name = device.name;
+			card.description = device.description;
+			card.icon = device.icon;
+			card.size = device.size_display;
+			card.address = device.device_file;
+
+			cards[device.object_path] = card;
+			devices_box.append (card);
+			devices_box.visible = true;
+		}
+
+		public void remove_device (string object_path) {
+			var card = cards[object_path];
+			if (card != null) {
+				cards.unset (object_path);
+				devices_box.remove (card);
+				if (cards.is_empty)
+					devices_box.visible = false;
+			}
+		}
 	}
 }

@@ -6,7 +6,7 @@ template $TailorDevicesPage : Adw.Bin {
 		child: Box {
 			orientation: vertical;
 
-			Box devices {
+			Box devices_box {
 				orientation: vertical;
 				hexpand: true;
 				vexpand: true;
@@ -27,7 +27,7 @@ template $TailorDevicesPage : Adw.Bin {
 				hexpand: true;
 				vexpand: true;
 
-				visible: bind devices.visible inverted;
+				visible: bind devices_box.visible inverted;
 			}
 		};
 	};
