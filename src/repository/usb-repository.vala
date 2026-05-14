@@ -18,15 +18,13 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
-using Gee;
-
 namespace Tailor {
 
 	public class UsbRepository {
 
 		private UDisks.Client client;
 
-		private HashSet<string> known_paths = new HashSet<string> ();
+		private Gee.HashSet<string> known_paths = new Gee.HashSet<string> ();
 
 		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
