@@ -7,4 +7,5 @@ repos:
         language: system
         files: \.(vala|vapi|vala.in)$
         args: ["--config=vala-lint.conf"]
+        require_serial: true
 
