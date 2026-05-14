@@ -23,41 +23,56 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/device-card.ui")]
 	public class DeviceCard : Gtk.Box {
 
-		[GtkChild]
-		private unowned Gtk.Image icon;
-		[GtkChild]
-		private unowned Gtk.Label name_label;
-		[GtkChild]
-		private unowned Gtk.Label size_label;
-		[GtkChild]
-		private unowned Gtk.Label address_label;
-		[GtkChild]
-		private unowned Gtk.Label type_label;
-		[GtkChild]
-		private unowned Gtk.Button details_button;
-		[GtkChild]
-		private unowned Gtk.Button restore_button;
+		[GtkChild] private unowned Gtk.Label name_label;
+		[GtkChild] private unowned Gtk.Image icon_image;
+		[GtkChild] private unowned Gtk.Label description_label;
+		[GtkChild] private unowned Gtk.Label size_label;
+		[GtkChild] private unowned Gtk.Label address_label;
+		[GtkChild] private unowned Gtk.Button details_button;
+		[GtkChild] private unowned Gtk.Button restore_button;
 
-		private string _name;
-		public string device_name {
-			get { return _name; }
+		private Icon _icon;
+		public Icon icon {
+			get { return _icon; }
 			set {
-				_name = value;
-				name_label.label = value;
-				icon.set_from_icon_name ("usb-stick-symbolic");
+				_icon = value;
+				icon_image.gicon = _icon;
 			}
 		}
 
-		private string calculate_size (uint size) {
-			return size.to_string ();
+		private string _device_name;
+		public string device_name {
+			get { return _device_name; }
+			set {
+				_device_name = value;
+				name_label.label = _device_name;
+			}
 		}
 
-		private uint _size;
-		public uint size {
+		private string _size;
+		public string size {
 			get { return _size; }
 			set {
 				_size = value;
-				size_label.label = calculate_size (value);
+				size_label.label = _size;
+			}
+		}
+
+		private string _address;
+		public string address {
+			get { return _address; }
+			set {
+				_address = value;
+				address_label.label = _address;
+			}
+		}
+
+		private string _description;
+		public string description {
+			get { return _description; }
+			set {
+				_description = value;
+				description_label.label = _description;
 			}
 		}
 

@@ -2,6 +2,7 @@ using Gtk 4.0;
 
 template $TailorDeviceCard: Box {
 	styles [ "card" ]
+	hexpand: true;
 
 	Box {
 		orientation: vertical;
@@ -15,7 +16,7 @@ template $TailorDeviceCard: Box {
 			orientation: horizontal;
 			spacing: 12;
 
-			Image icon {
+			Image icon_image {
 				pixel-size: 16;
 				accessibility {
 					label: _("Drive icon");
@@ -58,10 +59,10 @@ template $TailorDeviceCard: Box {
 
 			Label {
 				styles [ "dim-label" ]
-				label: _("Device type");
+				label: _("Device description");
 			}
 
-			Label type_label {
+			Label description_label {
 				styles [ "dim-label" ]
 				halign: end;
 				hexpand: true;
