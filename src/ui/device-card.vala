@@ -27,8 +27,6 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.Label filesystem_label;
 		[GtkChild] private unowned Gtk.Label size_label;
 		[GtkChild] private unowned Gtk.Label address_label;
-		[GtkChild] private unowned Gtk.Button details_button;
-		[GtkChild] private unowned Gtk.Button restore_button;
 
 		private string _device_name;
 		public string device_name {
@@ -66,8 +64,19 @@ namespace Tailor {
 			}
 		}
 
-		public DeviceCard () {
-			Object ();
+		[GtkCallback]
+		private void on_more_in_disks_clicked () {
+			try {
+				var app = AppInfo.create_from_commandline (
+					"gnome-disks --block-device " + _address,
+					null,
+					AppInfoCreateFlags.NONE
+				);
+				app.launch (null, null);
+			} catch (Error e) {
+				warning ("Failed to open gnome-disks: %s", e.message);
+			}
 		}
+
 	}
 }
