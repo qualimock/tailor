@@ -4,16 +4,18 @@ using Adw 1;
 template $TailorDevicesPage : Adw.Bin {
 	child: ScrolledWindow {
 		child: Box {
-			halign: center;
 			orientation: vertical;
 
 			Box devices {
 				orientation: vertical;
+				hexpand: true;
+				vexpand: true;
 				margin-top: 12;
 				margin-bottom: 12;
 				margin-start: 12;
 				margin-end: 12;
 				spacing: 12;
+
 				visible: false;
 			}
 
@@ -21,6 +23,10 @@ template $TailorDevicesPage : Adw.Bin {
 				icon-name: "drive-removable-media-symbolic";
 				title: _("No Drives Found");
 				description: _("Insert a drive to begin.");
+
+				hexpand: true;
+				vexpand: true;
+
 				visible: bind devices.visible inverted;
 			}
 		};
