@@ -56,6 +56,25 @@ namespace Tailor {
 				device_removed (path);
 		}
 
+		private bool is_partition (DBusObject obj, string object_path) {
+			var udisks_obj = obj as UDisks.Object;
+			if (udisks_obj == null)
+				return false;
+
+			var partition = udisks_obj.get_partition ();
+			if (partition == null)
+				return false;
+
+			// Filter to this drive only
+			if (partition.table != object_path)
+				return false;
+
+			if (partition.is_container)
+				return false;
+
+			return true;
+		}
+
 		private UsbDevice? make_device (DBusObject dbus_obj) {
 			var udisks_obj = dbus_obj as UDisks.Object;
 			if (udisks_obj == null) return null;
@@ -89,14 +108,23 @@ namespace Tailor {
 			var device = new UsbDevice (udisks_obj.get_object_path ());
 			device.device_file = block.device;
 			device.name = object_info.get_name ();
-
-			if (block.id_type != null && block.id_type != "")
-				device.filesystem = block.id_type;
-			else
-				device.filesystem = "No filesystem";
-
 			device.size = drive.size;
 			device.size_display = client.get_size_for_display (drive.size, false, false);
+
+			uint partition_count = 0;
+			foreach (var obj in client.get_object_manager ().get_objects ()) {
+				if (is_partition (obj, udisks_obj.get_object_path ()))
+					partition_count++;
+			}
+
+			if (partition_count > 0) {
+				device.filesystem = ngettext ("%u partition", "%u partitions", partition_count)
+					.printf (partition_count);
+			} else {
+				device.filesystem = (block.id_type != null && block.id_type != "")
+					? block.id_type
+					: _("No filesystem");
+			}
 
 			return device;
 		}
