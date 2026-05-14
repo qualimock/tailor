@@ -56,22 +56,22 @@ namespace Tailor {
 				device_removed (path);
 		}
 
-		private string get_device_display_size (string total_space, uint64 free_bytes) {
-			var free_space = free_bytes != 0 ? client.get_size_for_display (free_bytes, false, false) : null;
-			if (free_space == null)
+		private string get_device_display_size (string total_space, uint64 used_bytes) {
+			var used_space = used_bytes != 0 ? client.get_size_for_display (used_bytes, false, false) : null;
+			if (used_space == null)
 				return total_space;
 
-			var free_parts = free_space.split (" ");
+			var used_parts = used_space.split (" ");
 			var total_parts = total_space.split (" ");
 
-			if (free_parts.length >= 2 && total_parts.length >= 2)
-				if (free_parts[1] == total_parts[1])
-					return @"$(free_parts[0])/$(total_space)";
+			if (used_parts.length >= 2 && total_parts.length >= 2)
+				if (used_parts[1] == total_parts[1])
+					return @"$(used_parts[0])/$(total_space)";
 
-			return @"$(free_space)/$(total_space)";
+			return @"$(used_space)/$(total_space)";
 		}
 
-		private uint64 count_drive_free_bytes (DBusObject drive, string drive_path) {
+		private uint64 count_drive_used_bytes (DBusObject drive, string drive_path) {
 			var udisks_obj = drive as UDisks.Object;
 			if (udisks_obj == null)
 				return 0;
@@ -89,7 +89,7 @@ namespace Tailor {
 			if (Posix.statvfs_exec (fs.mount_points[0], out stat_buf) != 0)
 				return 0;
 
-			return (uint64) stat_buf.f_bavail * (uint64) stat_buf.f_frsize;
+			return (stat_buf.f_blocks - stat_buf.f_bfree) * stat_buf.f_frsize;
 		}
 
 		private bool is_partition (DBusObject obj, string object_path) {
@@ -146,10 +146,10 @@ namespace Tailor {
 			device.name = object_info.get_name ();
 			device.size = drive.size;
 
-			uint64 free_bytes = 0;
+			uint64 used_bytes = 0;
 			uint partition_count = 0;
 			foreach (var obj in client.get_object_manager ().get_objects ()) {
-				free_bytes += count_drive_free_bytes (obj, drive_obj.get_object_path ());
+				used_bytes += count_drive_used_bytes (obj, drive_obj.get_object_path ());
 
 				if (is_partition (obj, udisks_obj.get_object_path ()))
 					partition_count++;
@@ -157,7 +157,7 @@ namespace Tailor {
 
 			device.size_display = get_device_display_size (
 				client.get_size_for_display (drive.size, false, false),
-				free_bytes
+				used_bytes
 			);
 
 			if (partition_count > 0) {
