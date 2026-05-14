@@ -9,9 +9,13 @@ app_sources = files(
 	'ui' / 'download-page.vala',
 	'ui' / 'device-card.vala',
 
+	'model' / 'usb-device.vala',
+
 	'repository' / 'osinfo-repository.vala',
+	'repository' / 'usb-repository.vala',
 
 	'service' / 'osinfo-service.vala',
+	'service' / 'usb-service.vala',
 
 ) + configure_file(
 	input: 'build.vala.in',
@@ -24,6 +28,8 @@ app_dependencies = [
 	dependency('libdex-1'),
 	dependency('libosinfo-1.0'),
 	dependency('gee-0.8'),
+	dependency('gio-2.0'),
+	dependency('udisks2'),
 ]
 
 executable(
