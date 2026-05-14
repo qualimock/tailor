@@ -18,11 +18,15 @@
  * SPDX-License-Identifier: GPL-3.0-or-later
  */
 
+using Gee;
+
 namespace Tailor {
 
 	public class UsbRepository {
 
 		private UDisks.Client client;
+
+		private HashSet<string> known_paths = new HashSet<string> ();
 
 		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
@@ -40,11 +44,18 @@ namespace Tailor {
 
 		private void on_object_added (DBusObject obj) {
 			var device = make_device (obj);
-			if (device != null) device_added (device);
+
+			if (device != null) {
+				known_paths.add (device.object_path);
+				device_added (device);
+			}
 		}
 
 		private void on_object_removed (DBusObject obj) {
-			device_removed (obj.get_object_path ());
+			var path = obj.get_object_path ();
+
+			if (known_paths.remove (path))
+				device_removed (path);
 		}
 
 		private UsbDevice? make_device (DBusObject dbus_obj) {
