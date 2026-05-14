@@ -75,8 +75,6 @@ namespace Tailor {
 			if (block.size != drive.size) return null;
 
 			var object_info = client.get_object_info (udisks_obj);
-			var icon = object_info.get_icon_symbolic ();
-			var media_icon = object_info.get_media_icon_symbolic ();
 
 			var device = new UsbDevice (udisks_obj.get_object_path ());
 
@@ -85,7 +83,6 @@ namespace Tailor {
 			device.description = object_info.get_media_description ();
 			device.size = drive.size;
 			device.size_display = client.get_size_for_display (drive.size, false, false);
-			device.icon = media_icon != null ? media_icon : icon;
 
 			return device;
 		}

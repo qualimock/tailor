@@ -10,16 +10,9 @@
 
 		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
 
-		<file>org.altlinux.Tailor.metainfo.xml</file>
-	</gresource>
+		<file preprocess="xml-stripblanks">icons/scalable/actions/drawer-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/actions/sad-computer-symbolic.svg</file>
 
-	<gresource prefix="/org/altlinux/Tailor/icons">
-		<file alias="org.altlinux.Tailor.svg">icons/hicolor/scalable/apps/org.altlinux.Tailor.svg</file>
-		<file alias="org.altlinux.Tailor-symbolic.svg">icons/hicolor/symbolic/apps/org.altlinux.Tailor-symbolic.svg</file>
-		<file alias="download-symbolic.svg">icons/hicolor/symbolic/actions/download-symbolic.svg</file>
-		<file alias="drawer-symbolic.svg">icons/hicolor/symbolic/actions/drawer-symbolic.svg</file>
-		<file alias="cd-symbolic.svg">icons/hicolor/symbolic/actions/cd-symbolic.svg</file>
-		<file alias="usb-stick-symbolic.svg">icons/hicolor/symbolic/actions/usb-stick-symbolic.svg</file>
-		<file alias="sad-computer-symbolic.svg">icons/hicolor/symbolic/actions/sad-computer-symbolic.svg</file>
+		<file>org.altlinux.Tailor.metainfo.xml</file>
 	</gresource>
 </gresources>

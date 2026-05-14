@@ -24,21 +24,11 @@ namespace Tailor {
 	public class DeviceCard : Gtk.Box {
 
 		[GtkChild] private unowned Gtk.Label name_label;
-		[GtkChild] private unowned Gtk.Image icon_image;
 		[GtkChild] private unowned Gtk.Label description_label;
 		[GtkChild] private unowned Gtk.Label size_label;
 		[GtkChild] private unowned Gtk.Label address_label;
 		[GtkChild] private unowned Gtk.Button details_button;
 		[GtkChild] private unowned Gtk.Button restore_button;
-
-		private Icon _icon;
-		public Icon icon {
-			get { return _icon; }
-			set {
-				_icon = value;
-				icon_image.gicon = _icon;
-			}
-		}
 
 		private string _device_name;
 		public string device_name {
