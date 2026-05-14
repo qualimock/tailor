@@ -27,10 +27,14 @@ namespace Tailor {
 		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
 
+		private void on_device_added (UsbDevice d) { device_added (d); }
+		private void on_device_removed (string path) { device_removed (path); }
+
 		public async void init_async () throws Error {
 			repo = new UsbRepository ();
-			repo.device_added.connect ((d) => device_added (d));
-			repo.device_removed.connect ((d) => device_removed (d));
+
+			repo.device_added.connect (on_device_added);
+			repo.device_removed.connect (on_device_removed);
 
 			yield repo.init_async ();
 		}
