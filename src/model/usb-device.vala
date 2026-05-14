@@ -25,7 +25,7 @@ namespace Tailor {
 		public string object_path { get; construct; }
 		public string device_file { get; set; }
 		public string name { get; set; }
-		public string description { get; set; }
+		public string filesystem { get; set; }
 		public uint64 size { get; set; }
 		public string size_display { get; set; }
 

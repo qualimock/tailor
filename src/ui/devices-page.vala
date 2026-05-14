@@ -43,7 +43,7 @@ namespace Tailor {
 		public void add_device (UsbDevice device) {
 			var card = new DeviceCard ();
 			card.device_name = device.name;
-			card.description = device.description;
+			card.filesystem = device.filesystem;
 			card.size = device.size_display;
 			card.address = device.device_file;
 

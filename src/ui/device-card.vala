@@ -24,7 +24,7 @@ namespace Tailor {
 	public class DeviceCard : Gtk.Box {
 
 		[GtkChild] private unowned Gtk.Label name_label;
-		[GtkChild] private unowned Gtk.Label description_label;
+		[GtkChild] private unowned Gtk.Label filesystem_label;
 		[GtkChild] private unowned Gtk.Label size_label;
 		[GtkChild] private unowned Gtk.Label address_label;
 		[GtkChild] private unowned Gtk.Button details_button;
@@ -57,12 +57,12 @@ namespace Tailor {
 			}
 		}
 
-		private string _description;
-		public string description {
-			get { return _description; }
+		private string _filesystem;
+		public string filesystem {
+			get { return _filesystem; }
 			set {
-				_description = value;
-				description_label.label = _description;
+				_filesystem = value;
+				filesystem_label.label = _filesystem;
 			}
 		}
 

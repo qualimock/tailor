@@ -77,10 +77,14 @@ namespace Tailor {
 			var object_info = client.get_object_info (udisks_obj);
 
 			var device = new UsbDevice (udisks_obj.get_object_path ());
-
 			device.device_file = block.device;
 			device.name = object_info.get_name ();
-			device.description = object_info.get_media_description ();
+
+			if (block.id_type != null && block.id_type != "")
+				device.filesystem = block.id_type;
+			else
+				device.filesystem = "No filesystem";
+
 			device.size = drive.size;
 			device.size_display = client.get_size_for_display (drive.size, false, false);
 
