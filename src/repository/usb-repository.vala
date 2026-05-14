@@ -59,9 +59,10 @@ namespace Tailor {
 		}
 
 		private UsbDevice? make_device (DBusObject dbus_obj) {
-			var udisks_obj = (UDisks.Object) dbus_obj;
-			var block = udisks_obj.get_block ();
+			var udisks_obj = dbus_obj as UDisks.Object;
+			if (udisks_obj == null) return null;
 
+			var block = udisks_obj.get_block ();
 			if (block == null) return null;
 
 			var drive_obj = (UDisks.Object?) client.get_object_manager ()
