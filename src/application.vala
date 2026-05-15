@@ -1,4 +1,4 @@
-/* app.vala
+/* application.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *

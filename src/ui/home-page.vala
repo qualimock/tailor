@@ -1,4 +1,4 @@
-/* main-page.vala
+/* home-page.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *

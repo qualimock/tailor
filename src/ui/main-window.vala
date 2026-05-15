@@ -1,4 +1,4 @@
-/* mainwindow.vala
+/* main-window.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
