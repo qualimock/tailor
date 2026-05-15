@@ -83,7 +83,7 @@ namespace Tailor {
 			var filtered = new Gee.ArrayList<Osinfo.Os> ();
 
 			foreach (var os in list)
-				if (os_has_arch (os, filter)) filtered.add (os);
+				if (os_matches_arch (os, filter)) filtered.add (os);
 
 			return filtered;
 		}
@@ -105,8 +105,7 @@ namespace Tailor {
 			}
 		}
 
-		// TODO: rename: os_matches_arch
-		private static bool os_has_arch (Osinfo.Os os, string? arch) {
+		private static bool os_matches_arch (Osinfo.Os os, string? arch) {
 			if (arch == null) return true;
 
 			foreach (var entity in os.get_media_list ().get_elements ()) {
