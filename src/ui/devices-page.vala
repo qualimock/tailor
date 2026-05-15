@@ -31,6 +31,7 @@ namespace Tailor {
 		construct {
 			usb_service.device_added.connect (add_device);
 			usb_service.device_removed.connect (remove_device);
+			usb_service.device_updated.connect (update_device);
 			usb_service.init_async.begin ((obj, res) => {
 				try {
 					usb_service.init_async.end (res);
@@ -60,6 +61,14 @@ namespace Tailor {
 				if (cards.is_empty)
 					devices_box.visible = false;
 			}
+
+		public void update_device (UsbDevice device) {
+			var card = cards[device.object_path];
+			if (card == null)
+				return;
+
+			card.filesystem = device.filesystem;
+			card.size = device.size_display;
 		}
 	}
 }

@@ -28,6 +28,7 @@ namespace Tailor {
 
 		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
+		public signal void device_updated (UsbDevice device);
 
 		public async void init_async () throws Error {
 			client = yield new UDisks.Client (null);
@@ -35,6 +36,7 @@ namespace Tailor {
 
 			manager.object_added.connect (on_object_added);
 			manager.object_removed.connect (on_object_removed);
+			client.changed.connect (on_client_changed);
 
 			foreach (var obj in manager.get_objects ())
 				on_object_added (obj);
@@ -47,6 +49,8 @@ namespace Tailor {
 				known_paths.add (device.object_path);
 				device_added (device);
 			}
+
+			maybe_update_parent (obj);
 		}
 
 		private void on_object_removed (DBusObject obj) {
@@ -54,6 +58,46 @@ namespace Tailor {
 
 			if (known_paths.remove (path))
 				device_removed (path);
+
+			maybe_update_parent (obj);
+		}
+
+		private void on_client_changed () {
+			foreach (var path in known_paths) {
+				var obj = client.get_object_manager ().get_object (path);
+				if (obj == null)
+					continue;
+
+				var updated = make_device (obj);
+				if (updated == null)
+					continue;
+
+				device_updated (updated);
+			}
+		}
+
+		private void maybe_update_parent (DBusObject obj) {
+			var udisks_obj = obj as UDisks.Object;
+			if (udisks_obj == null)
+				return;
+
+			var partition = udisks_obj.get_partition ();
+			if (partition == null || partition.is_container)
+				return;
+
+			var parent_path = partition.table;
+			if (!known_paths.contains (parent_path))
+				return;
+
+			var parent_obj = client.get_object_manager ().get_object (parent_path);
+			if (parent_obj == null)
+				return;
+
+			var updated = make_device (parent_obj);
+			if (updated == null)
+				return;
+
+			device_updated (updated);
 		}
 
 		private string get_device_display_size (string total_space, uint64 used_bytes) {
