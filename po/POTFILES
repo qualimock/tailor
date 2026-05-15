@@ -1,4 +1,13 @@
+data/org.altlinux.Tailor.desktop.in
 data/org.altlinux.Tailor.metainfo.xml.in
+data/ui/device-card.blp
+data/ui/devices-page.blp
+data/ui/download-page.blp
+data/ui/home-page.blp
 data/ui/main-window.blp
-src/main.vala
+data/ui/write-page.blp
 src/application.vala
+src/main.vala
+src/repository/usb-repository.vala
+src/ui/write-page.vala
+
