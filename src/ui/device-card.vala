@@ -33,7 +33,7 @@ namespace Tailor {
 			get { return _device_name; }
 			set {
 				_device_name = value;
-				name_label.label = _device_name;
+				name_label.label = value;
 			}
 		}
 
@@ -42,7 +42,7 @@ namespace Tailor {
 			get { return _size; }
 			set {
 				_size = value;
-				size_label.label = _size;
+				size_label.label = value;
 			}
 		}
 
@@ -51,7 +51,7 @@ namespace Tailor {
 			get { return _address; }
 			set {
 				_address = value;
-				address_label.label = _address;
+				address_label.label = value;
 			}
 		}
 
@@ -60,7 +60,7 @@ namespace Tailor {
 			get { return _filesystem; }
 			set {
 				_filesystem = value;
-				filesystem_label.label = _filesystem;
+				filesystem_label.label = value;
 			}
 		}
 

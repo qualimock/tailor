@@ -108,11 +108,13 @@ namespace Tailor {
 			var used_parts = used_space.split (" ");
 			var total_parts = total_space.split (" ");
 
-			if (used_parts.length >= 2 && total_parts.length >= 2)
-				if (used_parts[1] == total_parts[1])
-					return @"$(used_parts[0])/$(total_space)";
+			if (used_parts.length < 2 || total_parts.length < 2)
+				return @"$(used_space)/$(total_space)";
 
-			return @"$(used_space)/$(total_space)";
+			if (used_parts[1] != total_parts[1])
+				return @"$(used_space)/$(total_space)";
+
+			return @"$(used_parts[0])/$(total_space)";
 		}
 
 		private uint64 count_drive_used_bytes (DBusObject drive, string drive_path) {
@@ -121,9 +123,14 @@ namespace Tailor {
 				return 0;
 
 			var block = udisks_obj.get_block ();
-			if (block == null) return 0;
-			if (block.drive != drive_path) return 0;
-			if (block.size == 0) return 0;
+			if (block == null)
+				return 0;
+
+			if (block.drive != drive_path)
+				return 0;
+
+			if (block.size == 0)
+				return 0;
 
 			var fs = udisks_obj.get_filesystem ();
 			if (fs == null || fs.mount_points.length == 0)
@@ -157,31 +164,45 @@ namespace Tailor {
 
 		private UsbDevice? make_device (DBusObject dbus_obj) {
 			var udisks_obj = dbus_obj as UDisks.Object;
-			if (udisks_obj == null) return null;
+			if (udisks_obj == null)
+				return null;
 
 			var block = udisks_obj.get_block ();
-			if (block == null) return null;
+			if (block == null)
+				return null;
 
 			var drive_obj = (UDisks.Object?) client.get_object_manager ()
 				.get_object (block.drive);
-			if (drive_obj == null) return null;
+			if (drive_obj == null)
+				return null;
 
 			var drive = drive_obj.get_drive ();
-			if (drive == null) return null;
+			if (drive == null)
+				return null;
 
 			/* Allow:
 			 * top-level block-devices,
 			 * USB bus,
 			 * removable
 			 */
-			if (drive.connection_bus != "usb") return null;
-			if (!drive.removable) return null;
-			if (drive.size == 0) return null;
-			if (block.hint_system) return null;
-			if (block.hint_ignore) return null;
+			if (drive.connection_bus != "usb")
+				return null;
+
+			if (!drive.removable)
+				return null;
+
+			if (drive.size == 0)
+				return null;
+
+			if (block.hint_system)
+				return null;
+
+			if (block.hint_ignore)
+				return null;
 
 			// Ignore partition objects
-			if (block.size != drive.size) return null;
+			if (block.size != drive.size)
+				return null;
 
 			var object_info = client.get_object_info (udisks_obj);
 

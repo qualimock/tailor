@@ -93,17 +93,16 @@ namespace Tailor {
 
 		private bool search_filter_cb (Gtk.ListBoxRow row) {
 			var row_title = ((Adw.ActionRow) row).title.down ();
-			if (row_title.contains (search_query.down ()))
-				return true;
-
-			return false;
+			return row_title.contains (search_query.down ());
 		}
 
 		private bool list_has_visible_rows (Gtk.ListBox list) {
 			var row = list.get_row_at_index (0);
 
 			for (int i = 0; row != null; ) {
-				if (row.get_child_visible ()) return true;
+				if (row.get_child_visible ())
+					return true;
+
 				row = list.get_row_at_index (++i);
 			}
 
@@ -175,8 +174,7 @@ namespace Tailor {
 			arch_dropdown.selected = arches.index_of (arch_filter);
 
 			arch_dropdown.notify["selected"].connect (() => {
-				var index = arch_dropdown.selected;
-				arch_filter = arches.to_array ()[index];
+				arch_filter = arches.to_array ()[arch_dropdown.selected];
 				populate_os_list ();
 			});
 		}

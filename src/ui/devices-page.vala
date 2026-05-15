@@ -55,12 +55,14 @@ namespace Tailor {
 
 		public void remove_device (string object_path) {
 			var card = cards[object_path];
-			if (card != null) {
-				cards.unset (object_path);
-				devices_box.remove (card);
-				if (cards.is_empty)
-					devices_box.visible = false;
-			}
+			if (card == null)
+				return;
+
+			cards.unset (object_path);
+			devices_box.remove (card);
+			if (cards.is_empty)
+				devices_box.visible = false;
+		}
 
 		public void update_device (UsbDevice device) {
 			var card = cards[device.object_path];

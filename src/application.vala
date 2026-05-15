@@ -71,14 +71,17 @@ namespace Tailor {
 		}
 
 		private void about_activated () {
-			if (main_window == null) return;
+			if (main_window == null)
+				return;
 
 			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/org.altlinux.Tailor.metainfo.xml", VERSION) {
 				copyright = "© 2026 ALT Linux Team",
 				developers = {
 					"Alexey \"qualimock\" Volkov <qualimock@altlinux.org>",
 				},
-				artists = { "Viktoria \"gingercat\" Zubacheva" },
+				artists = {
+					"Viktoria \"gingercat\" Zubacheva",
+				},
 				translator_credits = _("translator-credits")
 			};
 
