@@ -22,11 +22,71 @@ namespace Tailor {
 
 	public class OsinfoRepository {
 
-		public static Osinfo.Db load_db () throws Error {
+		private string primary_distro;
+
+		public signal void os_added (OS os);
+
+		public void init (string primary_distro) throws Error {
+			this.primary_distro = primary_distro;
+
 			var loader = new Osinfo.Loader ();
 			loader.process_default_path ();
 
-			return loader.get_db ();
+			var os_list = loader.get_db ().get_os_list ();
+			var superseded_oses = get_superseded_oses (os_list);
+
+			foreach (var element in os_list.get_elements ()) {
+				var os = make_os ((Osinfo.Os) element, superseded_oses);
+				if (os != null)
+					os_added (os);
+			}
+		}
+
+		private Gee.HashSet<string> get_superseded_oses (Osinfo.OsList os_list) {
+			var superseded = new Gee.HashSet<string> ();
+
+			foreach (var entity in os_list.get_elements ()) {
+				var osinfo_os = (Osinfo.Os) entity;
+				var upgrades = osinfo_os.get_related (Osinfo.ProductRelationship.UPGRADES);
+
+				foreach (var older in upgrades.get_elements ())
+					superseded.add (older.get_id ());
+			}
+
+			return superseded;
+		}
+
+		private string get_distro_display_name (Osinfo.Os os) {
+			var name = os.get_name () ?? os.get_distro () ?? os.get_short_id ();
+			for (int i = 0; i < name.length; i++) {
+				if (name[i].isdigit ())
+					return name[0:i].strip ();
+			}
+
+			return name.strip ();
+		}
+
+		private OS? make_os (Osinfo.Os osinfo_os, Gee.HashSet<string> superseded) {
+			if (superseded.contains (osinfo_os.get_id ()))
+				return null;
+
+			if (osinfo_os.get_param_value ("eol-date") != null)
+				return null;
+
+			var os = new OS (osinfo_os.id);
+			os.display_name = get_distro_display_name (osinfo_os);
+			os.vendor = osinfo_os.vendor;
+			os.primary = (osinfo_os.get_distro () == primary_distro);
+
+			var arches = new Gee.ArrayList<string> ();
+			foreach (var entity in osinfo_os.get_media_list ().get_elements ()) {
+				var arch = ((Osinfo.Media) entity).get_architecture ();
+				if (arch != null && arch != "all" && !arches.contains (arch))
+					arches.add (arch);
+			}
+			os.arches = arches;
+
+			return os;
 		}
 	}
 }

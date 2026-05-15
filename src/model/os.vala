@@ -1,4 +1,4 @@
-/* main-window.vala
+/* os.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,20 +20,16 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
-	public class MainWindow : Adw.ApplicationWindow {
+	public class OS : Object {
 
-		[GtkChild] private unowned DownloadPage download_page;
+		public string id { get; construct; }
+		public string display_name { get; set; }
+		public string vendor { get; set; }
+		public bool primary { get; set; }
+		public Gee.ArrayList<string> arches { get; set; }
 
-		static construct {
-			typeof (HomePage).ensure ();
-			typeof (DownloadPage).ensure ();
-		}
-
-		public MainWindow (Tailor.Application app) {
-			Object (application: app);
-			download_page.osinfo_service = app.osinfo_service;
-			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
+		public OS (string id) {
+			Object (id: id);
 		}
 	}
 }

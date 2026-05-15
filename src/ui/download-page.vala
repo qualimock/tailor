@@ -37,63 +37,110 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
-		private Gee.ArrayList<Osinfo.Os> os_list;
-
+		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
+		private ListStore os_store = new ListStore (typeof (OS));
+		private Gtk.CustomFilter base_filter;
 		private string? arch_filter = null;
 		private string search_query = "";
 
-		public string primary_distro { get; construct set; default = ""; }
 		public string primary_os_title { get; construct set; default = ""; }
 
-		construct {
-			var future = Dex.thread_spawn ("osinfo-loader", load_db);
-			var chain = new Dex.Future.then (future, init);
-			chain = new Dex.Future.catch (chain, load_error);
-			chain.disown ();
+		private OsinfoService _osinfo_service;
+		public OsinfoService osinfo_service {
+			get { return _osinfo_service; }
+			construct set {
+				_osinfo_service = value;
+				if (value == null)
+					return;
+
+				value.os_added.connect (add_os);
+				value.init_succeed.connect (init);
+				value.init_failed.connect (init_error);
+			}
 		}
 
 		[GtkCallback] private bool logical_not (bool value) { return !value; }
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-		private Dex.Future load_db () {
-			try {
-				os_list = OsinfoService.load_os_list ();
-				return new Dex.Future.for_boolean (true);
-			} catch (Error e) {
-				return new Dex.Future.for_error (e);
-			}
-		}
-
-		private Dex.Future init () {
+		private void init () {
 			primary_os_label.label = primary_os_title;
 
-			populate_arch_dropdown ();
-			populate_os_list ();
-
-			primary_os_list.set_filter_func (search_filter_cb);
-			other_os_list.set_filter_func (search_filter_cb);
-
-			search_entry.changed.connect (on_search_changed);
+			setup_models ();
+			setup_arch_dropdown ();
 
 			os_box.visible = true;
 
-			return new Dex.Future.for_boolean (true);
+			arch_dropdown.notify["selected"].connect (() => {
+				arch_filter = arches_list[(int) arch_dropdown.selected];
+				base_filter.changed (Gtk.FilterChange.DIFFERENT);
+				update_box_visibility ();
+			});
+
+			search_entry.changed.connect (() => {
+				search_query = search_entry.text;
+				base_filter.changed (Gtk.FilterChange.DIFFERENT);
+				update_box_visibility ();
+			});
+
+			update_box_visibility ();
 		}
 
-		private Dex.Future load_error (Dex.Future future) {
-			try {
-				future.get_value ();
-			} catch (Error e) {
-				warning ("Failed to load OS database: %s", e.message);
-			}
-
+		private void init_error (Error e) {
+			warning ("Failed to load OS database: %s", e.message);
 			download_error.visible = true;
-			return new Dex.Future.for_boolean (false);
 		}
 
-		private bool search_filter_cb (Gtk.ListBoxRow row) {
-			var row_title = ((Adw.ActionRow) row).title.down ();
-			return row_title.contains (search_query.down ());
+		private void setup_models () {
+			base_filter = new Gtk.CustomFilter (matches);
+			var base_model = new Gtk.FilterListModel (os_store, base_filter);
+
+			var primary_model = new Gtk.FilterListModel (
+				base_model,
+				new Gtk.CustomFilter (obj => ((OS) obj).primary)
+			);
+			var other_model = new Gtk.FilterListModel (
+				base_model,
+				new Gtk.CustomFilter (obj => !((OS) obj).primary)
+			);
+
+			primary_os_list.bind_model (primary_model, make_row);
+			other_os_list.bind_model (other_model, make_row);
+		}
+
+		private bool matches (Object obj) {
+			var os = (OS) obj;
+			return arch_matches (os) && search_matches (os);
+		}
+
+		private bool arch_matches (OS os) {
+			if (arch_filter == null)
+				return true;
+
+			return os.arches.contains (arch_filter) || os.arches.is_empty;
+		}
+
+		private bool search_matches (OS os) {
+			if (search_query == "")
+				return true;
+
+			return os.display_name.down ().contains (search_query.down ());
+		}
+
+		private Gtk.Widget make_row (Object obj) {
+			var os = (OS) obj;
+
+			var row = new Adw.ActionRow ();
+			row.title = os.display_name;
+			row.subtitle = os.vendor;
+
+			return row;
+		}
+
+		public void add_os (OS os) {
+			Idle.add (() => {
+				os_store.append (os);
+				return Source.REMOVE;
+			});
 		}
 
 		private bool list_has_visible_rows (Gtk.ListBox list) {
@@ -114,69 +161,18 @@ namespace Tailor {
 			other_os_box.visible = list_has_visible_rows (other_os_list);
 		}
 
-		private void on_search_changed () {
-			search_query = search_entry.text;
+		private void setup_arch_dropdown () {
+			arches_list.add_all (osinfo_service.arches);
 
-			primary_os_list.invalidate_filter ();
-			other_os_list.invalidate_filter ();
-
-			update_box_visibility ();
-		}
-
-		private void build_os_listbox (Gtk.ListBox list, Gee.ArrayList<Osinfo.Os> oses) {
-			foreach (var os in oses) {
-				var row = new Adw.ActionRow ();
-				row.title = os.get_name () ?? os.get_short_id ();
-				row.subtitle = os.get_vendor () ?? "";
-
-				list.append (row);
-			}
-		}
-
-		private void populate_os_list () {
-			primary_os_list.remove_all ();
-			other_os_list.remove_all ();
-
-			var filtered = OsinfoService.filter_by_arch (os_list, arch_filter);
-
-			Gee.ArrayList<Osinfo.Os> primary;
-			Gee.ArrayList<Osinfo.Os> other;
-			OsinfoService.split_by_distro (filtered, primary_distro,
-			                               out primary, out other);
-
-			build_os_listbox (primary_os_list, primary);
-			build_os_listbox (other_os_list, other);
-
-			update_box_visibility ();
-		}
-
-		private void populate_arch_dropdown () {
 			var model = new Gtk.StringList (null);
-			var arches = OsinfoService.get_arch_list (os_list);
-
-			foreach (var arch in arches)
+			foreach (var arch in arches_list)
 				model.append (arch);
 
 			arch_dropdown.model = model;
 
 			string host_arch = Posix.utsname ().machine;
-
-			if (arches.contains (host_arch))
-				arch_filter = arches.get (arches.index_of (host_arch));
-			else {
-				critical (
-					"Cannot find host arch: %s. Defaulting to %s",
-					host_arch, arches[0]
-				);
-				arch_filter = arches[0];
-			}
-
-			arch_dropdown.selected = arches.index_of (arch_filter);
-
-			arch_dropdown.notify["selected"].connect (() => {
-				arch_filter = arches.to_array ()[arch_dropdown.selected];
-				populate_os_list ();
-			});
+			arch_filter = arches_list.contains (host_arch) ? host_arch : arches_list[0];
+			arch_dropdown.selected = (uint) arches_list.index_of (arch_filter);
 		}
 	}
 }

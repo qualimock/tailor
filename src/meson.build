@@ -9,6 +9,7 @@ app_sources = files(
 	'ui' / 'download-page.vala',
 	'ui' / 'device-card.vala',
 
+	'model' / 'os.vala',
 	'model' / 'usb-device.vala',
 
 	'repository' / 'osinfo-repository.vala',

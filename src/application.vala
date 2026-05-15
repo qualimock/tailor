@@ -31,6 +31,7 @@ namespace Tailor {
 		private MainWindow main_window;
 
 		public Settings settings { get; private set; }
+		public OsinfoService osinfo_service { get; private set; }
 
 		public Application () {
 			Object (application_id: Tailor.ID,
@@ -41,7 +42,33 @@ namespace Tailor {
 			base.startup ();
 
 			settings = new Settings (Tailor.ID);
+			osinfo_service = new OsinfoService ();
+
 			Dex.init ();
+
+			var future = Dex.thread_spawn ("init-osinfo", () => {
+				try {
+					osinfo_service.init (settings.get_string ("primary-os"));
+					return new Dex.Future.for_boolean (true);
+				} catch (Error e) {
+					return new Dex.Future.for_error (e);
+				}
+			});
+			var chain = new Dex.Future.then (future, () => {
+				osinfo_service.init_succeed ();
+				return new Dex.Future.for_boolean (true);
+			});
+			chain = new Dex.Future.catch (chain, (f) => {
+				try {
+					f.get_value ();
+				} catch (Error e) {
+					osinfo_service.init_failed (e);
+				}
+
+				return new Dex.Future.for_boolean (false);
+			});
+
+			chain.disown ();
 
 			add_action_entries (APP_ENTRIES, this);
 			set_accels_for_action ("app.quit", { "<Ctrl>Q" });
