@@ -3,12 +3,13 @@
 # This file is distributed under the same license as the tailor package.
 # Alexey Volkov <qualimock@altlinux.org>, 2026.
 #
+#: data/ui/download-page.blp:27
 msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-22 15:37+0300\n"
-"PO-Revision-Date: 2026-04-22 15:42+0300\n"
+"POT-Creation-Date: 2026-05-15 12:48+0300\n"
+"PO-Revision-Date: 2026-05-15 12:58+0300\n"
 "Last-Translator: Alexey Volkov <qualimock@altlinux.org>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
@@ -19,22 +20,170 @@ msgstr ""
 "%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Gtranslator 50.0\n"
 
-#: data/space.qualimock.Tailor.metainfo.xml.in:5 src/main.vala:28
+#. Translators: app name should be translated
+#: data/org.altlinux.Tailor.desktop.in:4
+#: data/org.altlinux.Tailor.metainfo.xml.in:5 data/ui/main-window.blp:7
+#: src/main.vala:28
 msgid "Tailor"
 msgstr "Портной"
 
-#: data/space.qualimock.Tailor.metainfo.xml.in:7
-msgid "Alexey Volkov"
-msgstr "Алексей Волков"
-
-#: data/space.qualimock.Tailor.metainfo.xml.in:9
+#: data/org.altlinux.Tailor.desktop.in:5
+#: data/org.altlinux.Tailor.metainfo.xml.in:9
 msgid "Create bootable drives"
 msgstr ""
 
-#: data/space.qualimock.Tailor.metainfo.xml.in:15
-msgid "TODO"
+#. Translators: keep number of ';'
+#: data/org.altlinux.Tailor.desktop.in:7
+msgid "tailor;tale;teilor;usb;flash;writer;bootable;drive;iso;img;disk;image;"
 msgstr ""
 
-#: data/space.qualimock.Tailor.metainfo.xml.in:40
+#: data/org.altlinux.Tailor.metainfo.xml.in:15
+msgid "TODO: description"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in:40
 msgid "todo"
 msgstr ""
+
+#: data/ui/device-card.blp:23
+msgid "Drive icon"
+msgstr "Иконка устройства"
+
+#: data/ui/device-card.blp:29
+msgid "Drive name"
+msgstr "Название устройства"
+
+#: data/ui/device-card.blp:47
+msgid "Address"
+msgstr "Адрес"
+
+#: data/ui/device-card.blp:63
+msgid "Filesystem"
+msgstr "Файловая система"
+
+#: data/ui/device-card.blp:79
+msgid "More in “Disks”"
+msgstr "Подробнее в “Дисках”"
+
+#: data/ui/device-card.blp:85
+msgid "Restore"
+msgstr "Восстановить"
+
+#: data/ui/devices-page.blp:24
+msgid "No Drives Found"
+msgstr "Устройства не найдены"
+
+#: data/ui/devices-page.blp:25
+msgid "Insert a drive to begin."
+msgstr "Для начала вставьте устройство."
+
+#: data/ui/download-page.blp:5
+msgid "Download Image"
+msgstr "Скачать образ"
+
+#: data/ui/download-page.blp:43
+msgid "Loading"
+msgstr "Загрузка"
+
+#: data/ui/download-page.blp:44
+msgid "Loading OS database…"
+msgstr "Загрузка базы данных ОС…"
+
+#: data/ui/download-page.blp:52
+msgid "Loading Failed"
+msgstr "Загрузка не удалась"
+
+#: data/ui/download-page.blp:53
+msgid "OS database failed to load"
+msgstr "База данных ОС не загрузилась"
+
+#: data/ui/download-page.blp:72
+msgid "Search"
+msgstr "Поиск"
+
+#: data/ui/download-page.blp:84
+msgid "No results"
+msgstr "Нет результатов"
+
+#: data/ui/download-page.blp:85
+msgid "Try to search for something else"
+msgstr "Попробуйте поискать что-нибудь еще"
+
+#: data/ui/download-page.blp:113
+msgid "Primary OS"
+msgstr "Основная ОС"
+
+#: data/ui/download-page.blp:130
+msgid "Other operating systems"
+msgstr "Другие операционные системы"
+
+#: data/ui/home-page.blp:5
+msgid "Home page"
+msgstr "Домашняя страница"
+
+#: data/ui/home-page.blp:19
+msgid "About"
+msgstr "О программе"
+
+#: data/ui/home-page.blp:28
+msgid "Write"
+msgstr "Запись"
+
+#: data/ui/home-page.blp:36
+msgid "Devices"
+msgstr "Устройства"
+
+#: data/ui/write-page.blp:6
+msgid "Welcome to Tailor!"
+msgstr "Добро пожаловать в Портного!"
+
+#: data/ui/write-page.blp:7
+msgid "Select image source to start."
+msgstr "Для начала выберите источник образа."
+
+#: data/ui/write-page.blp:22 data/ui/write-page.blp:45
+msgid "Install From File"
+msgstr "Установить из файла"
+
+#: data/ui/write-page.blp:53
+msgid "Load an .iso image from your device"
+msgstr "Загрузите .iso образ с вашего устройства"
+
+#: data/ui/write-page.blp:61 data/ui/write-page.blp:86
+msgid "Download and Write"
+msgstr "Скачать и записать"
+
+#: data/ui/write-page.blp:94
+msgid "Download the required OS image directly in the application"
+msgstr "Скачайте необходимый образ ОС прямо в приложении"
+
+#: src/application.vala:82
+msgid "translator-credits"
+msgstr ""
+
+#: src/repository/usb-repository.vala:164
+#, c-format
+msgid "%u partition"
+msgid_plural "%u partitions"
+msgstr[0] "%u раздел"
+msgstr[1] "%u раздела"
+msgstr[2] "%u разделов"
+
+#: src/repository/usb-repository.vala:169
+msgid "No filesystem"
+msgstr "Без файловой системы"
+
+#: src/ui/write-page.vala:29
+msgid "ISO Images"
+msgstr "ISO образы"
+
+#: src/ui/write-page.vala:35
+msgid "All Files"
+msgstr "Все файлы"
+
+#: src/ui/write-page.vala:43
+msgid "Select Image"
+msgstr "Выберите образ"
+
+#~ msgid "Alexey Volkov"
+#~ msgstr "Алексей Волков"
