@@ -1,4 +1,4 @@
-/* os.vala
+/* osinfo-repository.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,16 +20,40 @@
 
 namespace Tailor {
 
-	public class OS : Object {
+	public class OsinfoProvider {
 
-		public string id { get; construct; }
-		public string display_name { get; set; }
-		public string vendor { get; set; }
-		public bool primary { get; set; }
-		public Gee.ArrayList<string> arches { get; set; }
+		private Osinfo.Loader loader = new Osinfo.Loader ();
+		private Osinfo.Db db;
 
-		public OS (string id) {
-			Object (id: id);
+		public async void load () throws Error {
+			SourceFunc callback = load.callback;
+			Error? thread_error = null;
+
+			new Thread<void> ("osinfo-loader", () => {
+				try {
+					loader.process_default_path ();
+					db = loader.get_db ();
+				} catch (Error e) {
+					thread_error = e;
+				}
+
+				Idle.add ((owned) callback);
+			});
+
+			yield;
+
+			if (thread_error != null)
+				throw thread_error;
+		}
+
+		public Gee.ArrayList<Osinfo.Os> get_os_list () {
+			var list = new Gee.ArrayList<Osinfo.Os> ();
+
+			foreach (var element in db.get_os_list ().get_elements ()) {
+				list.add ((Osinfo.Os) element);
+			}
+
+			return list;
 		}
 	}
 }

@@ -37,9 +37,10 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
+		public OsinfoService osinfo_service { get; construct set; }
 		public string primary_os_title { get; construct set; default = ""; }
 
-		private ListStore os_store = new ListStore (typeof (OS));
+		private ListStore os_store = new ListStore (typeof (OsDto));
 		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
 		private Gtk.CustomFilter base_filter = null;
 		private string? arch_filter = null;
@@ -48,7 +49,23 @@ namespace Tailor {
 		[GtkCallback] private bool logical_not (bool value) { return !value; }
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-		construct {
+		public DownloadPage (OsinfoService osinfo_service) {
+			Object (osinfo_service: osinfo_service);
+		}
+
+		public void populate () {
+			primary_os_label.label = primary_os_title;
+
+			foreach (var os in osinfo_service.oses)
+				os_store.append (os);
+
+			arches_list.add_all (osinfo_service.arches);
+
+			setup_models ();
+			setup_arch_dropdown ();
+
+			os_box.visible = true;
+
 			arch_dropdown.notify["selected"].connect (() => {
 				arch_filter = arches_list[(int) arch_dropdown.selected];
 				on_filter_changed ();
@@ -58,26 +75,11 @@ namespace Tailor {
 				search_query = search_entry.text;
 				on_filter_changed ();
 			});
-		}
-
-		public void setup (OsinfoResult result) {
-			primary_os_label.label = primary_os_title;
-
-			foreach (var os in result.oses)
-				os_store.append (os);
-
-			arches_list.add_all (result.arches);
-
-			setup_models ();
-			setup_arch_dropdown ();
-
-			os_box.visible = true;
 
 			update_box_visibility ();
 		}
 
-		public void show_error (Error e) {
-			download_error.description = "Failed to load OS database";
+		public void show_error () {
 			download_error.visible = true;
 		}
 
@@ -92,11 +94,11 @@ namespace Tailor {
 
 			var primary_model = new Gtk.FilterListModel (
 				base_model,
-				new Gtk.CustomFilter (obj => ((OS) obj).primary)
+				new Gtk.CustomFilter (obj => ((OsDto) obj).primary)
 			);
 			var other_model = new Gtk.FilterListModel (
 				base_model,
-				new Gtk.CustomFilter (obj => !((OS) obj).primary)
+				new Gtk.CustomFilter (obj => !((OsDto) obj).primary)
 			);
 
 			primary_os_list.bind_model (primary_model, make_row);
@@ -104,18 +106,18 @@ namespace Tailor {
 		}
 
 		private bool matches (Object obj) {
-			var os = (OS) obj;
+			var os = (OsDto) obj;
 			return arch_matches (os) && search_matches (os);
 		}
 
-		private bool arch_matches (OS os) {
+		private bool arch_matches (OsDto os) {
 			if (arch_filter == null)
 				return true;
 
 			return os.arches.contains (arch_filter) || os.arches.is_empty;
 		}
 
-		private bool search_matches (OS os) {
+		private bool search_matches (OsDto os) {
 			if (search_query == "")
 				return true;
 
@@ -123,7 +125,7 @@ namespace Tailor {
 		}
 
 		private Gtk.Widget make_row (Object obj) {
-			var os = (OS) obj;
+			var os = (OsDto) obj;
 
 			var row = new Adw.ActionRow ();
 			row.title = os.display_name;

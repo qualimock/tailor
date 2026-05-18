@@ -32,10 +32,6 @@ namespace Tailor {
 
 		public Settings settings { get; private set; }
 		public OsinfoService osinfo_service { get; private set; }
-		public OsinfoResult? osinfo_result { get; private set; }
-
-		public signal void osinfo_ready (OsinfoResult result);
-		public signal void osinfo_failed (Error e);
 
 		public Application () {
 			Object (application_id: Tailor.ID,
@@ -48,43 +44,8 @@ namespace Tailor {
 			settings = new Settings (Tailor.ID);
 			osinfo_service = new OsinfoService ();
 
-			Dex.init ();
-
-			init_osinfo ();
-
 			add_action_entries (APP_ENTRIES, this);
 			set_accels_for_action ("app.quit", { "<Ctrl>Q" });
-		}
-
-		private void init_osinfo () {
-			var future = Dex.thread_spawn ("init-osinfo", () => {
-				try {
-					return new Dex.Future.for_object (
-						osinfo_service.init (settings.get_string ("primary-os"))
-					);
-				} catch (Error e) {
-					return new Dex.Future.for_error (e);
-				}
-			});
-			var chain = new Dex.Future.then (future, () => {
-				try {
-					osinfo_ready (future.get_value ().get_object () as OsinfoResult);
-					return new Dex.Future.for_boolean (true);
-				} catch (Error e) {
-					return new Dex.Future.for_error (e);
-				}
-			});
-			chain = new Dex.Future.catch (chain, (f) => {
-				try {
-					f.get_value ();
-				} catch (Error e) {
-					osinfo_failed (e);
-				}
-
-				return new Dex.Future.for_boolean (false);
-			});
-
-			chain.disown ();
 		}
 
 		public override void activate () {
@@ -93,7 +54,9 @@ namespace Tailor {
 				return;
 			}
 
-			main_window = new MainWindow (this);
+			main_window = new MainWindow (this, osinfo_service);
+
+			osinfo_service.load.begin (settings.get_string ("primary-os"));
 
 			main_window.present ();
 		}

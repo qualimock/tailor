@@ -1,4 +1,4 @@
-/* osinfo-service.vala
+/* os-dto.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,28 +20,16 @@
 
 namespace Tailor {
 
-	public class OsinfoResult : Object {
-		public Gee.ArrayList<OS> oses { get; construct set; }
-		public Gee.TreeSet<string> arches { get; construct set; }
+	public class OsDto : Object {
 
-		public OsinfoResult (Gee.ArrayList<OS> oses, Gee.TreeSet<string> arches) {
-			Object (oses: oses, arches: arches);
-		}
-	}
+		public string id { get; construct; }
+		public string display_name { get; set; }
+		public string vendor { get; set; }
+		public bool primary { get; set; }
+		public Gee.ArrayList<string> arches { get; set; }
 
-	public class OsinfoService {
-
-		private OsinfoRepository repo;
-
-		public OsinfoResult init (string primary_distro) throws Error {
-			repo = new OsinfoRepository ();
-			var oses = repo.init (primary_distro);
-
-			var arches = new Gee.TreeSet<string> ();
-			foreach (var os in oses)
-				arches.add_all (os.arches);
-
-			return new OsinfoResult (oses, arches);
+		public OsDto (string id) {
+			Object (id: id);
 		}
 	}
 }

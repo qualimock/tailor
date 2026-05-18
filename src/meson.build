@@ -9,14 +9,14 @@ app_sources = files(
 	'ui' / 'download-page.vala',
 	'ui' / 'device-card.vala',
 
-	'model' / 'os.vala',
-	'model' / 'usb-device.vala',
+	'osinfo' / 'osinfo-provider.vala',
+	'osinfo' / 'osinfo-service.vala',
+	'osinfo' / 'os-mapper.vala',
+	'osinfo' / 'os-dto.vala',
 
-	'repository' / 'osinfo-repository.vala',
 	'repository' / 'usb-repository.vala',
-
-	'service' / 'osinfo-service.vala',
 	'service' / 'usb-service.vala',
+	'model' / 'usb-device.vala',
 
 ) + configure_file(
 	input: 'build.vala.in',
@@ -26,7 +26,6 @@ app_sources = files(
 
 app_dependencies = [
 	dependency('libadwaita-1'),
-	dependency('libdex-1'),
 	dependency('libosinfo-1.0'),
 	dependency('gee-0.8'),
 	dependency('gio-2.0'),
