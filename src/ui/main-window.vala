@@ -32,8 +32,15 @@ namespace Tailor {
 
 		public MainWindow (Tailor.Application app) {
 			Object (application: app);
-			download_page.osinfo_service = app.osinfo_service;
+
 			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
+
+			if (app.osinfo_result != null) {
+				download_page.setup (app.osinfo_result);
+			} else {
+				app.osinfo_ready.connect ((r) => download_page.setup (r));
+				app.osinfo_failed.connect ((e) => download_page.show_error (e));
+			}
 		}
 	}
 }

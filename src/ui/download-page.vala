@@ -37,57 +37,53 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
-		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
-		private ListStore os_store = new ListStore (typeof (OS));
-		private Gtk.CustomFilter base_filter;
-		private string? arch_filter = null;
-		private string search_query = "";
-
 		public string primary_os_title { get; construct set; default = ""; }
 
-		private OsinfoService _osinfo_service;
-		public OsinfoService osinfo_service {
-			get { return _osinfo_service; }
-			construct set {
-				_osinfo_service = value;
-				if (value == null)
-					return;
-
-				value.os_added.connect (add_os);
-				value.init_succeed.connect (init);
-				value.init_failed.connect (init_error);
-			}
-		}
+		private ListStore os_store = new ListStore (typeof (OS));
+		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
+		private Gtk.CustomFilter base_filter = null;
+		private string? arch_filter = null;
+		private string search_query = "";
 
 		[GtkCallback] private bool logical_not (bool value) { return !value; }
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-		private void init () {
+		construct {
+			arch_dropdown.notify["selected"].connect (() => {
+				arch_filter = arches_list[(int) arch_dropdown.selected];
+				on_filter_changed ();
+			});
+
+			search_entry.changed.connect (() => {
+				search_query = search_entry.text;
+				on_filter_changed ();
+			});
+		}
+
+		public void setup (OsinfoResult result) {
 			primary_os_label.label = primary_os_title;
+
+			foreach (var os in result.oses)
+				os_store.append (os);
+
+			arches_list.add_all (result.arches);
 
 			setup_models ();
 			setup_arch_dropdown ();
 
 			os_box.visible = true;
 
-			arch_dropdown.notify["selected"].connect (() => {
-				arch_filter = arches_list[(int) arch_dropdown.selected];
-				base_filter.changed (Gtk.FilterChange.DIFFERENT);
-				update_box_visibility ();
-			});
-
-			search_entry.changed.connect (() => {
-				search_query = search_entry.text;
-				base_filter.changed (Gtk.FilterChange.DIFFERENT);
-				update_box_visibility ();
-			});
-
 			update_box_visibility ();
 		}
 
-		private void init_error (Error e) {
-			warning ("Failed to load OS database: %s", e.message);
+		public void show_error (Error e) {
+			download_error.description = "Failed to load OS database";
 			download_error.visible = true;
+		}
+
+		private void on_filter_changed () {
+			base_filter.changed (Gtk.FilterChange.DIFFERENT);
+			update_box_visibility ();
 		}
 
 		private void setup_models () {
@@ -136,21 +132,15 @@ namespace Tailor {
 			return row;
 		}
 
-		public void add_os (OS os) {
-			Idle.add (() => {
-				os_store.append (os);
-				return Source.REMOVE;
-			});
-		}
-
 		private bool list_has_visible_rows (Gtk.ListBox list) {
-			var row = list.get_row_at_index (0);
+			int index = 0;
+			var row = list.get_row_at_index (index);
 
-			for (int i = 0; row != null; ) {
+			while (row != null) {
 				if (row.get_child_visible ())
 					return true;
 
-				row = list.get_row_at_index (++i);
+				row = list.get_row_at_index (++index);
 			}
 
 			return false;
@@ -162,7 +152,10 @@ namespace Tailor {
 		}
 
 		private void setup_arch_dropdown () {
-			arches_list.add_all (osinfo_service.arches);
+			if (arches_list.is_empty) {
+				critical ("Empty arches list");
+				return;
+			}
 
 			var model = new Gtk.StringList (null);
 			foreach (var arch in arches_list)

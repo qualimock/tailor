@@ -24,9 +24,7 @@ namespace Tailor {
 
 		private string primary_distro;
 
-		public signal void os_added (OS os);
-
-		public void init (string primary_distro) throws Error {
+		public Gee.ArrayList<OS> init (string primary_distro) throws Error {
 			this.primary_distro = primary_distro;
 
 			var loader = new Osinfo.Loader ();
@@ -35,11 +33,15 @@ namespace Tailor {
 			var os_list = loader.get_db ().get_os_list ();
 			var superseded_oses = get_superseded_oses (os_list);
 
+			var oses = new Gee.ArrayList<OS> ();
 			foreach (var element in os_list.get_elements ()) {
 				var os = make_os ((Osinfo.Os) element, superseded_oses);
+
 				if (os != null)
-					os_added (os);
+					oses.add (os);
 			}
+
+			return oses;
 		}
 
 		private Gee.HashSet<string> get_superseded_oses (Osinfo.OsList os_list) {
@@ -57,7 +59,11 @@ namespace Tailor {
 		}
 
 		private string get_distro_display_name (Osinfo.Os os) {
-			var name = os.get_name () ?? os.get_distro () ?? os.get_short_id ();
+			var name = os.get_name () ??
+			           os.get_distro () ??
+			           os.get_short_id () ??
+			           "Unknown";
+
 			for (int i = 0; i < name.length; i++) {
 				if (name[i].isdigit ())
 					return name[0:i].strip ();

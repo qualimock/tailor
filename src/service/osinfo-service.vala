@@ -20,27 +20,28 @@
 
 namespace Tailor {
 
+	public class OsinfoResult : Object {
+		public Gee.ArrayList<OS> oses { get; construct set; }
+		public Gee.TreeSet<string> arches { get; construct set; }
+
+		public OsinfoResult (Gee.ArrayList<OS> oses, Gee.TreeSet<string> arches) {
+			Object (oses: oses, arches: arches);
+		}
+	}
+
 	public class OsinfoService {
 
 		private OsinfoRepository repo;
 
-		public signal void os_added (OS os);
-		public signal void init_succeed ();
-		public signal void init_failed (Error e);
-
-		public Gee.TreeSet<string> arches = new Gee.TreeSet<string> ();
-
-		private void on_os_added (OS os) {
-			arches.add_all (os.arches);
-			os_added (os);
-		}
-
-		public void init (string primary_distro) throws Error {
+		public OsinfoResult init (string primary_distro) throws Error {
 			repo = new OsinfoRepository ();
+			var oses = repo.init (primary_distro);
 
-			repo.os_added.connect (on_os_added);
+			var arches = new Gee.TreeSet<string> ();
+			foreach (var os in oses)
+				arches.add_all (os.arches);
 
-			repo.init (primary_distro);
+			return new OsinfoResult (oses, arches);
 		}
 	}
 }
