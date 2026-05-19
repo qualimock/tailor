@@ -8,6 +8,7 @@ app_sources = files(
 	'ui' / 'devices-page.vala',
 	'ui' / 'download-page.vala',
 	'ui' / 'device-card.vala',
+	'ui' / 'os-page.vala',
 
 	'osinfo' / 'osinfo-provider.vala',
 	'osinfo' / 'osinfo-service.vala',

@@ -25,10 +25,12 @@ namespace Tailor {
 
 		[GtkChild] private unowned DownloadPage download_page;
 		[GtkChild] private unowned HomePage home_page;
+		[GtkChild] private unowned OsPage os_page;
 
 		static construct {
 			typeof (HomePage).ensure ();
 			typeof (DownloadPage).ensure ();
+			typeof (OsPage).ensure ();
 		}
 
 		public MainWindow (

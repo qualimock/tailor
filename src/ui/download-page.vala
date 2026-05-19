@@ -111,6 +111,11 @@ namespace Tailor {
 			update_box_visibility ();
 		}
 
+		private void update_box_visibility () {
+			primary_os_box.visible = primary_model.n_items > 0;
+			other_os_box.visible = other_model.n_items > 0;
+		}
+
 		private void setup_models () {
 			os_filter = new Gtk.CustomFilter ((obj) => {
 				var os = obj as Os;
@@ -155,29 +160,24 @@ namespace Tailor {
 			return text.down ().contains (search_query.down ());
 		}
 
+		private Gtk.Widget construct_row (string title, string subtitle) {
+			var row = new Adw.ActionRow ();
+			row.title = title;
+			row.subtitle = subtitle;
+			row.activatable = true;
+			row.action_name = "navigation.push";
+			row.action_target = "os-page";
+			return row;
+		}
+
 		private Gtk.Widget make_os_row (Object obj) {
 			var os = (Os) obj;
-
-			var row = new Adw.ActionRow ();
-			row.title = os.display_name;
-			row.subtitle = os.vendor;
-
-			return row;
+			return construct_row (os.display_name, os.vendor);
 		}
 
 		private Gtk.Widget make_family_row (Object obj) {
 			var family = (OsFamily) obj;
-
-			var row = new Adw.ActionRow ();
-			row.title = family.display_name;
-			row.subtitle = family.vendor;
-
-			return row;
-		}
-
-		private void update_box_visibility () {
-			primary_os_box.visible = primary_model.n_items > 0;
-			other_os_box.visible = other_model.n_items > 0;
+			return construct_row (family.display_name, family.vendor);
 		}
 
 		private void setup_arch_dropdown () {
