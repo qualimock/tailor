@@ -51,7 +51,7 @@ namespace Tailor {
 			var superseded = get_superseded_oses (os_list);
 
 			foreach (var os in os_list) {
-				if (!is_eligible (os, superseded))
+				if (!is_eligible (os, superseded) || !is_downloadable (os))
 					continue;
 
 				var os_dto = OsMapper.from_osinfo (os, primary_distro);
@@ -61,6 +61,20 @@ namespace Tailor {
 			}
 
 			loaded ();
+		}
+
+		private bool is_downloadable (Osinfo.Os os) {
+			bool downloadable = false;
+
+			foreach (var entity in os.get_media_list ().get_elements ()) {
+				var media = (Osinfo.Media) entity;
+				if (media.get_url () != null) {
+					downloadable = true;
+					break;
+				}
+			}
+
+			return downloadable;
 		}
 
 		private bool is_eligible (Osinfo.Os os, Gee.HashSet<string> superseded) {
