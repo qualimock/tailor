@@ -69,10 +69,20 @@ namespace Tailor {
 
 		public void populate () {
 			primary_os_label.label = primary_os_title;
-
 			os_store.remove_all ();
+
+			var families = new Gee.HashMap<string, OsDto> ();
 			foreach (var os in osinfo_service.oses)
-				os_store.append (os);
+				families.set (os.family, os);
+
+			var keys = new Gee.ArrayList<string> ();
+			foreach (var key in families.keys)
+				keys.add (key);
+
+			keys.sort ();
+
+			foreach (var key in keys)
+				os_store.append (families.get (key));
 
 			arches_list.add_all (osinfo_service.arches);
 

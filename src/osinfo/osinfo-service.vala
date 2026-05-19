@@ -64,13 +64,9 @@ namespace Tailor {
 		}
 
 		private bool is_eligible (Osinfo.Os os, Gee.HashSet<string> superseded) {
-			if (superseded.contains (os.get_id ()))
-				return false;
-
-			if (os.get_param_value ("eol-date") != null)
-				return false;
-
-			return true;
+			return !superseded.contains (os.get_id ()) &&
+			        os.get_param_value ("eol-date") == null &&
+			        os.get_distro () != null;
 		}
 
 		private Gee.HashSet<string> get_superseded_oses (Gee.ArrayList<Osinfo.Os> os_list) {

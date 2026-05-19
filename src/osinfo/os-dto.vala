@@ -25,6 +25,7 @@ namespace Tailor {
 		public string id { get; construct; }
 		public string display_name { get; set; }
 		public string vendor { get; set; }
+		public string family { get; set; }
 		public bool primary { get; set; }
 		public Gee.ArrayList<string> arches { get; set; }
 

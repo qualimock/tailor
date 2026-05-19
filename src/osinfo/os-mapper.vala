@@ -26,7 +26,8 @@ namespace Tailor {
 			var dto = new OsDto (os.get_id ());
 			dto.display_name = get_os_display_name (os);
 			dto.vendor = os.vendor;
-			dto.primary = (os.get_distro () == primary_distro);
+			dto.family = os.distro.down ();
+			dto.primary = (os.distro == primary_distro);
 			dto.arches = get_os_arches (os);
 			return dto;
 		}
