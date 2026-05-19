@@ -40,6 +40,8 @@ namespace Tailor {
 		public OsinfoService osinfo_service { get; construct set; }
 		public string primary_os_title { get; construct set; default = ""; }
 
+		private Gtk.FilterListModel primary_model;
+		private Gtk.FilterListModel other_model;
 		private ListStore os_store = new ListStore (typeof (OsDto));
 		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
 		private Gtk.CustomFilter base_filter = null;
@@ -92,11 +94,11 @@ namespace Tailor {
 			base_filter = new Gtk.CustomFilter (matches);
 			var base_model = new Gtk.FilterListModel (os_store, base_filter);
 
-			var primary_model = new Gtk.FilterListModel (
+			primary_model = new Gtk.FilterListModel (
 				base_model,
 				new Gtk.CustomFilter (obj => ((OsDto) obj).primary)
 			);
-			var other_model = new Gtk.FilterListModel (
+			other_model = new Gtk.FilterListModel (
 				base_model,
 				new Gtk.CustomFilter (obj => !((OsDto) obj).primary)
 			);
@@ -134,23 +136,9 @@ namespace Tailor {
 			return row;
 		}
 
-		private bool list_has_visible_rows (Gtk.ListBox list) {
-			int index = 0;
-			var row = list.get_row_at_index (index);
-
-			while (row != null) {
-				if (row.get_child_visible ())
-					return true;
-
-				row = list.get_row_at_index (++index);
-			}
-
-			return false;
-		}
-
 		private void update_box_visibility () {
-			primary_os_box.visible = list_has_visible_rows (primary_os_list);
-			other_os_box.visible = list_has_visible_rows (other_os_list);
+			primary_os_box.visible = primary_model.n_items > 0;
+			other_os_box.visible = other_model.n_items > 0;
 		}
 
 		private void setup_arch_dropdown () {
