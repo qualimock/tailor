@@ -70,12 +70,22 @@ namespace Tailor {
 		}
 
 		private static string get_os_id (Osinfo.Os os, Osinfo.Media media) {
+			const string[] SUFFIXES = { "-netinst", "-netinstall", "-live", "-dvd" };
+
 			var variants = media.get_os_variants ().get_elements ();
 			var id = os.id;
 
-			return variants.is_empty ()
-				? id[0:id.last_index_of ("/")]
-				: ((Osinfo.OsVariant) variants.nth_data (0)).id;
+			if (variants.is_empty ())
+				return id[0:id.last_index_of ("/")];
+
+			id = ((Osinfo.OsVariant) variants.nth_data (0)).id;
+
+			foreach (var suffix in SUFFIXES) {
+				if (id.has_suffix (suffix))
+					return id[0:id.length - suffix.length];
+			}
+
+			return id;
 		}
 
 		private static string get_os_display_name (Osinfo.Os os, Osinfo.Media media) {
