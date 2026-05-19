@@ -70,6 +70,7 @@ namespace Tailor {
 		public void populate () {
 			primary_os_label.label = primary_os_title;
 
+			os_store.remove_all ();
 			foreach (var os in osinfo_service.oses)
 				os_store.append (os);
 
