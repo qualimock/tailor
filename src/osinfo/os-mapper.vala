@@ -22,39 +22,73 @@ namespace Tailor {
 
 	public class OsMapper {
 
-		public static OsDto from_osinfo (Osinfo.Os os, string primary_distro) {
-			var dto = new OsDto (os.get_id ());
-			dto.display_name = get_os_display_name (os);
-			dto.vendor = os.vendor;
+		public static Os os_from_osinfo (Osinfo.Os os, Osinfo.Media media, string primary_distro) {
+
+			var dto = new Os (get_os_id (os, media));
+			dto.display_name = get_os_display_name (os, media);
+			dto.variant = os.vendor;
+			dto.version = os.version;
+			dto.arch = media.get_architecture ();
 			dto.family = os.distro.down ();
+			dto.vendor = os.vendor;
+			dto.url = media.get_url ();
 			dto.primary = (os.distro == primary_distro);
-			dto.arches = get_os_arches (os);
 			return dto;
 		}
 
-		private static string get_os_display_name (Osinfo.Os os) {
-			var name = os.get_name () ??
-			           os.get_distro () ??
-			           os.get_short_id () ??
-			           "Unknown";
+		public static OsFamily family_from_osinfo (Osinfo.Os os, string primary_distro) {
+			var dto = new OsFamily (os.distro, os.vendor);
+			dto.primary = (os.distro == primary_distro);
+			dto.display_name = get_family_display_name (os);
+			return dto;
+		}
 
+		private static string get_family_display_name (Osinfo.Os os) {
+			const string[] SUFFIXES = {
+				"testing", "unstable", "stable",
+				"rolling", "rawhide", "unknown",
+				"factory", "tumbleweed", "latest",
+				"beta", "nightly"
+			};
+
+			var name = os.name;
 			for (int i = 0; i < name.length - 1; i++) {
 				if (name[i] == ' ' && name[i + 1].isdigit ())
 					return name[0:i];
 			}
 
+			int last_space = name.last_index_of (" ");
+			if (last_space >= 0) {
+				var last_word = name[last_space + 1:].down ();
+				foreach (var word in SUFFIXES) {
+					if (word in last_word)
+						return name[0:last_space].strip ();
+				}
+			}
+
 			return name.strip ();
 		}
 
-		private static Gee.ArrayList<string> get_os_arches (Osinfo.Os os) {
-			var arches = new Gee.ArrayList<string> ();
-			foreach (var element in os.get_media_list ().get_elements ()) {
-				var arch = ((Osinfo.Media) element).get_architecture ();
-				if (arch != null && arch != "all" && !arches.contains (arch))
-					arches.add (arch);
-			}
+		private static string get_os_id (Osinfo.Os os, Osinfo.Media media) {
+			var variants = media.get_os_variants ().get_elements ();
+			var id = os.id;
 
-			return arches;
+			return variants.is_empty ()
+				? id[0:id.last_index_of ("/")]
+				: ((Osinfo.OsVariant) variants.nth_data (0)).id;
+		}
+
+		private static string get_os_display_name (Osinfo.Os os, Osinfo.Media media) {
+			var variants = media.get_os_variants ().get_elements ();
+			var name = variants.is_empty ()
+				? null
+				: ((Osinfo.OsVariant) variants.nth_data (0)).get_name ();
+
+			return name ??
+			       os.name ??
+			       os.distro ??
+			       os.short_id ??
+			       "Unknown";
 		}
 	}
 }

@@ -1,4 +1,4 @@
-/* os-dto.vala
+/* os-family.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,17 +20,40 @@
 
 namespace Tailor {
 
-	public class OsDto : Object {
+	public class OsFamily : Object {
 
-		public string id { get; construct; }
+		public string family { get; construct; }
+		public string vendor { get; construct; }
 		public string display_name { get; set; }
-		public string vendor { get; set; }
-		public string family { get; set; }
 		public bool primary { get; set; }
-		public Gee.ArrayList<string> arches { get; set; }
+		public Gee.ArrayList<Os> distros { get; private set; }
+		public Gee.HashMap<string, Gee.ArrayList<Os>> fresh { get; private set; }
 
-		public OsDto (string id) {
-			Object (id: id);
+		public OsFamily (string family, string vendor) {
+			Object (
+				family: family,
+				vendor: vendor
+			);
+
+			distros = new Gee.ArrayList<Os> ();
+		}
+
+		public Gee.HashMap<string, Os> get_fresh_oses () {
+			var fresh = new Gee.HashMap<string, Os> ();
+			foreach (var distro in distros) {
+				if (!fresh.has_key (distro.id)) {
+					fresh.set (distro.id, distro);
+					continue;
+				}
+
+				double current = double.parse (distro.version);
+				double contained = double.parse (fresh.get (distro.id).version);
+
+				if (current > contained)
+					fresh[distro.id] = distro;
+			}
+
+			return fresh;
 		}
 	}
 }

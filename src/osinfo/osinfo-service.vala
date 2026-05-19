@@ -24,12 +24,12 @@ namespace Tailor {
 
 		private OsinfoProvider provider;
 
-		public Gee.ArrayList<OsDto> oses { get; private set; }
+		public Gee.HashMap<string, OsFamily> families { get; private set; }
 		public Gee.TreeSet<string> arches { get; private set; }
 
 		public OsinfoService () {
 			provider = new OsinfoProvider ();
-			oses = new Gee.ArrayList<OsDto> ();
+			families = new Gee.HashMap<string, OsFamily> ();
 			arches = new Gee.TreeSet<string> ();
 		}
 
@@ -44,57 +44,59 @@ namespace Tailor {
 				return;
 			}
 
-			oses.clear ();
-			arches.clear ();
-
-			var os_list = provider.get_os_list ();
-			var superseded = get_superseded_oses (os_list);
-
-			foreach (var os in os_list) {
-				if (!is_eligible (os, superseded) || !is_downloadable (os))
-					continue;
-
-				var os_dto = OsMapper.from_osinfo (os, primary_distro);
-
-				oses.add (os_dto);
-				arches.add_all (os_dto.arches);
-			}
+			collect_oses (primary_distro);
 
 			loaded ();
 		}
 
-		private bool is_downloadable (Osinfo.Os os) {
-			bool downloadable = false;
+		private void collect_oses (string primary_distro) {
+			families.clear ();
+			arches.clear ();
 
-			foreach (var entity in os.get_media_list ().get_elements ()) {
-				var media = (Osinfo.Media) entity;
-				if (media.get_url () != null) {
-					downloadable = true;
-					break;
+			foreach (var os in provider.get_os_list ()) {
+				if (os.distro == null || is_at_eol (os)) {
+					continue;
 				}
-			}
 
-			return downloadable;
+				var os_family_dto = OsMapper.family_from_osinfo (os, primary_distro);
+
+				foreach (var entity in os.get_media_list ().get_elements ()) {
+					var media = (Osinfo.Media) entity;
+					if (!is_downloadable (media))
+						continue;
+
+					var os_dto = OsMapper.os_from_osinfo (os, media, primary_distro);
+
+					os_family_dto.distros.add (os_dto);
+					arches.add (os_dto.arch);
+				}
+
+				if (os_family_dto.distros.is_empty)
+					continue;
+
+				if (families.has_key (os_family_dto.family))
+					families[os_family_dto.family].distros.add_all (os_family_dto.distros);
+				else
+					families.set (os_family_dto.family, os_family_dto);
+			}
 		}
 
-		private bool is_eligible (Osinfo.Os os, Gee.HashSet<string> superseded) {
-			return !superseded.contains (os.get_id ()) &&
-			        os.get_param_value ("eol-date") == null &&
-			        os.get_distro () != null;
+		private bool is_downloadable (Osinfo.Media media) {
+			return media.get_url () != null;
 		}
 
-		private Gee.HashSet<string> get_superseded_oses (Gee.ArrayList<Osinfo.Os> os_list) {
-			var superseded = new Gee.HashSet<string> ();
+		private bool is_at_eol (Osinfo.Os os) {
+			var eol = os.get_eol_date ();
+			if (eol == null)
+				return false;
 
-			foreach (var entity in os_list) {
-				var osinfo_os = (Osinfo.Os) entity;
-				var upgrades = osinfo_os.get_related (Osinfo.ProductRelationship.UPGRADES);
+			var today = Date ();
+			today.set_time_t (time_t ());
 
-				foreach (var older in upgrades.get_elements ())
-					superseded.add (older.get_id ());
-			}
+			if (eol.compare (today) < 0)
+				return true;
 
-			return superseded;
+			return false;
 		}
 	}
 }

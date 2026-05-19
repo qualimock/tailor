@@ -40,11 +40,13 @@ namespace Tailor {
 		public OsinfoService osinfo_service { get; construct set; }
 		public string primary_os_title { get; construct set; default = ""; }
 
+		private ListStore os_store = new ListStore (typeof (Os));
+		private ListStore family_store = new ListStore (typeof (OsFamily));
+		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
 		private Gtk.FilterListModel primary_model;
 		private Gtk.FilterListModel other_model;
-		private ListStore os_store = new ListStore (typeof (OsDto));
-		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
-		private Gtk.CustomFilter base_filter = null;
+		private Gtk.CustomFilter os_filter = null;
+		private Gtk.CustomFilter family_filter = null;
 		private string? arch_filter = null;
 		private string search_query = "";
 
@@ -69,20 +71,25 @@ namespace Tailor {
 
 		public void populate () {
 			primary_os_label.label = primary_os_title;
+
 			os_store.remove_all ();
+			family_store.remove_all ();
+			arches_list.clear ();
 
-			var families = new Gee.HashMap<string, OsDto> ();
-			foreach (var os in osinfo_service.oses)
-				families.set (os.family, os);
+			var families = new Gee.ArrayList<OsFamily> ();
+			families.add_all (osinfo_service.families.values);
+			families.sort ((a, b) => {
+				return strcmp (a.display_name, b.display_name);
+			});
 
-			var keys = new Gee.ArrayList<string> ();
-			foreach (var key in families.keys)
-				keys.add (key);
-
-			keys.sort ();
-
-			foreach (var key in keys)
-				os_store.append (families.get (key));
+			foreach (var family in families) {
+				if (family.primary == true) {
+					foreach (var os in family.get_fresh_oses ().values)
+						os_store.append (os);
+				} else {
+					family_store.append (family);
+				}
+			}
 
 			arches_list.add_all (osinfo_service.arches);
 
@@ -99,52 +106,71 @@ namespace Tailor {
 		}
 
 		private void on_filter_changed () {
-			base_filter.changed (Gtk.FilterChange.DIFFERENT);
+			os_filter.changed (Gtk.FilterChange.DIFFERENT);
+			family_filter.changed (Gtk.FilterChange.DIFFERENT);
 			update_box_visibility ();
 		}
 
 		private void setup_models () {
-			base_filter = new Gtk.CustomFilter (matches);
-			var base_model = new Gtk.FilterListModel (os_store, base_filter);
+			os_filter = new Gtk.CustomFilter ((obj) => {
+				var os = obj as Os;
+				return os_arch_matches (os) && search_matches (os.display_name);
+			});
+			family_filter = new Gtk.CustomFilter ((obj) => {
+				var family = obj as OsFamily;
+				return family_arches_matches (family) && search_matches (family.display_name);
+			});
 
-			primary_model = new Gtk.FilterListModel (
-				base_model,
-				new Gtk.CustomFilter (obj => ((OsDto) obj).primary)
-			);
-			other_model = new Gtk.FilterListModel (
-				base_model,
-				new Gtk.CustomFilter (obj => !((OsDto) obj).primary)
-			);
+			primary_model = new Gtk.FilterListModel (os_store, os_filter);
+			other_model = new Gtk.FilterListModel (family_store, family_filter);
 
-			primary_os_list.bind_model (primary_model, make_row);
-			other_os_list.bind_model (other_model, make_row);
+			primary_os_list.bind_model (primary_model, make_os_row);
+			other_os_list.bind_model (other_model, make_family_row);
 		}
 
-		private bool matches (Object obj) {
-			var os = (OsDto) obj;
-			return arch_matches (os) && search_matches (os);
-		}
-
-		private bool arch_matches (OsDto os) {
+		private bool family_arches_matches (OsFamily family) {
 			if (arch_filter == null)
 				return true;
 
-			return os.arches.contains (arch_filter) || os.arches.is_empty;
+			bool found = false;
+			foreach (var distro in family.distros) {
+				if (distro.arch == arch_filter || distro.arch == null)
+					found = true;
+			}
+
+			return found;
 		}
 
-		private bool search_matches (OsDto os) {
+		private bool os_arch_matches (Os os) {
+			if (arch_filter == null)
+				return true;
+
+			return os.arch == arch_filter || os.arch == null;
+		}
+
+		private bool search_matches (string text) {
 			if (search_query == "")
 				return true;
 
-			return os.display_name.down ().contains (search_query.down ());
+			return text.down ().contains (search_query.down ());
 		}
 
-		private Gtk.Widget make_row (Object obj) {
-			var os = (OsDto) obj;
+		private Gtk.Widget make_os_row (Object obj) {
+			var os = (Os) obj;
 
 			var row = new Adw.ActionRow ();
 			row.title = os.display_name;
 			row.subtitle = os.vendor;
+
+			return row;
+		}
+
+		private Gtk.Widget make_family_row (Object obj) {
+			var family = (OsFamily) obj;
+
+			var row = new Adw.ActionRow ();
+			row.title = family.display_name;
+			row.subtitle = family.vendor;
 
 			return row;
 		}
