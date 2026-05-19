@@ -55,6 +55,18 @@ namespace Tailor {
 			Object (osinfo_service: osinfo_service);
 		}
 
+		construct {
+			arch_dropdown.notify["selected"].connect (() => {
+				arch_filter = arches_list[(int) arch_dropdown.selected];
+				on_filter_changed ();
+			});
+
+			search_entry.changed.connect (() => {
+				search_query = search_entry.text;
+				on_filter_changed ();
+			});
+		}
+
 		public void populate () {
 			primary_os_label.label = primary_os_title;
 
@@ -67,16 +79,6 @@ namespace Tailor {
 			setup_arch_dropdown ();
 
 			os_box.visible = true;
-
-			arch_dropdown.notify["selected"].connect (() => {
-				arch_filter = arches_list[(int) arch_dropdown.selected];
-				on_filter_changed ();
-			});
-
-			search_entry.changed.connect (() => {
-				search_query = search_entry.text;
-				on_filter_changed ();
-			});
 
 			update_box_visibility ();
 		}
