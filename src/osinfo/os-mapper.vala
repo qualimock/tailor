@@ -37,9 +37,9 @@ namespace Tailor {
 			           os.get_short_id () ??
 			           "Unknown";
 
-			for (int i = 0; i < name.length; i++) {
-				if (name[i].isdigit ())
-					return name[0:i].strip ();
+			for (int i = 0; i < name.length - 1; i++) {
+				if (name[i] == ' ' && name[i + 1].isdigit ())
+					return name[0:i];
 			}
 
 			return name.strip ();
