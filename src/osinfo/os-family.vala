@@ -41,16 +41,17 @@ namespace Tailor {
 		public Gee.HashMap<string, Os> get_fresh_oses () {
 			var fresh = new Gee.HashMap<string, Os> ();
 			foreach (var distro in distros) {
-				if (!fresh.has_key (distro.id)) {
-					fresh.set (distro.id, distro);
+				var key = distro.id + "/" + distro.arch;
+				if (!fresh.has_key (key)) {
+					fresh.set (key, distro);
 					continue;
 				}
 
 				double current = double.parse (distro.version);
-				double contained = double.parse (fresh.get (distro.id).version);
+				double contained = double.parse (fresh.get (key).version);
 
 				if (current > contained)
-					fresh[distro.id] = distro;
+					fresh[key] = distro;
 			}
 
 			return fresh;
