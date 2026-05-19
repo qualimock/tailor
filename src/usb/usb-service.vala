@@ -70,9 +70,10 @@ namespace Tailor {
 
 		private void on_device_updated (UsbDto device) {
 			var old = devices.first_match (d => d.object_path == device.object_path);
-			if (old != null)
-				devices.remove (old);
+			if (old == null)
+				return;
 
+			devices.remove (old);
 			devices.add (device);
 			device_updated (device);
 		}
