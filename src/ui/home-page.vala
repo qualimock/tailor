@@ -23,9 +23,17 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/home-page.ui")]
 	public class HomePage : Adw.NavigationPage {
 
+		[GtkChild] internal unowned DevicesPage devices_page;
+
+		public UsbService usb_service { get; construct set; }
+
 		static construct {
 			typeof (WritePage).ensure ();
 			typeof (DevicesPage).ensure ();
+		}
+
+		construct {
+			devices_page.usb_service = usb_service;
 		}
 	}
 }

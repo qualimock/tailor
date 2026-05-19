@@ -24,6 +24,7 @@ namespace Tailor {
 	public class MainWindow : Adw.ApplicationWindow {
 
 		[GtkChild] private unowned DownloadPage download_page;
+		[GtkChild] private unowned HomePage home_page;
 
 		static construct {
 			typeof (HomePage).ensure ();
@@ -32,7 +33,8 @@ namespace Tailor {
 
 		public MainWindow (
 			Tailor.Application app,
-			OsinfoService osinfo_service
+			OsinfoService osinfo_service,
+			UsbService usb_service
 		) {
 			Object (application: app);
 
@@ -41,6 +43,8 @@ namespace Tailor {
 
 			osinfo_service.loaded.connect (download_page.populate);
 			osinfo_service.load_failed.connect (download_page.show_error);
+
+			home_page.devices_page.usb_service = usb_service;
 		}
 	}
 }

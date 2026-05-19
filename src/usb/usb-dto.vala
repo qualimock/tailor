@@ -1,4 +1,4 @@
-/* usb-device.vala
+/* usb-dto.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,7 +20,7 @@
 
 namespace Tailor {
 
-	public class UsbDevice : Object {
+	public class UsbDto : Object {
 
 		public string object_path { get; construct; }
 		public string device_file { get; set; }
@@ -29,7 +29,7 @@ namespace Tailor {
 		public uint64 size { get; set; }
 		public string size_display { get; set; }
 
-		public UsbDevice (string object_path) {
+		public UsbDto (string object_path) {
 			Object (object_path: object_path);
 		}
 	}

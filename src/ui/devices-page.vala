@@ -25,23 +25,23 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.Box devices_box;
 
-		private UsbService usb_service = new UsbService ();
+		public UsbService usb_service { get; construct set; }
 		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
 
 		construct {
+			notify["usb-service"].connect (on_usb_service_set);
+		}
+
+		private void on_usb_service_set () {
+			if (usb_service == null)
+				return;
+
 			usb_service.device_added.connect (add_device);
 			usb_service.device_removed.connect (remove_device);
 			usb_service.device_updated.connect (update_device);
-			usb_service.init_async.begin ((obj, res) => {
-				try {
-					usb_service.init_async.end (res);
-				} catch (Error e) {
-					warning ("USB init failed: %s", e.message);
-				}
-			});
 		}
 
-		public void add_device (UsbDevice device) {
+		public void add_device (UsbDto device) {
 			var card = new DeviceCard ();
 			card.device_name = device.name;
 			card.filesystem = device.filesystem;
@@ -64,7 +64,7 @@ namespace Tailor {
 				devices_box.visible = false;
 		}
 
-		public void update_device (UsbDevice device) {
+		public void update_device (UsbDto device) {
 			var card = cards[device.object_path];
 			if (card == null)
 				return;

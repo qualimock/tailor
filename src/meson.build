@@ -14,9 +14,10 @@ app_sources = files(
 	'osinfo' / 'os-mapper.vala',
 	'osinfo' / 'os-dto.vala',
 
-	'repository' / 'usb-repository.vala',
-	'service' / 'usb-service.vala',
-	'model' / 'usb-device.vala',
+	'usb' / 'usb-provider.vala',
+	'usb' / 'usb-service.vala',
+	'usb' / 'usb-mapper.vala',
+	'usb' / 'usb-dto.vala',
 
 ) + configure_file(
 	input: 'build.vala.in',
@@ -39,3 +40,15 @@ executable(
 	vala_args: ['--pkg=posix'],
 	install: true
 )
+
+vala_lint = find_program('vala-lint', required: false)
+if vala_lint.found()
+	test(
+		'Lint vala files',
+		vala_lint,
+		args: [
+			'--config', meson.source_root() / 'vala-lint.conf',
+			meson.current_source_dir()
+		]
+	)
+endif
