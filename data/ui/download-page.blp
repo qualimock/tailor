@@ -33,7 +33,6 @@ template $TailorDownloadPage : Adw.NavigationPage {
 				orientation: vertical;
 
 				Adw.StatusPage spinner {
-					hexpand: true;
 					vexpand: true;
 
 					child: Adw.Spinner {
@@ -52,6 +51,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 					icon-name: "sad-computer-symbolic";
 					title: _("Loading Failed");
 					description: _("OS database failed to load");
+					vexpand: true;
 					visible: false;
 				}
 
