@@ -60,12 +60,13 @@ namespace Tailor {
 		}
 
 		private void on_device_removed (string object_path) {
+			device_removed (object_path);
+
 			var removed = devices.first_match (d => d.object_path == object_path);
 			if (removed == null)
 				return;
 
 			devices.remove (removed);
-			device_removed (object_path);
 		}
 
 		private void on_device_updated (UsbDto device) {
