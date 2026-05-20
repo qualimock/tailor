@@ -47,19 +47,34 @@ template $TailorOsPage : Adw.NavigationPage {
 				ListBox {
 					styles [ "boxed-list" ]
 
-					Adw.ComboRow {
+					Adw.ActionRow {
 						title: _("Edition");
 						selectable: false;
+
+						[suffix]
+						DropDown edition_dropdown {
+							valign: center;
+						}
 					}
 
-					Adw.ComboRow {
+					Adw.ActionRow {
 						title: _("Version");
 						selectable: false;
+
+						[suffix]
+						DropDown version_dropdown {
+							valign: center;
+						}
 					}
 
-					Adw.ComboRow {
+					Adw.ActionRow {
 						title: _("Architecture");
 						selectable: false;
+
+						[suffix]
+						DropDown arch_dropdown {
+							valign: center;
+						}
 					}
 				}
 
@@ -151,9 +166,14 @@ template $TailorOsPage : Adw.NavigationPage {
 				ListBox {
 					styles [ "boxed-list" ]
 
-					Adw.ComboRow devices_row {
+					Adw.ActionRow {
 						title: _("Target device");
 						selectable: false;
+
+						[suffix]
+						DropDown devices_dropdown {
+							valign: center;
+						}
 					}
 				}
 			}

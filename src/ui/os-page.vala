@@ -23,7 +23,10 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/os-page.ui")]
 	public class OsPage : Adw.NavigationPage {
 
-		[GtkChild] private unowned Adw.ComboRow devices_row;
+		[GtkChild] private unowned Gtk.DropDown edition_dropdown;
+		[GtkChild] private unowned Gtk.DropDown version_dropdown;
+		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
+		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
 		private ServiceContext _service;
 		public ServiceContext service {
@@ -41,8 +44,8 @@ namespace Tailor {
 		private ListStore device_store = new ListStore (typeof (UsbDto));
 
 		construct {
-			devices_row.model = new Gtk.SingleSelection (device_store);
-			devices_row.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
+			devices_dropdown.model = new Gtk.SingleSelection (device_store);
+			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
 		}
 
 		public void add_device (UsbDto device) {
