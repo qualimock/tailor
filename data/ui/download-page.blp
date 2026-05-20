@@ -2,144 +2,151 @@ using Gtk 4.0;
 using Adw 1;
 
 template $TailorDownloadPage : Adw.NavigationPage {
-	title: _("Download Image");
 	tag: "download-page";
 
-	child: Adw.BreakpointBin {
-		width-request: 1;
-		height-request: 1;
+	child: Adw.NavigationView {
+		Adw.NavigationPage {
+			title: _("Download Image");
 
-		Adw.Breakpoint {
-			condition ("max-width: 599")
+			child: Adw.BreakpointBin {
+				width-request: 1;
+				height-request: 1;
 
-			setters {
-				search_box.orientation: vertical;
-			}
+				Adw.Breakpoint {
+					condition ("max-width: 599")
+
+					setters {
+						search_box.orientation: vertical;
+					}
+				}
+
+				child: Adw.ToolbarView {
+					[top]
+					Adw.HeaderBar {
+						[end]
+						Button {
+							styles [ "flat" ]
+
+							tooltip-text: _("");
+							icon-name: "open-menu-symbolic";
+						}
+					}
+
+					content: Box {
+						orientation: vertical;
+
+						Adw.StatusPage spinner {
+							vexpand: true;
+
+							child: Adw.Spinner {
+								height-request: 64;
+								width-request: 64;
+							};
+
+							title: _("Loading");
+							description: _("Loading OS database…");
+							visible: bind $logical_not(
+								$logical_or(download_error.visible, os_box.visible) as <bool>
+							) as <bool>;
+						}
+
+						Adw.StatusPage download_error {
+							icon-name: "sad-computer-symbolic";
+							title: _("Loading Failed");
+							description: _("OS database failed to load");
+							vexpand: true;
+							visible: false;
+						}
+
+						Box os_box {
+							orientation: vertical;
+							hexpand: true;
+							visible: false;
+
+							Box search_box {
+								styles [ "linked" ]
+
+								orientation: horizontal;
+								margin-top: 8;
+								margin-bottom: 12;
+								margin-start: 12;
+								margin-end: 12;
+
+								Entry search_entry {
+									placeholder-text: _("Search");
+									primary-icon-name: "system-search";
+									hexpand: true;
+								}
+								DropDown arch_dropdown {}
+							}
+
+							Adw.StatusPage search_error {
+								valign: center;
+								vexpand: true;
+
+								icon-name: "edit-find-symbolic";
+								title: _("No results");
+								description: _("Try to search for something else");
+
+								visible: bind os_window.visible inverted;
+							}
+
+							ScrolledWindow os_window {
+								vexpand: true;
+								visible: bind $logical_or(
+									primary_os_box.visible,
+									other_os_box.visible
+								) as <bool>;
+
+								child: Box {
+									orientation: vertical;
+									margin-top: 12;
+									margin-bottom: 12;
+									margin-start: 12;
+									margin-end: 12;
+									spacing: 24;
+
+									Box primary_os_box {
+										orientation: vertical;
+										spacing: 12;
+
+										Label primary_os_label {
+											styles [ "title-4" ]
+											halign: start;
+
+											label: _("Primary OS");
+										}
+
+										ListBox primary_os_list {
+											styles [ "boxed-list" ]
+											hexpand: true;
+										}
+									}
+
+									Box other_os_box {
+										orientation: vertical;
+										spacing: 12;
+
+										Label {
+											styles [ "title-4" ]
+											halign: start;
+
+											label: _("Other operating systems");
+										}
+
+										ListBox other_os_list {
+											styles [ "boxed-list" ]
+											hexpand: true;
+										}
+									}
+								};
+							}
+						}
+					};
+				};
+			};
 		}
 
-		child: Adw.ToolbarView {
-			[top]
-			Adw.HeaderBar {
-				[end]
-				Button {
-					styles [ "flat" ]
-
-					tooltip-text: _("");
-					icon-name: "open-menu-symbolic";
-				}
-			}
-
-			content: Box {
-				orientation: vertical;
-
-				Adw.StatusPage spinner {
-					vexpand: true;
-
-					child: Adw.Spinner {
-						height-request: 64;
-						width-request: 64;
-					};
-
-					title: _("Loading");
-					description: _("Loading OS database…");
-					visible: bind $logical_not(
-						$logical_or(download_error.visible, os_box.visible) as <bool>
-					) as <bool>;
-				}
-
-				Adw.StatusPage download_error {
-					icon-name: "sad-computer-symbolic";
-					title: _("Loading Failed");
-					description: _("OS database failed to load");
-					vexpand: true;
-					visible: false;
-				}
-
-				Box os_box {
-					orientation: vertical;
-					hexpand: true;
-					visible: false;
-
-					Box search_box {
-						styles [ "linked" ]
-
-						orientation: horizontal;
-						margin-top: 8;
-						margin-bottom: 12;
-						margin-start: 12;
-						margin-end: 12;
-
-						Entry search_entry {
-							placeholder-text: _("Search");
-							primary-icon-name: "system-search";
-							hexpand: true;
-						}
-						DropDown arch_dropdown {}
-					}
-
-					Adw.StatusPage search_error {
-						valign: center;
-						vexpand: true;
-
-						icon-name: "edit-find-symbolic";
-						title: _("No results");
-						description: _("Try to search for something else");
-
-						visible: bind os_window.visible inverted;
-					}
-
-					ScrolledWindow os_window {
-						vexpand: true;
-						visible: bind $logical_or(
-							primary_os_box.visible,
-							other_os_box.visible
-						) as <bool>;
-
-						child: Box {
-							orientation: vertical;
-							margin-top: 12;
-							margin-bottom: 12;
-							margin-start: 12;
-							margin-end: 12;
-							spacing: 24;
-
-							Box primary_os_box {
-								orientation: vertical;
-								spacing: 12;
-
-								Label primary_os_label {
-									styles [ "title-4" ]
-									halign: start;
-
-									label: _("Primary OS");
-								}
-
-								ListBox primary_os_list {
-									styles [ "boxed-list" ]
-									hexpand: true;
-								}
-							}
-
-							Box other_os_box {
-								orientation: vertical;
-								spacing: 12;
-
-								Label {
-									styles [ "title-4" ]
-									halign: start;
-
-									label: _("Other operating systems");
-								}
-
-								ListBox other_os_list {
-									styles [ "boxed-list" ]
-									hexpand: true;
-								}
-							}
-						};
-					}
-				}
-			};
-		};
+		$TailorOsPage os_page {}
 	};
 }

@@ -25,12 +25,10 @@ namespace Tailor {
 
 		[GtkChild] private unowned DownloadPage download_page;
 		[GtkChild] private unowned HomePage home_page;
-		[GtkChild] private unowned OsPage os_page;
 
 		static construct {
 			typeof (HomePage).ensure ();
 			typeof (DownloadPage).ensure ();
-			typeof (OsPage).ensure ();
 		}
 
 		public MainWindow (
@@ -41,13 +39,13 @@ namespace Tailor {
 			Object (application: app);
 
 			download_page.osinfo_service = osinfo_service;
+			download_page.usb_service = usb_service;
 			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
 
 			osinfo_service.loaded.connect (download_page.populate);
 			osinfo_service.load_failed.connect (download_page.show_error);
 
 			home_page.devices_page.usb_service = usb_service;
-			os_page.usb_service = usb_service;
 		}
 	}
 }
