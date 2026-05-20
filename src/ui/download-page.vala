@@ -50,23 +50,23 @@ namespace Tailor {
 		private string? arch_filter = null;
 		private string search_query = "";
 
-		[GtkCallback] private bool logical_not (bool value) { return !value; }
-		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
-
 		static construct {
 			typeof (OsPage).ensure ();
 		}
 
-		construct {
-			arch_dropdown.notify["selected"].connect (() => {
-				arch_filter = arches_list[(int) arch_dropdown.selected];
-				on_filter_changed ();
-			});
+		[GtkCallback] private bool logical_not (bool value) { return !value; }
+		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-			search_entry.changed.connect (() => {
-				search_query = search_entry.text;
-				on_filter_changed ();
-			});
+		[GtkCallback]
+		private void on_arch_dropdown_selected () {
+			arch_filter = arches_list[(int) arch_dropdown.selected];
+			on_filter_changed ();
+		}
+
+		[GtkCallback]
+		private void on_search_entry_changed () {
+			search_query = search_entry.text;
+			on_filter_changed ();
 		}
 
 		public void populate () {

@@ -76,8 +76,13 @@ template $TailorDownloadPage : Adw.NavigationPage {
 									placeholder-text: _("Search");
 									primary-icon-name: "system-search";
 									hexpand: true;
+
+									changed => $on_search_entry_changed();
 								}
-								DropDown arch_dropdown {}
+
+								DropDown arch_dropdown {
+									notify::selected => $on_arch_dropdown_selected ();
+								}
 							}
 
 							Adw.StatusPage search_error {
