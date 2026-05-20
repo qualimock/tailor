@@ -25,22 +25,24 @@ namespace Tailor {
 
 		[GtkChild] private unowned Adw.ComboRow devices_row;
 
-		public UsbService usb_service { get; construct set; }
+		private ServiceContext _service;
+		public ServiceContext service {
+			get { return _service; }
+			set {
+				_service = value;
+				if (value == null)
+					return;
+
+				value.usb.device_added.connect (add_device);
+				value.usb.device_removed.connect (remove_device);
+			}
+		}
+
 		private ListStore device_store = new ListStore (typeof (UsbDto));
 
 		construct {
-			notify["usb-service"].connect (on_usb_service_set);
-
 			devices_row.model = new Gtk.SingleSelection (device_store);
 			devices_row.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
-		}
-
-		private void on_usb_service_set () {
-			if (usb_service == null)
-				return;
-
-			usb_service.device_added.connect (add_device);
-			usb_service.device_removed.connect (remove_device);
 		}
 
 		public void add_device (UsbDto device) {
@@ -48,7 +50,7 @@ namespace Tailor {
 		}
 
 		public void remove_device (string object_path) {
-			var match = usb_service.devices.first_match (
+			var match = service.usb.devices.first_match (
 				d => d.object_path == object_path
 			);
 

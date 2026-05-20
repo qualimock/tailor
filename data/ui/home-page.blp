@@ -36,7 +36,9 @@ template $TailorHomePage : Adw.NavigationPage {
 				title: _("Devices");
 				icon-name: "settings-symbolic";
 
-				child: $TailorDevicesPage devices_page {};
+				child: $TailorDevicesPage devices_page {
+					service: bind template.service;
+				};
 			}
 		};
 

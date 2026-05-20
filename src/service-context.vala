@@ -1,4 +1,4 @@
-/* home-page.vala
+/* service-context.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,14 +20,19 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/home-page.ui")]
-	public class HomePage : Adw.NavigationPage {
+	public class ServiceContext : Object {
 
-		public ServiceContext service { get; construct set; }
+		public OsinfoService osinfo { get; construct; }
+		public UsbService usb { get; construct; }
 
-		static construct {
-			typeof (WritePage).ensure ();
-			typeof (DevicesPage).ensure ();
+		public ServiceContext (
+			OsinfoService osinfo_service,
+			UsbService usb_service
+		) {
+			Object (
+				osinfo: osinfo_service,
+				usb: usb_service
+			);
 		}
 	}
 }

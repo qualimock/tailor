@@ -147,6 +147,8 @@ template $TailorDownloadPage : Adw.NavigationPage {
 			};
 		}
 
-		$TailorOsPage os_page {}
+		$TailorOsPage os_page {
+			service: bind template.service;
+		}
 	};
 }

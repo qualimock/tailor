@@ -25,21 +25,21 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.Box devices_box;
 
-		public UsbService usb_service { get; construct set; }
+		private ServiceContext _service;
+		public ServiceContext service {
+			get { return _service; }
+			set {
+				_service = value;
+				if (value == null)
+					return;
+
+				value.usb.device_added.connect (add_device);
+				value.usb.device_removed.connect (remove_device);
+				value.usb.device_updated.connect (update_device);
+			}
+		}
+
 		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
-
-		construct {
-			notify["usb-service"].connect (on_usb_service_set);
-		}
-
-		private void on_usb_service_set () {
-			if (usb_service == null)
-				return;
-
-			usb_service.device_added.connect (add_device);
-			usb_service.device_removed.connect (remove_device);
-			usb_service.device_updated.connect (update_device);
-		}
 
 		public void add_device (UsbDto device) {
 			var card = new DeviceCard ();

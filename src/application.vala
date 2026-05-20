@@ -31,8 +31,10 @@ namespace Tailor {
 		private MainWindow main_window;
 
 		public Settings settings { get; private set; }
-		public OsinfoService osinfo_service { get; private set; }
-		public UsbService usb_service { get; private set; }
+
+		private OsinfoService osinfo_service { get; private set; }
+		private UsbService usb_service { get; private set; }
+		private ServiceContext service_context { get; private set; }
 
 		public Application () {
 			Object (application_id: Tailor.ID,
@@ -46,6 +48,11 @@ namespace Tailor {
 			osinfo_service = new OsinfoService ();
 			usb_service = new UsbService ();
 
+			service_context = new ServiceContext (
+				osinfo_service,
+				usb_service
+			);
+
 			add_action_entries (APP_ENTRIES, this);
 			set_accels_for_action ("app.quit", { "<Ctrl>Q" });
 		}
@@ -56,7 +63,7 @@ namespace Tailor {
 				return;
 			}
 
-			main_window = new MainWindow (this, osinfo_service, usb_service);
+			main_window = new MainWindow (this, service_context);
 
 			osinfo_service.load.begin (settings.get_string ("primary-os"));
 			usb_service.init_async.begin ();

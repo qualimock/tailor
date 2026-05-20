@@ -7,7 +7,12 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 	title: _("Tailor");
 
 	content: Adw.NavigationView {
-		$TailorHomePage home_page {}
-		$TailorDownloadPage download_page {}
+		$TailorHomePage home_page {
+			service: bind template.service;
+		}
+
+		$TailorDownloadPage download_page {
+			service: bind template.service;
+		}
 	};
 }

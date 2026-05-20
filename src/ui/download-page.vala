@@ -23,8 +23,6 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
-		[GtkChild] private unowned OsPage os_page;
-
 		[GtkChild] private unowned Gtk.Box os_box;
 		[GtkChild] private unowned Adw.StatusPage download_error;
 
@@ -39,8 +37,7 @@ namespace Tailor {
 
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 
-		public OsinfoService osinfo_service { get; construct set; }
-		public UsbService usb_service { get; construct set; }
+		public ServiceContext service { get; construct set; }
 		public string primary_os_title { get; construct set; default = ""; }
 
 		private ListStore os_store = new ListStore (typeof (Os));
@@ -61,11 +58,6 @@ namespace Tailor {
 		}
 
 		construct {
-			notify["usb-service"].connect (() => {
-				if (usb_service != null)
-					os_page.usb_service = usb_service;
-			});
-
 			arch_dropdown.notify["selected"].connect (() => {
 				arch_filter = arches_list[(int) arch_dropdown.selected];
 				on_filter_changed ();
@@ -85,7 +77,7 @@ namespace Tailor {
 			arches_list.clear ();
 
 			var families = new Gee.ArrayList<OsFamily> ();
-			families.add_all (osinfo_service.families.values);
+			families.add_all (service.osinfo.families.values);
 			families.sort ((a, b) => {
 				return strcmp (a.display_name, b.display_name);
 			});
@@ -99,7 +91,7 @@ namespace Tailor {
 				}
 			}
 
-			arches_list.add_all (osinfo_service.arches);
+			arches_list.add_all (service.osinfo.arches);
 
 			setup_models ();
 			setup_arch_dropdown ();
