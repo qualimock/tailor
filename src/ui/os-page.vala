@@ -41,7 +41,6 @@ namespace Tailor {
 
 			usb_service.device_added.connect (add_device);
 			usb_service.device_removed.connect (remove_device);
-			usb_service.device_updated.connect (update_device);
 		}
 
 		public void add_device (UsbDto device) {
@@ -49,23 +48,13 @@ namespace Tailor {
 		}
 
 		public void remove_device (string object_path) {
-			for (uint i = 0; i < device_store.n_items; i++) {
-				var device = (UsbDto) device_store.get_item (i);
-				if (device.object_path == object_path) {
-					device_store.remove (i);
-					return;
-				}
-			}
-		}
+			var match = usb_service.devices.first_match (
+				d => d.object_path == object_path
+			);
 
-		public void update_device (UsbDto device) {
-			for (uint i = 0; i < device_store.n_items; i++) {
-				var current = (UsbDto) device_store.get_item (i);
-				if (current.object_path == device.object_path) {
-					current.name = device.name;
-					return;
-				}
-			}
+			uint index;
+			if (device_store.find (match, out index))
+				device_store.remove (index);
 		}
 	}
 }
