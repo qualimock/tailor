@@ -165,6 +165,7 @@ namespace Tailor {
 			row.title = title;
 			row.subtitle = subtitle;
 			row.activatable = true;
+			row.selectable = false;
 			row.action_name = "navigation.push";
 			row.action_target = "os-page";
 			return row;

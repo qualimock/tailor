@@ -1,0 +1,183 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorOsPage : Adw.NavigationPage {
+	title: _("OS Info");
+	tag: "os-page";
+
+	child: Adw.ToolbarView {
+		[top]
+		Adw.HeaderBar {
+			[end]
+			Button {
+				styles [ "flat" ]
+
+				tooltip-text: _("");
+				icon-name: "open-menu-symbolic";
+			}
+		}
+
+		content: Box {
+			orientation: vertical;
+			margin-top: 12;
+			margin-bottom: 12;
+			margin-start: 12;
+			margin-end: 12;
+			spacing: 24;
+
+			Image os_logo {
+				pixel-size: 128;
+				icon-name: "image-missing-symbolic";
+				accessibility {
+					label: _("OS logo");
+				}
+			}
+
+			Box image_box {
+				orientation: vertical;
+				spacing: 12;
+
+				Label {
+					styles [ "title-4" ]
+
+					label: _("Image");
+					halign: start;
+				}
+
+				ListBox {
+					styles [ "boxed-list" ]
+
+					Adw.ComboRow {
+						title: _("Edition");
+						selectable: false;
+					}
+
+					Adw.ComboRow {
+						title: _("Version");
+						selectable: false;
+					}
+
+					Adw.ComboRow {
+						title: _("Architecture");
+						selectable: false;
+					}
+				}
+
+				ListBox {
+					styles [ "boxed-list" ]
+
+					Adw.ExpanderRow {
+						title: _("More About Image");
+						subtitle: _("Information about the format, volume, and release");
+						selectable: false;
+
+						Adw.ActionRow {
+							title: _("Size");
+							selectable: false;
+
+							[suffix]
+							Label size_label {
+								label: _("Gig");
+							}
+						}
+
+						Adw.ActionRow {
+							title: _("Release");
+							selectable: false;
+
+							[suffix]
+							Label release_label {
+								label: _("Rel");
+							}
+						}
+					}
+
+					Adw.ExpanderRow {
+						title: _("System Requirements");
+						selectable: false;
+
+						Adw.ActionRow {
+							title: _("CPU");
+							selectable: false;
+
+							[suffix]
+							Label cpu_label {
+								label: _("Core");
+							}
+						}
+
+						Adw.ActionRow {
+							title: _("RAM");
+							selectable: false;
+
+							[suffix]
+							Label ram_label {
+								label: _("1 Gb");
+							}
+						}
+
+						Adw.ActionRow {
+							title: _("Free Disk Space");
+							selectable: false;
+
+							[suffix]
+							Label free_space_label {
+								label: _("1 Gb");
+							}
+						}
+					}
+				}
+
+			}
+
+			Box device_box {
+				orientation: vertical;
+				spacing: 12;
+
+				Label {
+					styles [ "title-4" ]
+
+					label: _("Media");
+					halign: start;
+				}
+
+				Label {
+					styles [ "dim-label" ]
+
+					label: _("CAUTION: All data will be deleted. Check the media for important data.");
+					halign: start;
+				}
+
+				ListBox {
+					styles [ "boxed-list" ]
+
+					Adw.ComboRow devices_row {
+						title: _("Target device");
+						selectable: false;
+					}
+				}
+			}
+
+			Box optional_box {
+				orientation: vertical;
+				spacing: 12;
+
+				Label {
+					styles [ "title-4" ]
+
+					label: _("Optional");
+					halign: start;
+				}
+
+				ListBox {
+					styles [ "boxed-list" ]
+
+					Adw.SwitchRow {
+						title: _("Trash download after writing");
+						selectable: false;
+					}
+				}
+			}
+		};
+	};
+}

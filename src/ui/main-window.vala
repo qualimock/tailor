@@ -47,6 +47,7 @@ namespace Tailor {
 			osinfo_service.load_failed.connect (download_page.show_error);
 
 			home_page.devices_page.usb_service = usb_service;
+			os_page.usb_service = usb_service;
 		}
 	}
 }
