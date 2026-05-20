@@ -74,9 +74,13 @@ namespace Tailor {
 			if (old == null)
 				return;
 
-			devices.remove (old);
-			devices.add (device);
-			device_updated (device);
+			old.device_file = device.device_file;
+			old.name = device.name;
+			old.size = device.size;
+			old.size_display = device.size_display;
+			old.filesystem = device.filesystem;
+
+			device_updated (old);
 		}
 	}
 }
