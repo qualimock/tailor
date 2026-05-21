@@ -50,16 +50,19 @@ template $TailorOsPage : Adw.NavigationPage {
 					Adw.ActionRow {
 						title: _("Edition");
 						selectable: false;
+						visible: bind template.has_editions;
 
 						[suffix]
 						DropDown edition_dropdown {
 							valign: center;
+							notify::selected => $reconfigure_by_edition ();
 						}
 					}
 
 					Adw.ActionRow {
 						title: _("Version");
 						selectable: false;
+						visible: bind template.has_versions;
 
 						[suffix]
 						DropDown version_dropdown {

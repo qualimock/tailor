@@ -23,13 +23,12 @@ namespace Tailor {
 	public class OsMapper {
 
 		public static Os os_from_osinfo (Osinfo.Os os, Osinfo.Media media, string primary_distro) {
-
 			var dto = new Os (get_os_id (os, media));
 			dto.display_name = get_os_display_name (os, media);
-			dto.variant = os.vendor;
+			dto.edition = get_os_edition (dto, os, media);
 			dto.version = os.version;
 			dto.arch = media.get_architecture ();
-			dto.family = os.distro.down ();
+			dto.family = os.distro;
 			dto.vendor = os.vendor;
 			dto.url = media.get_url ();
 			dto.primary = (os.distro == primary_distro);
@@ -88,17 +87,64 @@ namespace Tailor {
 			return id;
 		}
 
-		private static string get_os_display_name (Osinfo.Os os, Osinfo.Media media) {
+		private static Osinfo.OsVariant get_os_variant (Osinfo.Os os, Osinfo.Media media) {
 			var variants = media.get_os_variants ().get_elements ();
-			var name = variants.is_empty ()
-				? null
-				: ((Osinfo.OsVariant) variants.nth_data (0)).get_name ();
 
-			return name ??
-			       os.name ??
-			       os.distro ??
-			       os.short_id ??
-			       "Unknown";
+			return variants.is_empty ()
+				? null
+				: (Osinfo.OsVariant) variants.nth_data (0);
+		}
+
+		private static string strip_parens (string str) {
+			var parts = new Gee.ArrayList<string> ();
+
+			foreach (var token in str.split (" ")) {
+				if (!token.has_prefix ("("))
+					parts.add (token);
+			}
+
+			return string.joinv (" ", parts.to_array ()).strip ();
+		}
+
+		private static string get_os_display_name (Osinfo.Os os, Osinfo.Media media) {
+			var fallback = os.name ?? os.distro ?? os.short_id ?? "Unknown";
+			var variant = get_os_variant (os, media);
+
+			if (variant != null)
+				return strip_parens (variant.name ?? fallback);
+
+			return strip_parens (fallback);
+		}
+
+		private static string? get_os_edition (Os dto, Osinfo.Os os, Osinfo.Media media) {
+			var variant = get_os_variant (os, media);
+			if (variant == null) {
+				var family_display = get_family_display_name (os);
+				var parts = family_display.split (" ", 2);
+				if (parts.length > 1 && parts[0].down () == os.distro.down ())
+					return parts[1];
+
+				return null;
+			}
+
+			var variant_name = variant.name;
+			if (variant_name == null)
+				return null;
+
+			var os_tokens = new Gee.HashSet<string> ();
+			if (os.name != null) {
+				foreach (var t in os.name.split (" "))
+					os_tokens.add (t);
+			}
+
+			var edition_parts = new Gee.ArrayList<string> ();
+			foreach (var token in variant_name.split (" ")) {
+				if (!os_tokens.contains (token) && !token.has_prefix ("("))
+					edition_parts.add (token);
+			}
+
+			var edition = string.joinv (" ", edition_parts.to_array ()).strip ();
+			return edition.length > 0 ? edition : null;
 		}
 	}
 }

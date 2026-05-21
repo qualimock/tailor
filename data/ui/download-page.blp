@@ -4,7 +4,7 @@ using Adw 1;
 template $TailorDownloadPage : Adw.NavigationPage {
 	tag: "download-page";
 
-	child: Adw.NavigationView {
+	child: Adw.NavigationView nav_view {
 		Adw.NavigationPage {
 			title: _("Download Image");
 
@@ -125,6 +125,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 										ListBox primary_os_list {
 											styles [ "boxed-list" ]
 											hexpand: true;
+											row-activated => $configure_os_page_from_os ();
 										}
 									}
 
@@ -142,6 +143,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 										ListBox other_os_list {
 											styles [ "boxed-list" ]
 											hexpand: true;
+											row-activated => $configure_os_page_from_family ();
 										}
 									}
 								};

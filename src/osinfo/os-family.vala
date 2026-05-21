@@ -28,6 +28,10 @@ namespace Tailor {
 		public bool primary { get; set; }
 		public Gee.ArrayList<Os> distros { get; private set; }
 		public Gee.HashMap<string, Gee.ArrayList<Os>> fresh { get; private set; }
+		public Gee.HashMap<
+			string,
+			Gee.HashMap<string, Gee.TreeSet<string>>
+		> editions { get; private set; }
 
 		public OsFamily (string family, string vendor) {
 			Object (
@@ -55,6 +59,24 @@ namespace Tailor {
 			}
 
 			return fresh;
+		}
+
+		public void build_index () {
+			editions = new Gee.HashMap<string, Gee.HashMap<string, Gee.TreeSet<string>>> ();
+
+			foreach (var os in distros) {
+				var edition = os.edition ?? "";
+				var version = os.version ?? "";
+
+				if (!editions.has_key (edition))
+					editions[edition] = new Gee.HashMap<string, Gee.TreeSet<string>> ();
+
+				if (!editions[edition].has_key (version))
+					editions[edition][version] = new Gee.TreeSet<string> ();
+
+				if (os.arch != null)
+					editions[edition][version].add (os.arch);
+			}
 		}
 	}
 }

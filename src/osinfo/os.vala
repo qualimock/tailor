@@ -24,7 +24,7 @@ namespace Tailor {
 
 		public string id { get; construct; }
 		public string display_name { get; set; }
-		public string variant { get; set; }
+		public string edition { get; set; }
 		public string version { get; set; }
 		public string arch { get; set; }
 		public string family { get; set; }

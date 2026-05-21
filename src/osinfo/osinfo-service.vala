@@ -79,6 +79,9 @@ namespace Tailor {
 				else
 					families.set (os_family_dto.family, os_family_dto);
 			}
+
+			foreach (var family in families.values)
+				family.build_index ();
 		}
 
 		private bool is_downloadable (Osinfo.Media media) {

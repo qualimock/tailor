@@ -23,6 +23,10 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
+		[GtkChild] private unowned OsPage os_page;
+
+		[GtkChild] private unowned Adw.NavigationView nav_view;
+
 		[GtkChild] private unowned Gtk.Box os_box;
 		[GtkChild] private unowned Adw.StatusPage download_error;
 
@@ -50,6 +54,8 @@ namespace Tailor {
 		private string? arch_filter = null;
 		private string search_query = "";
 
+		private string host_arch = Posix.utsname ().machine;
+
 		static construct {
 			typeof (OsPage).ensure ();
 		}
@@ -67,6 +73,28 @@ namespace Tailor {
 		private void on_search_entry_changed () {
 			search_query = search_entry.text;
 			on_filter_changed ();
+		}
+
+		[GtkCallback]
+		private void configure_os_page_from_os (Gtk.ListBoxRow row) {
+			var os = (Os) primary_model.get_item (row.get_index ());
+			var family = service.osinfo.families[os.family];
+			os_page.configure (family, os);
+			nav_view.push (os_page);
+		}
+
+		[GtkCallback]
+		private void configure_os_page_from_family (Gtk.ListBoxRow row) {
+			var family = (OsFamily) other_model.get_item (row.get_index ());
+			Os? pick = null;
+
+			foreach (var os in family.get_fresh_oses ().values) {
+				if (os.arch == (string) arch_dropdown.selected_item) { pick = os; break; }
+				if (pick == null) pick = os;
+			}
+
+			os_page.configure (family, pick);
+			nav_view.push (os_page);
 		}
 
 		public void populate () {
@@ -160,25 +188,25 @@ namespace Tailor {
 			return text.down ().contains (search_query.down ());
 		}
 
-		private Gtk.Widget construct_row (string title, string subtitle) {
+		private Adw.ActionRow construct_row (string title, string subtitle) {
 			var row = new Adw.ActionRow ();
 			row.title = title;
 			row.subtitle = subtitle;
 			row.activatable = true;
 			row.selectable = false;
-			row.action_name = "navigation.push";
-			row.action_target = "os-page";
 			return row;
 		}
 
-		private Gtk.Widget make_os_row (Object obj) {
+		private Adw.ActionRow make_os_row (Object obj) {
 			var os = (Os) obj;
-			return construct_row (os.display_name, os.vendor);
+			var row = construct_row (os.display_name, os.vendor);
+			return row;
 		}
 
-		private Gtk.Widget make_family_row (Object obj) {
+		private Adw.ActionRow make_family_row (Object obj) {
 			var family = (OsFamily) obj;
-			return construct_row (family.display_name, family.vendor);
+			var row = construct_row (family.display_name, family.vendor);
+			return row;
 		}
 
 		private void setup_arch_dropdown () {
@@ -193,7 +221,6 @@ namespace Tailor {
 
 			arch_dropdown.model = model;
 
-			string host_arch = Posix.utsname ().machine;
 			arch_filter = arches_list.contains (host_arch) ? host_arch : arches_list[0];
 			arch_dropdown.selected = (uint) arches_list.index_of (arch_filter);
 		}

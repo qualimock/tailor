@@ -41,7 +41,17 @@ namespace Tailor {
 			}
 		}
 
+		public bool has_editions { get; private set; default = false; }
+		public bool has_versions { get; private set; default = false; }
+		private OsFamily current_family { get; private set; }
+		private Os current_os { get; private set; }
+
 		private ListStore device_store = new ListStore (typeof (UsbDto));
+
+		[GtkCallback]
+		private void reconfigure_by_edition () {
+			var edition = edition_dropdown.selected_item as Gtk.StringObject;
+		}
 
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
@@ -60,6 +70,58 @@ namespace Tailor {
 			uint index;
 			if (device_store.find (match, out index))
 				device_store.remove (index);
+		}
+
+		public void configure (OsFamily family, Os selected) {
+			current_family = family;
+			title = family.display_name;
+
+			var selected_edition = selected.edition ?? "";
+			var selected_version = selected.version ?? "";
+
+			if (!family.editions.has_key (selected_edition))
+				return;
+
+			var edition_versions = family.editions[selected_edition];
+			if (!edition_versions.has_key (selected_version))
+				return;
+
+			var editions = new Gee.TreeSet<string> ();
+			editions.add_all (family.editions.keys);
+			editions.remove ("");
+
+			has_editions = !editions.is_empty;
+			if (has_editions)
+				populate_dropdown (edition_dropdown, editions, selected.edition ?? "");
+
+			var versions = new Gee.TreeSet<string> ();
+			versions.add_all (edition_versions.keys);
+			versions.remove ("");
+
+			has_versions = !versions.is_empty;
+			if (has_versions)
+				populate_dropdown (version_dropdown, versions, selected.version ?? "");
+
+			populate_dropdown (arch_dropdown, edition_versions[selected_version], selected.arch ?? "");
+		}
+
+		private void populate_dropdown (Gtk.DropDown dropdown, Gee.TreeSet<string> items, string selected) {
+			var model = new Gtk.StringList (null);
+			uint i = 0;
+			uint selected_idx = Gtk.INVALID_LIST_POSITION;
+
+			foreach (var item in items) {
+				model.append (item);
+				if (selected != null && item == selected)
+					selected_idx = i;
+
+				i++;
+			}
+
+			dropdown.model = model;
+			dropdown.expression = new Gtk.PropertyExpression (typeof (Gtk.StringObject), null, "string");
+			if (selected_idx != Gtk.INVALID_LIST_POSITION)
+				dropdown.selected = selected_idx;
 		}
 	}
 }
