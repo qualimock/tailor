@@ -50,7 +50,7 @@ if vala_lint.found()
 		'Lint vala files',
 		vala_lint,
 		args: [
-			'--config', meson.source_root() / 'vala-lint.conf',
+			'--config', meson.project_source_root() / 'vala-lint.conf',
 			meson.current_source_dir()
 		]
 	)
