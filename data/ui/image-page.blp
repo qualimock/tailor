@@ -5,6 +5,8 @@ template $TailorImagePage : Adw.NavigationPage {
 	tag: "image-page";
 	title: _("Image");
 
+	notify::service => $on_service_load ();
+
 	child: Adw.ToolbarView {
 		[top]
 		Adw.HeaderBar {
@@ -36,7 +38,7 @@ template $TailorImagePage : Adw.NavigationPage {
 					title: _("very-long-image-file.iso");
 					description: _("Local file");
 
-					child: Label {
+					child: Label size_label {
 						styles [ "numeric", "accent", "size-badge" ]
 						label: _("10 Gb");
 						halign: center;
@@ -72,6 +74,8 @@ template $TailorImagePage : Adw.NavigationPage {
 							[suffix]
 							DropDown devices_dropdown {
 								valign: center;
+								sensitive: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+								show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
 							}
 						}
 					}

@@ -28,7 +28,9 @@ template $TailorHomePage : Adw.NavigationPage {
 				title: _("Write");
 				icon-name: "settings-symbolic";
 
-				child: $TailorWritePage write_page {};
+				child: $TailorWritePage write_page {
+					service: bind template.service;
+				};
 			}
 
 			Adw.ViewStackPage {

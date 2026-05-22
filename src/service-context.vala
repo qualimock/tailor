@@ -25,6 +25,7 @@ namespace Tailor {
 		public OsinfoService osinfo { get; construct; }
 		public UsbService usb { get; construct; }
 		public string host_arch { get; construct; }
+		public File image_file { get; set; }
 
 		public ServiceContext (
 			OsinfoService osinfo_service,

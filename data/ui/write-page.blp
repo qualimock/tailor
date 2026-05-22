@@ -17,9 +17,7 @@ template $TailorWritePage : Adw.Bin {
 
 				Button {
 					styles [ "card" ]
-					// clicked => $open_select_image_dialog();
-					action-name: "navigation.push";
-					action-target: "'image-page'";
+					clicked => $open_select_image_dialog();
 
 					tooltip-text: _("Install From File");
 

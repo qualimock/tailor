@@ -23,6 +23,8 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/write-page.ui")]
 	public class WritePage : Adw.Bin {
 
+		public ServiceContext service { get; construct set; }
+
 		[GtkCallback]
 		private void open_select_image_dialog () {
 			var iso_filter = new Gtk.FileFilter ();
@@ -49,15 +51,9 @@ namespace Tailor {
 				null,
 				(obj, res) => {
 					try {
-						var file = dialog.open.end (res);
-						message (
-							"File name: %s",
-							file.query_info (
-								"standard::name",
-								GLib.FileQueryInfoFlags.NONE,
-								null
-							).get_name ()
-						);
+						service.image_file = dialog.open.end (res);
+						var nav = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+						nav.push_by_tag ("image-page");
 					} catch (Error e) {
 						warning ("Cannot open file: %s", e.message);
 					}
