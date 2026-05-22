@@ -59,6 +59,9 @@ namespace Tailor {
 			return obj?.string ?? "";
 		}
 
+		[GtkCallback]
+		private bool greater_than (uint a, uint b) { return a > b; }
+
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
 			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
