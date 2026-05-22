@@ -6,4 +6,5 @@ blueprints = files(
 	'download-page.blp',
 	'device-card.blp',
 	'os-page.blp',
+	'image-page.blp',
 )

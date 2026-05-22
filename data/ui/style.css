@@ -1,0 +1,12 @@
+.size-badge {
+	border-radius: 999px;
+	padding: 3px 16px;
+
+	background-color: alpha(var(--accent-bg-color), 0.20);
+	color: var(--accent-color);
+	font-weight: 700;
+}
+
+statuspage.image-info > scrolledwindow > viewport > box > label {
+	margin-top: -20px;
+}

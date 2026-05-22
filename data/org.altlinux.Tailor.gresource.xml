@@ -3,11 +3,14 @@
 	<gresource prefix="/org/altlinux/Tailor">
 		<file alias="main-window.ui" preprocess="xml-stripblanks">ui/main-window.ui</file>
 
+		<file alias="style.css">ui/style.css</file>
+
 		<file alias="home-page.ui" preprocess="xml-stripblanks">ui/home-page.ui</file>
 		<file alias="write-page.ui" preprocess="xml-stripblanks">ui/write-page.ui</file>
 		<file alias="devices-page.ui" preprocess="xml-stripblanks">ui/devices-page.ui</file>
 		<file alias="download-page.ui" preprocess="xml-stripblanks">ui/download-page.ui</file>
 		<file alias="os-page.ui" preprocess="xml-stripblanks">ui/os-page.ui</file>
+		<file alias="image-page.ui" preprocess="xml-stripblanks">ui/image-page.ui</file>
 
 		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
 

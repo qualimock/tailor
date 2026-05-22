@@ -1,0 +1,89 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorImagePage : Adw.NavigationPage {
+	tag: "image-page";
+	title: _("Image");
+
+	child: Adw.ToolbarView {
+		[top]
+		Adw.HeaderBar {
+			[end]
+			Button {
+				styles [ "flat" ]
+
+				tooltip-text: _("");
+				icon-name: "open-menu-symbolic";
+			}
+		}
+
+		content: Box {
+			orientation: vertical;
+			margin-top: 12;
+			margin-bottom: 24;
+			margin-start: 12;
+			margin-end: 12;
+			spacing: 12;
+
+			Box {
+				orientation: vertical;
+				valign: center;
+
+				Adw.StatusPage image_info {
+					styles [ "image-info" ]
+
+					icon-name: "media-optical-symbolic";
+					title: _("very-long-image-file.iso");
+					description: _("Local file");
+
+					child: Label {
+						styles [ "numeric", "accent", "size-badge" ]
+						label: _("10 Gb");
+						halign: center;
+					};
+				}
+
+				Box device_box {
+					orientation: vertical;
+					spacing: 12;
+					vexpand: true;
+
+					Label {
+						styles [ "title-4" ]
+
+						label: _("Media");
+						halign: start;
+					}
+
+					Label {
+						styles [ "dim-label" ]
+
+						label: _("CAUTION: All data will be deleted. Check the media for important data.");
+						halign: start;
+					}
+
+					ListBox {
+						styles [ "boxed-list" ]
+
+						Adw.ActionRow {
+							title: _("Target device");
+							selectable: false;
+
+							[suffix]
+							DropDown devices_dropdown {
+								valign: center;
+							}
+						}
+					}
+				}
+			}
+
+			Button {
+				styles [ "suggested-action", "pill" ]
+
+				label: _("Create Bootable USB");
+				halign: center;
+			}
+		};
+	};
+}

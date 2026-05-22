@@ -1,4 +1,4 @@
-/* main-window.vala
+/* image-page.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,28 +20,9 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
-	public class MainWindow : Adw.ApplicationWindow {
+	[GtkTemplate (ui = "/org/altlinux/Tailor/image-page.ui")]
+	public class ImagePage : Adw.NavigationPage {
 
-		[GtkChild] private unowned DownloadPage download_page;
-
-		public ServiceContext service { get; construct; }
-
-		static construct {
-			typeof (HomePage).ensure ();
-			typeof (DownloadPage).ensure ();
-			typeof (ImagePage).ensure ();
-		}
-
-		public MainWindow (Tailor.Application app, ServiceContext service) {
-			Object (application: app, service: service);
-
-			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
-		}
-
-		construct {
-			service.osinfo.loaded.connect (download_page.populate);
-			service.osinfo.load_failed.connect (download_page.show_error);
-		}
+		public ServiceContext service { get; construct set; }
 	}
 }
