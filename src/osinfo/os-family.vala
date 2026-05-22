@@ -51,8 +51,8 @@ namespace Tailor {
 					continue;
 				}
 
-				double current = double.parse (distro.version);
-				double contained = double.parse (fresh.get (key).version);
+				double current = double.parse (distro.version ?? "0");
+				double contained = double.parse (fresh.get (key).version ?? "0");
 
 				if (current > contained)
 					fresh[key] = distro;

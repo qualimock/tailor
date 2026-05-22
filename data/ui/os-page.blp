@@ -5,6 +5,13 @@ template $TailorOsPage : Adw.NavigationPage {
 	title: _("OS Info");
 	tag: "os-page";
 
+	selected-edition: bind $stringify(edition_dropdown.selected-item as <Gtk.StringObject>) as <string>;
+	selected-version: bind $stringify(version_dropdown.selected-item as <Gtk.StringObject>) as <string>;
+	selected-arch: bind $stringify(arch_dropdown.selected-item as <Gtk.StringObject>) as <string>;
+
+	notify::selected-edition => $reconfigure_by_edition ();
+	notify::selected-version => $reconfigure_by_version ();
+
 	child: Adw.ToolbarView {
 		[top]
 		Adw.HeaderBar {
@@ -55,7 +62,6 @@ template $TailorOsPage : Adw.NavigationPage {
 						[suffix]
 						DropDown edition_dropdown {
 							valign: center;
-							notify::selected => $reconfigure_by_edition ();
 						}
 					}
 
@@ -73,6 +79,7 @@ template $TailorOsPage : Adw.NavigationPage {
 					Adw.ActionRow {
 						title: _("Architecture");
 						selectable: false;
+						visible: bind template.has_arches;
 
 						[suffix]
 						DropDown arch_dropdown {

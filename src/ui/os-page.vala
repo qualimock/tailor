@@ -43,14 +43,20 @@ namespace Tailor {
 
 		public bool has_editions { get; private set; default = false; }
 		public bool has_versions { get; private set; default = false; }
+		public bool has_arches { get; private set; default = false; }
+
+		public string? selected_edition { get; set; }
+		public string? selected_version { get; set; }
+		public string? selected_arch { get; set; }
+
 		private OsFamily current_family { get; private set; }
-		private Os current_os { get; private set; }
 
 		private ListStore device_store = new ListStore (typeof (UsbDto));
+		private bool updating = false;
 
 		[GtkCallback]
-		private void reconfigure_by_edition () {
-			var edition = edition_dropdown.selected_item as Gtk.StringObject;
+		private string? stringify (Gtk.StringObject? obj) {
+			return obj?.string ?? "";
 		}
 
 		construct {
@@ -75,16 +81,7 @@ namespace Tailor {
 		public void configure (OsFamily family, Os selected) {
 			current_family = family;
 			title = family.display_name;
-
-			var selected_edition = selected.edition ?? "";
-			var selected_version = selected.version ?? "";
-
-			if (!family.editions.has_key (selected_edition))
-				return;
-
-			var edition_versions = family.editions[selected_edition];
-			if (!edition_versions.has_key (selected_version))
-				return;
+			updating = true;
 
 			var editions = new Gee.TreeSet<string> ();
 			editions.add_all (family.editions.keys);
@@ -94,15 +91,63 @@ namespace Tailor {
 			if (has_editions)
 				populate_dropdown (edition_dropdown, editions, selected.edition ?? "");
 
+			populate_versions (selected.edition ?? "", selected.version ?? "");
+			populate_arches (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
+
+			updating = false;
+		}
+
+		[GtkCallback]
+		private void reconfigure_by_edition () {
+			if (updating)
+				return;
+
+			populate_versions (selected_edition ?? "", selected_version ?? "");
+		}
+
+		[GtkCallback]
+		private void reconfigure_by_version () {
+			if (updating)
+				return;
+
+			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+		}
+
+		private void populate_versions (string edition, string preferred) {
+			if (current_family == null || !current_family.editions.has_key (edition))
+				return;
+
 			var versions = new Gee.TreeSet<string> ();
-			versions.add_all (edition_versions.keys);
+			versions.add_all (current_family.editions[edition].keys);
 			versions.remove ("");
 
 			has_versions = !versions.is_empty;
-			if (has_versions)
-				populate_dropdown (version_dropdown, versions, selected.version ?? "");
+			if (!has_versions)
+				return;
 
-			populate_dropdown (arch_dropdown, edition_versions[selected_version], selected.arch ?? "");
+			var selected = versions.contains (preferred) ? preferred : versions.first ();
+			populate_dropdown (version_dropdown, versions, selected);
+		}
+
+		private void populate_arches (string edition, string version, string preferred) {
+			if (current_family == null || !current_family.editions.has_key (edition))
+				return;
+
+			var edition_versions = current_family.editions[edition];
+			if (!edition_versions.has_key (version))
+				return;
+
+			var arches = new Gee.TreeSet<string> ();
+			arches.add_all (edition_versions[version]);
+			arches.remove ("");
+
+			has_arches = !arches.is_empty;
+			if (!has_arches)
+				return;
+
+			var selected = arches.contains (preferred) ? preferred : arches.first ();
+
+			populate_dropdown (arch_dropdown, arches, selected);
 		}
 
 		private void populate_dropdown (Gtk.DropDown dropdown, Gee.TreeSet<string> items, string selected) {

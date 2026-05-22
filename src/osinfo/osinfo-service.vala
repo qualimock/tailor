@@ -68,7 +68,8 @@ namespace Tailor {
 					var os_dto = OsMapper.os_from_osinfo (os, media, primary_distro);
 
 					os_family_dto.distros.add (os_dto);
-					arches.add (os_dto.arch);
+					if (os_dto.arch != null)
+						arches.add (os_dto.arch);
 				}
 
 				if (os_family_dto.distros.is_empty)

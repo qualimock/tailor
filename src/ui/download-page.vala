@@ -54,8 +54,6 @@ namespace Tailor {
 		private string? arch_filter = null;
 		private string search_query = "";
 
-		private string host_arch = Posix.utsname ().machine;
-
 		static construct {
 			typeof (OsPage).ensure ();
 		}
@@ -88,8 +86,10 @@ namespace Tailor {
 			var family = (OsFamily) other_model.get_item (row.get_index ());
 			Os? pick = null;
 
+			var arch_obj = arch_dropdown.selected_item as Gtk.StringObject;
+			var preferred_arch = arch_obj?.string ?? service.host_arch;
 			foreach (var os in family.get_fresh_oses ().values) {
-				if (os.arch == (string) arch_dropdown.selected_item) { pick = os; break; }
+				if (os.arch == preferred_arch) { pick = os; break; }
 				if (pick == null) pick = os;
 			}
 
@@ -221,7 +221,7 @@ namespace Tailor {
 
 			arch_dropdown.model = model;
 
-			arch_filter = arches_list.contains (host_arch) ? host_arch : arches_list[0];
+			arch_filter = arches_list.contains (service.host_arch) ? service.host_arch : arches_list[0];
 			arch_dropdown.selected = (uint) arches_list.index_of (arch_filter);
 		}
 	}

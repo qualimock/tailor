@@ -24,6 +24,7 @@ namespace Tailor {
 
 		public OsinfoService osinfo { get; construct; }
 		public UsbService usb { get; construct; }
+		public string host_arch { get; construct; }
 
 		public ServiceContext (
 			OsinfoService osinfo_service,
@@ -31,7 +32,8 @@ namespace Tailor {
 		) {
 			Object (
 				osinfo: osinfo_service,
-				usb: usb_service
+				usb: usb_service,
+				host_arch: Posix.utsname ().machine
 			);
 		}
 	}
