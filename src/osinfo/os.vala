@@ -39,6 +39,12 @@ namespace Tailor {
 		public bool primary { get; set; }
 		public OsResources resources { get; set; }
 
+		// Release and volume info
+		public int64 volume_size { get; set; default = -1; }
+		public string? media_type { get; set; default = null; }
+		public string? release_date { get; set; default = null; }
+		public string? codename { get; set; default = null; }
+
 		public Os (string id) {
 			Object (id: id);
 		}

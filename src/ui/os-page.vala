@@ -32,6 +32,11 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.Label ram_label;
 		[GtkChild] private unowned Gtk.Label free_space_label;
 
+		[GtkChild] private unowned Gtk.Label size_label;
+		[GtkChild] private unowned Gtk.Label release_label;
+		[GtkChild] private unowned Gtk.Label media_type_label;
+		[GtkChild] private unowned Gtk.Label codename_label;
+
 		private ServiceContext _service;
 		public ServiceContext service {
 			get { return _service; }
@@ -72,6 +77,20 @@ namespace Tailor {
 			return has ? "" : _("Not available");
 		}
 
+		[GtkCallback]
+		private bool is_not_empty_string (string str) { return str.length > 0; }
+
+		[GtkCallback]
+		private bool any (int count, ...) {
+			var args = va_list ();
+
+			for (int i = 0; i < count; i++) {
+				if (args.arg<bool> ()) return true;
+			}
+
+			return false;
+		}
+
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
 			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
@@ -105,6 +124,29 @@ namespace Tailor {
 			return _("%.1f GiB").printf ((double) bytes / Osinfo.GIBIBYTES);
 		}
 
+		private void update_os_info (Os os) {
+			has_requirements = os.resources.cpu > 0 ||
+			                   os.resources.ram > 0 ||
+			                   os.resources.storage > 0;
+
+			cpu_label.label = os.resources.cpu > 0
+				? format_hertz (os.resources.cpu)
+				: _("Not available");
+
+			ram_label.label = os.resources.ram > 0
+				? format_bytes (os.resources.ram)
+				: _("Not available");
+
+			free_space_label.label = os.resources.storage > 0
+				? format_bytes (os.resources.storage)
+				: _("Not available");
+
+			size_label.label = os.volume_size > 0 ? format_bytes (os.volume_size) : "";
+			release_label.label = os.release_date ?? "";
+			media_type_label.label = os.media_type ?? "";
+			codename_label.label = os.codename ?? "";
+		}
+
 		public void configure (OsFamily family, Os selected) {
 			current_family = family;
 			title = family.display_name;
@@ -121,21 +163,7 @@ namespace Tailor {
 			populate_versions (selected.edition ?? "", selected.version ?? "");
 			populate_arches (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
 
-			has_requirements = selected.resources.cpu > 0 ||
-			                   selected.resources.ram > 0 ||
-			                   selected.resources.storage > 0;
-
-			cpu_label.label = selected.resources.cpu > 0
-				? format_hertz (selected.resources.cpu)
-				: _("Not available");
-
-			ram_label.label = selected.resources.ram > 0
-				? format_bytes (selected.resources.ram)
-				: _("Not available");
-
-			free_space_label.label = selected.resources.storage > 0
-				? format_bytes (selected.resources.storage)
-				: _("Not available");
+			update_os_info (selected);
 
 			updating = false;
 		}
@@ -172,6 +200,14 @@ namespace Tailor {
 			populate_dropdown (version_dropdown, versions, selected);
 		}
 
+		private Os? find_selected_os () {
+			return current_family.distros.first_match (os =>
+				(os.edition ?? "") == (selected_edition ?? "") &&
+				(os.version ?? "") == (selected_version ?? "") &&
+				(os.arch ?? "") == (selected_arch ?? "")
+			);
+		}
+
 		private void populate_arches (string edition, string version, string preferred) {
 			if (current_family == null || !current_family.editions.has_key (edition))
 				return;
@@ -191,6 +227,12 @@ namespace Tailor {
 			var selected = arches.contains (preferred) ? preferred : arches.first ();
 
 			populate_dropdown (arch_dropdown, arches, selected);
+
+			if (!updating) {
+				var os = find_selected_os ();
+				if (os != null)
+					update_os_info (os);
+			}
 		}
 
 		private void populate_dropdown (Gtk.DropDown dropdown, Gee.TreeSet<string> items, string selected) {

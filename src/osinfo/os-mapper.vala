@@ -32,6 +32,10 @@ namespace Tailor {
 			dto.vendor = os.vendor;
 			dto.url = media.get_url ();
 			dto.primary = (os.distro == primary_distro);
+			dto.volume_size = media.volume_size;
+			dto.release_date = os.get_release_date_string ();
+			dto.codename = os.codename;
+			dto.media_type = get_media_type (media);
 
 			var resources = os.get_minimum_resources ().get_elements ();
 			Osinfo.Resources matched = null;
@@ -166,6 +170,22 @@ namespace Tailor {
 
 			var edition = string.joinv (" ", edition_parts.to_array ()).strip ();
 			return edition.length > 0 ? edition : null;
+		}
+
+		private static string? get_media_type (Osinfo.Media media) {
+			var live = media.live;
+			var installer = media.installer;
+
+			if (live && installer)
+				return _("Live + Installer");
+
+			if (live)
+				return _("Live");
+
+			if (installer)
+				return _("Installer");
+
+			return null;
 		}
 	}
 }
