@@ -32,14 +32,14 @@ template $TailorImagePage : Adw.NavigationPage {
 				valign: center;
 
 				Adw.StatusPage image_info {
-					styles [ "image-info" ]
+					styles [ "tl-with-badge" ]
 
 					icon-name: "media-optical-symbolic";
 					title: _("very-long-image-file.iso");
 					description: _("Local file");
 
 					child: Label size_label {
-						styles [ "numeric", "accent", "size-badge" ]
+						styles [ "accent", "tl-badge" ]
 						label: _("10 Gb");
 						halign: center;
 					};
@@ -51,14 +51,14 @@ template $TailorImagePage : Adw.NavigationPage {
 					vexpand: true;
 
 					Label {
-						styles [ "title-4" ]
+						styles [ "heading" ]
 
 						label: _("Media");
 						halign: start;
 					}
 
 					Label {
-						styles [ "dim-label" ]
+						styles [ "dimmed" ]
 
 						label: _("CAUTION: All data will be deleted. Check the media for important data.");
 						halign: start;

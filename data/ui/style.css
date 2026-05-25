@@ -1,4 +1,4 @@
-.size-badge {
+.tl-badge {
 	border-radius: 999px;
 	padding: 3px 16px;
 
@@ -7,6 +7,22 @@
 	font-weight: 700;
 }
 
-statuspage.image-info > scrolledwindow > viewport > box > label {
+.tl-text-large {
+	font-size: 118%;
+}
+
+statuspage.tl-with-badge > scrolledwindow > viewport > box > label {
 	margin-top: -20px;
+}
+
+statuspage.tl-with-badge.compact > scrolledwindow > viewport > box > label {
+	margin-top: -10px;
+}
+
+statuspage.tl-with-badge.compact image.icon {
+	-gtk-icon-size: 128px;
+}
+
+statuspage.tl-with-badge.compact title.label {
+	font-size: 28pt;
 }

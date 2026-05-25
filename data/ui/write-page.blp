@@ -2,99 +2,124 @@ using Gtk 4.0;
 using Adw 1;
 
 template $TailorWritePage : Adw.Bin {
-	child: Adw.StatusPage {
-		title: _("Welcome to Tailor!");
-		description: _("Select image source to start.");
-		icon-name: "org.altlinux.Tailor-symbolic";
+	child: Adw.BreakpointBin {
+		height-request: 1;
+		width-request: 1;
 
-		child: Adw.Clamp {
-			maximum-size: 1024;
+		Adw.Breakpoint {
+			condition ("max-width: 599")
 
-			child: Box cards_box {
-				homogeneous: true;
-				halign: center;
-				spacing: 24;
+			setters {
+				cards_box.orientation: vertical;
+			}
+		}
 
-				Button {
-					styles [ "card" ]
-					clicked => $open_select_image_dialog();
+		Adw.Breakpoint {
+			condition ("min-width: 650")
 
-					tooltip-text: _("Install From File");
+			apply => $increase_cards_text_size ();
+			unapply => $decrease_cards_text_size ();
 
-					child: Box {
-						orientation: vertical;
-						margin-top: 24;
-						margin-bottom: 24;
-						margin-start: 24;
-						margin-end: 24;
-						spacing: 12;
+			setters {
+				from_file_icon.pixel-size: 128;
+				download_icon.pixel-size: 128;
+			}
+		}
 
-						Image {
-							styles [ "dim-label" ]
+		child: Adw.StatusPage {
+			title: _("Welcome to Tailor!");
+			description: _("Select image source to start.");
+			icon-name: "org.altlinux.Tailor-symbolic";
 
-							margin-bottom: 6;
+			child: Adw.Clamp {
+				maximum-size: 1024;
 
-							pixel-size: 64;
-							icon-name: "drawer-symbolic";
-							accessible-role: presentation;
-						}
+				child: Box cards_box {
+					homogeneous: true;
+					halign: center;
+					spacing: 24;
 
-						Label {
-							styles [ "title-4" ]
+					Button {
+						styles [ "card" ]
+						clicked => $open_select_image_dialog();
 
-							label: _("Install From File");
-						}
+						tooltip-text: _("Install From File");
 
-						Label {
-							styles [ "dim-label" ]
+						child: Box {
+							orientation: vertical;
+							margin-top: 24;
+							margin-bottom: 24;
+							margin-start: 24;
+							margin-end: 24;
+							spacing: 12;
 
-							wrap: true;
-							justify: center;
-							label: _("Load an .iso image from your device");
-						}
-					};
-				}
+							Image from_file_icon {
+								styles [ "dimmed" ]
 
-				Button {
-					styles [ "card" ]
+								margin-bottom: 6;
 
-					tooltip-text: _("Download and Write");
-					action-name: "navigation.push";
-					action-target: "'download-page'";
+								pixel-size: 64;
+								icon-name: "drawer-symbolic";
+								accessible-role: presentation;
+							}
 
-					child: Box {
-						orientation: vertical;
-						margin-top: 24;
-						margin-bottom: 24;
-						margin-start: 24;
-						margin-end: 24;
-						spacing: 12;
+							Label from_file_title {
+								styles [ "title-4" ]
 
-						Image {
-							styles [ "dim-label" ]
+								label: _("Install From File");
+							}
 
-							margin-bottom: 6;
+							Label from_file_subtitle {
+								styles [ "dimmed" ]
 
-							pixel-size: 64;
-							icon-name: "document-save-symbolic";
-							accessible-role: presentation;
-						}
+								wrap: true;
+								justify: center;
+								label: _("Load an .iso image from your device");
+							}
+						};
+					}
 
-						Label {
-							styles [ "title-4" ]
+					Button {
+						styles [ "card" ]
 
-							label: _("Download and Write");
-						}
+						tooltip-text: _("Download and Write");
+						action-name: "navigation.push";
+						action-target: "'download-page'";
 
-						Label {
-							styles [ "dim-label" ]
+						child: Box {
+							orientation: vertical;
+							margin-top: 24;
+							margin-bottom: 24;
+							margin-start: 24;
+							margin-end: 24;
+							spacing: 12;
 
-							wrap: true;
-							justify: center;
-							label: _("Download the required OS image directly in the application");
-						}
-					};
-				}
+							Image download_icon {
+								styles [ "dimmed" ]
+
+								margin-bottom: 6;
+
+								pixel-size: 64;
+								icon-name: "document-save-symbolic";
+								accessible-role: presentation;
+							}
+
+							Label download_title {
+								styles [ "title-4" ]
+
+								label: _("Download and Write");
+							}
+
+							Label download_subtitle {
+								styles [ "dimmed" ]
+
+								wrap: true;
+								justify: center;
+								label: _("Download the required OS image directly in the application");
+							}
+						};
+					}
+				};
 			};
 		};
 	};
