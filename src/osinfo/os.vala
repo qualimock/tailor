@@ -20,6 +20,12 @@
 
 namespace Tailor {
 
+	public struct OsResources {
+		int64 cpu;
+		int64 ram;
+		int64 storage;
+	}
+
 	public class Os : Object {
 
 		public string id { get; construct; }
@@ -31,6 +37,7 @@ namespace Tailor {
 		public string vendor { get; set; }
 		public string url { get; set; }
 		public bool primary { get; set; }
+		public OsResources resources { get; set; }
 
 		public Os (string id) {
 			Object (id: id);

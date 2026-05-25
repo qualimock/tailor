@@ -126,15 +126,15 @@ template $TailorOsPage : Adw.NavigationPage {
 					Adw.ExpanderRow {
 						title: _("System Requirements");
 						selectable: false;
+						enable-expansion: bind template.has-requirements;
+						subtitle: bind $requirements_subtitle (template.has-requirements) as <string>;
 
 						Adw.ActionRow {
 							title: _("CPU");
 							selectable: false;
 
 							[suffix]
-							Label cpu_label {
-								label: _("Core");
-							}
+							Label cpu_label {}
 						}
 
 						Adw.ActionRow {
@@ -142,9 +142,7 @@ template $TailorOsPage : Adw.NavigationPage {
 							selectable: false;
 
 							[suffix]
-							Label ram_label {
-								label: _("1 Gb");
-							}
+							Label ram_label {}
 						}
 
 						Adw.ActionRow {
@@ -152,9 +150,7 @@ template $TailorOsPage : Adw.NavigationPage {
 							selectable: false;
 
 							[suffix]
-							Label free_space_label {
-								label: _("1 Gb");
-							}
+							Label free_space_label {}
 						}
 					}
 				}

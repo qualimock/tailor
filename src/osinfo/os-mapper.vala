@@ -27,11 +27,32 @@ namespace Tailor {
 			dto.display_name = get_os_display_name (os, media);
 			dto.edition = get_os_edition (dto, os, media);
 			dto.version = os.version;
-			dto.arch = media.get_architecture ();
+			dto.arch = media.architecture;
 			dto.family = os.distro;
 			dto.vendor = os.vendor;
 			dto.url = media.get_url ();
 			dto.primary = (os.distro == primary_distro);
+
+			var resources = os.get_minimum_resources ().get_elements ();
+			Osinfo.Resources matched = null;
+			foreach (var entity in resources) {
+				var resource = (Osinfo.Resources) entity;
+
+				if (resource.architecture == media.architecture)
+					matched = resource;
+
+				if (resource.architecture == Osinfo.ARCHITECTURE_ALL && matched == null)
+					matched = resource;
+			}
+
+			if (matched != null) {
+				dto.resources = OsResources () {
+					cpu = matched.cpu,
+					ram = matched.ram,
+					storage = matched.storage
+				};
+			}
+
 			return dto;
 		}
 

@@ -28,6 +28,10 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
+		[GtkChild] private unowned Gtk.Label cpu_label;
+		[GtkChild] private unowned Gtk.Label ram_label;
+		[GtkChild] private unowned Gtk.Label free_space_label;
+
 		private ServiceContext _service;
 		public ServiceContext service {
 			get { return _service; }
@@ -44,6 +48,7 @@ namespace Tailor {
 		public bool has_editions { get; private set; default = false; }
 		public bool has_versions { get; private set; default = false; }
 		public bool has_arches { get; private set; default = false; }
+		public bool has_requirements { get; private set; default = false; }
 
 		public string? selected_edition { get; set; }
 		public string? selected_version { get; set; }
@@ -61,6 +66,11 @@ namespace Tailor {
 
 		[GtkCallback]
 		private bool greater_than (uint a, uint b) { return a > b; }
+
+		[GtkCallback]
+		private string requirements_subtitle (bool has) {
+			return has ? "" : _("Not available");
+		}
 
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
@@ -81,6 +91,20 @@ namespace Tailor {
 				device_store.remove (index);
 		}
 
+		private static string format_hertz (int64 hz) {
+			if (hz < Osinfo.MEGAHERTZ * 1000)
+				return _("%.0f MHz").printf ((double) hz / Osinfo.MEGAHERTZ);
+
+			return _("%.1f GHz").printf ((double) hz / (Osinfo.MEGAHERTZ * 1000));
+		}
+
+		private static string format_bytes (int64 bytes) {
+			if (bytes < Osinfo.GIBIBYTES)
+				return _("%.0f MiB").printf ((double) bytes / Osinfo.MEBIBYTES);
+
+			return _("%.1f GiB").printf ((double) bytes / Osinfo.GIBIBYTES);
+		}
+
 		public void configure (OsFamily family, Os selected) {
 			current_family = family;
 			title = family.display_name;
@@ -96,6 +120,22 @@ namespace Tailor {
 
 			populate_versions (selected.edition ?? "", selected.version ?? "");
 			populate_arches (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
+
+			has_requirements = selected.resources.cpu > 0 ||
+			                   selected.resources.ram > 0 ||
+			                   selected.resources.storage > 0;
+
+			cpu_label.label = selected.resources.cpu > 0
+				? format_hertz (selected.resources.cpu)
+				: _("Not available");
+
+			ram_label.label = selected.resources.ram > 0
+				? format_bytes (selected.resources.ram)
+				: _("Not available");
+
+			free_space_label.label = selected.resources.storage > 0
+				? format_bytes (selected.resources.storage)
+				: _("Not available");
 
 			updating = false;
 		}
