@@ -24,220 +24,222 @@ template $TailorOsPage : Adw.NavigationPage {
 			}
 		}
 
-		content: ScrolledWindow {
-			hscrollbar-policy: never;
+		content: Overlay {
+			ScrolledWindow {
+				hscrollbar-policy: never;
 
-			child: Box {
-				orientation: vertical;
-				margin-top: 12;
-				margin-bottom: 12;
-				margin-start: 12;
-				margin-end: 12;
-				spacing: 24;
-
-				Image os_logo {
-					pixel-size: 128;
-					icon-name: "image-missing-symbolic";
-					accessibility {
-						label: _("OS logo");
-					}
-				}
-
-				Box image_box {
+				child: Box {
 					orientation: vertical;
-					spacing: 12;
+					margin-top: 12;
+					margin-bottom: 88;
+					margin-start: 12;
+					margin-end: 12;
+					spacing: 24;
 
-					Label {
-						styles [ "heading" ]
-
-						label: _("Image");
-						halign: start;
-					}
-
-					ListBox {
-						styles [ "boxed-list" ]
-
-						Adw.ActionRow {
-							title: _("Edition");
-							selectable: false;
-							visible: bind template.has_editions;
-
-							[suffix]
-							DropDown edition_dropdown {
-								valign: center;
-								sensitive: bind $greater_than ((edition_dropdown.model as <StringList>).n-items, 1) as <bool>;
-								show-arrow: bind $greater_than ((edition_dropdown.model as <StringList>).n-items, 1) as <bool>;
-							}
-						}
-
-						Adw.ActionRow {
-							title: _("Version");
-							selectable: false;
-							visible: bind template.has_versions;
-
-							[suffix]
-							DropDown version_dropdown {
-								valign: center;
-								sensitive: bind $greater_than ((version_dropdown.model as <StringList>).n-items, 1) as <bool>;
-								show-arrow: bind $greater_than ((version_dropdown.model as <StringList>).n-items, 1) as <bool>;
-							}
-						}
-
-						Adw.ActionRow {
-							title: _("Architecture");
-							selectable: false;
-							visible: bind template.has_arches;
-
-							[suffix]
-							DropDown arch_dropdown {
-								valign: center;
-								sensitive: bind $greater_than ((arch_dropdown.model as <StringList>).n-items, 1) as <bool>;
-								show-arrow: bind $greater_than ((arch_dropdown.model as <StringList>).n-items, 1) as <bool>;
-							}
+					Image os_logo {
+						pixel-size: 128;
+						icon-name: "image-missing-symbolic";
+						accessibility {
+							label: _("OS logo");
 						}
 					}
 
-					ListBox {
-						styles [ "boxed-list" ]
+					Box image_box {
+						orientation: vertical;
+						spacing: 12;
 
-						Adw.ExpanderRow {
-							title: _("More About Image");
-							subtitle: _("Information about the format, volume, and release");
-							selectable: false;
-							visible: bind $any (4,
-								size_row.visible,
-								release_row.visible,
-								media_type_row.visible,
-								codename_row.visible
-							) as <bool>;
+						Label {
+							styles [ "heading" ]
 
-							Adw.ActionRow size_row {
-								title: _("Size");
-								selectable: false;
-								visible: bind $is_not_empty_string (size_label.label) as <bool>;
-
-								[suffix]
-								Label size_label {}
-							}
-
-							Adw.ActionRow release_row {
-								title: _("Release Date");
-								selectable: false;
-								visible: bind $is_not_empty_string (release_label.label) as <bool>;
-
-								[suffix]
-								Label release_label {}
-							}
-
-							Adw.ActionRow media_type_row {
-								title: _("Media Type");
-								selectable: false;
-								visible: bind $is_not_empty_string (media_type_label.label) as <bool>;
-
-								[suffix]
-								Label media_type_label {}
-							}
-
-							Adw.ActionRow codename_row {
-								title: _("Codename");
-								selectable: false;
-								visible: bind $is_not_empty_string (codename_label.label) as <bool>;
-
-								[suffix]
-								Label codename_label {}
-							}
+							label: _("Image");
+							halign: start;
 						}
 
-						Adw.ExpanderRow {
-							title: _("System Requirements");
-							selectable: false;
-							sensitive: bind template.has-requirements;
-							expanded: false;
-							subtitle: bind $requirements_subtitle (template.has-requirements) as <string>;
+						ListBox {
+							styles [ "boxed-list" ]
 
 							Adw.ActionRow {
-								title: _("CPU");
+								title: _("Edition");
 								selectable: false;
+								visible: bind template.has_editions;
 
 								[suffix]
-								Label cpu_label {}
+								DropDown edition_dropdown {
+									valign: center;
+									sensitive: bind $greater_than ((edition_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than ((edition_dropdown.model as <StringList>).n-items, 1) as <bool>;
+								}
 							}
 
 							Adw.ActionRow {
-								title: _("RAM");
+								title: _("Version");
 								selectable: false;
+								visible: bind template.has_versions;
 
 								[suffix]
-								Label ram_label {}
+								DropDown version_dropdown {
+									valign: center;
+									sensitive: bind $greater_than ((version_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than ((version_dropdown.model as <StringList>).n-items, 1) as <bool>;
+								}
 							}
 
 							Adw.ActionRow {
-								title: _("Free Disk Space");
+								title: _("Architecture");
+								selectable: false;
+								visible: bind template.has_arches;
+
+								[suffix]
+								DropDown arch_dropdown {
+									valign: center;
+									sensitive: bind $greater_than ((arch_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than ((arch_dropdown.model as <StringList>).n-items, 1) as <bool>;
+								}
+							}
+						}
+
+						ListBox {
+							styles [ "boxed-list" ]
+
+							Adw.ExpanderRow {
+								title: _("More About Image");
+								subtitle: _("Information about the format, volume, and release");
+								selectable: false;
+								visible: bind $any (4,
+									size_row.visible,
+									release_row.visible,
+									media_type_row.visible,
+									codename_row.visible
+								) as <bool>;
+
+								Adw.ActionRow size_row {
+									title: _("Size");
+									selectable: false;
+									visible: bind $is_not_empty_string (size_label.label) as <bool>;
+
+									[suffix]
+									Label size_label {}
+								}
+
+								Adw.ActionRow release_row {
+									title: _("Release Date");
+									selectable: false;
+									visible: bind $is_not_empty_string (release_label.label) as <bool>;
+
+									[suffix]
+									Label release_label {}
+								}
+
+								Adw.ActionRow media_type_row {
+									title: _("Media Type");
+									selectable: false;
+									visible: bind $is_not_empty_string (media_type_label.label) as <bool>;
+
+									[suffix]
+									Label media_type_label {}
+								}
+
+								Adw.ActionRow codename_row {
+									title: _("Codename");
+									selectable: false;
+									visible: bind $is_not_empty_string (codename_label.label) as <bool>;
+
+									[suffix]
+									Label codename_label {}
+								}
+							}
+
+							Adw.ExpanderRow {
+								title: _("System Requirements");
+								selectable: false;
+								sensitive: bind template.has-requirements;
+								expanded: false;
+								subtitle: bind $requirements_subtitle (template.has-requirements) as <string>;
+
+								Adw.ActionRow {
+									title: _("CPU");
+									selectable: false;
+
+									[suffix]
+									Label cpu_label {}
+								}
+
+								Adw.ActionRow {
+									title: _("RAM");
+									selectable: false;
+
+									[suffix]
+									Label ram_label {}
+								}
+
+								Adw.ActionRow {
+									title: _("Free Disk Space");
+									selectable: false;
+
+									[suffix]
+									Label free_space_label {}
+								}
+							}
+						}
+
+					}
+
+					Box device_box {
+						orientation: vertical;
+						spacing: 12;
+
+						Label {
+							styles [ "heading" ]
+
+							label: _("Media");
+							halign: start;
+						}
+
+						Label {
+							styles [ "dimmed" ]
+
+							label: _("CAUTION: All data will be deleted. Check the media for important data.");
+							halign: start;
+						}
+
+						ListBox {
+							styles [ "boxed-list" ]
+
+							Adw.ActionRow {
+								title: _("Target device");
 								selectable: false;
 
 								[suffix]
-								Label free_space_label {}
+								DropDown devices_dropdown {
+									valign: center;
+									sensitive: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+								}
 							}
 						}
 					}
 
-				}
+					Box optional_box {
+						orientation: vertical;
+						spacing: 12;
 
-				Box device_box {
-					orientation: vertical;
-					spacing: 12;
+						Label {
+							styles [ "heading" ]
 
-					Label {
-						styles [ "heading" ]
+							label: _("Optional");
+							halign: start;
+						}
 
-						label: _("Media");
-						halign: start;
-					}
+						ListBox {
+							styles [ "boxed-list" ]
 
-					Label {
-						styles [ "dimmed" ]
-
-						label: _("CAUTION: All data will be deleted. Check the media for important data.");
-						halign: start;
-					}
-
-					ListBox {
-						styles [ "boxed-list" ]
-
-						Adw.ActionRow {
-							title: _("Target device");
-							selectable: false;
-
-							[suffix]
-							DropDown devices_dropdown {
-								valign: center;
-								sensitive: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
-								show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+							Adw.SwitchRow {
+								title: _("Trash download after writing");
+								selectable: false;
 							}
 						}
 					}
-				}
-
-				Box optional_box {
-					orientation: vertical;
-					spacing: 12;
-
-					Label {
-						styles [ "heading" ]
-
-						label: _("Optional");
-						halign: start;
-					}
-
-					ListBox {
-						styles [ "boxed-list" ]
-
-						Adw.SwitchRow {
-							title: _("Trash download after writing");
-							selectable: false;
-						}
-					}
-				}
+				};
 			}
 		};
 	};
