@@ -84,7 +84,10 @@ namespace Tailor {
 						var nav = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 						nav.push_by_tag ("image-page");
 					} catch (Error e) {
-						warning ("Cannot open file: %s", e.message);
+						if (e.code == Gtk.DialogError.DISMISSED)
+							return;
+
+						critical ("Cannot open file: %s", e.message);
 					}
 				}
 			);
