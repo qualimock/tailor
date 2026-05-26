@@ -85,6 +85,8 @@ namespace Tailor {
 				family.build_index ();
 		}
 
+		// TODO: add OS detection in .iso file
+
 		private bool is_downloadable (Osinfo.Media media) {
 			return media.get_url () != null;
 		}
