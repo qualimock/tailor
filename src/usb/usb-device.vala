@@ -1,4 +1,4 @@
-/* usb-dto.vala
+/* usb-device.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *

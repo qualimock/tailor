@@ -21,7 +21,7 @@ app_sources = files(
 	'usb' / 'usb-provider.vala',
 	'usb' / 'usb-service.vala',
 	'usb' / 'usb-mapper.vala',
-	'usb' / 'usb-dto.vala',
+	'usb' / 'usb-device.vala',
 
 ) + configure_file(
 	input: 'build.vala.in',
