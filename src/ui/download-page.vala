@@ -109,7 +109,7 @@ namespace Tailor {
 			});
 
 			foreach (var family in families) {
-				if (family.primary == true) {
+				if (family.primary) {
 					foreach (var os in family.get_fresh_oses ().values)
 						os_store.append (os);
 				} else {
