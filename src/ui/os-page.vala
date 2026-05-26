@@ -41,6 +41,10 @@ namespace Tailor {
 		public ServiceContext service {
 			get { return _service; }
 			set {
+				if (_service != null) {
+					_service.usb.device_added.disconnect (add_device);
+					_service.usb.device_removed.disconnect (remove_device);
+				}
 				_service = value;
 				if (value == null)
 					return;
