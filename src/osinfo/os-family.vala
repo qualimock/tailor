@@ -27,7 +27,6 @@ namespace Tailor {
 		public string display_name { get; set; }
 		public bool primary { get; set; }
 		public Gee.ArrayList<Os> distros { get; private set; }
-		public Gee.HashMap<string, Gee.ArrayList<Os>> fresh { get; private set; }
 		public Gee.HashMap<
 			string,
 			Gee.HashMap<string, Gee.TreeSet<string>>
