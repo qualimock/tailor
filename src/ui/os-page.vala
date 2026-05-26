@@ -185,6 +185,8 @@ namespace Tailor {
 		}
 
 		private void populate_versions (string edition, string preferred) {
+			has_versions = false;
+
 			if (current_family == null || !current_family.editions.has_key (edition))
 				return;
 
@@ -209,6 +211,8 @@ namespace Tailor {
 		}
 
 		private void populate_arches (string edition, string version, string preferred) {
+			has_arches = false;
+
 			if (current_family == null || !current_family.editions.has_key (edition))
 				return;
 
