@@ -42,6 +42,21 @@ namespace Tailor {
 			distros = new Gee.ArrayList<Os> ();
 		}
 
+		private static int compare_versions (string? a, string? b) {
+			var a_parts = (a ?? "0").split (".");
+			var b_parts = (b ?? "0").split (".");
+			var len = int.max (a_parts.length, b_parts.length);
+
+			for (int i = 0; i < len; i++) {
+				var a_value = i < a_parts.length ? int.parse (a_parts[i]) : 0;
+				var b_value = i < b_parts.length ? int.parse (b_parts[i]) : 0;
+				if (a_value != b_value)
+					return a_value - b_value;
+			}
+
+			return 0;
+		}
+
 		public Gee.HashMap<string, Os> get_fresh_oses () {
 			var fresh = new Gee.HashMap<string, Os> ();
 			foreach (var distro in distros) {
@@ -51,10 +66,19 @@ namespace Tailor {
 					continue;
 				}
 
-				double current = double.parse (distro.version ?? "0");
-				double contained = double.parse (fresh.get (key).version ?? "0");
+				var contained = fresh.get (key);
+				int version_cmp = compare_versions (distro.version, contained.version);
 
-				if (current > contained)
+				if (version_cmp != 0) {
+					if (version_cmp > 0)
+						fresh[key] = distro;
+
+					continue;
+				}
+
+				var distro_date = distro.release_date ?? "";
+				var contained_date = contained.release_date ?? "";
+				if (strcmp (distro_date, contained_date) > 0)
 					fresh[key] = distro;
 			}
 
