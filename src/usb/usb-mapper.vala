@@ -27,7 +27,7 @@ namespace Tailor {
 			uint partition_count;
 		}
 
-		public static UsbDto? from_udisks (DBusObject dbus_obj, UDisks.Client client) {
+		public static UsbDevice? from_udisks (DBusObject dbus_obj, UDisks.Client client) {
 			var udisks_obj = dbus_obj as UDisks.Object;
 			if (udisks_obj == null)
 				return null;
@@ -48,7 +48,7 @@ namespace Tailor {
 				return null;
 
 			var object_info = client.get_object_info (udisks_obj);
-			var dto = new UsbDto (udisks_obj.get_object_path ());
+			var dto = new UsbDevice (udisks_obj.get_object_path ());
 			dto.device_file = block.device;
 			dto.name = object_info.get_name ();
 			dto.size = drive.size;

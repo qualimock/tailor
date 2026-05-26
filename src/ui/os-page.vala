@@ -61,7 +61,7 @@ namespace Tailor {
 
 		private OsFamily current_family { get; private set; }
 
-		private ListStore device_store = new ListStore (typeof (UsbDto));
+		private ListStore device_store = new ListStore (typeof (UsbDevice));
 		private bool updating = false;
 
 		[GtkCallback]
@@ -93,10 +93,10 @@ namespace Tailor {
 
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
-			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDto), null, "name");
+			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDevice), null, "name");
 		}
 
-		public void add_device (UsbDto device) {
+		public void add_device (UsbDevice device) {
 			device_store.append (device);
 		}
 

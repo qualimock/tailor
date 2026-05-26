@@ -24,9 +24,9 @@ namespace Tailor {
 
 		private UDisks.Client client;
 
-		public signal void device_added (UsbDto device);
+		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
-		public signal void device_updated (UsbDto device);
+		public signal void device_updated (UsbDevice device);
 
 		public async void init_async () throws Error {
 			client = yield new UDisks.Client (null);

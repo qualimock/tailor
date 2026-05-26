@@ -24,17 +24,17 @@ namespace Tailor {
 
 		private UsbProvider provider;
 
-		public Gee.ArrayList<UsbDto> devices { get; private set; }
+		public Gee.ArrayList<UsbDevice> devices { get; private set; }
 
 		public signal void initialized ();
 		public signal void init_failed (Error e);
 
-		public signal void device_added (UsbDto device);
+		public signal void device_added (UsbDevice device);
 		public signal void device_removed (string object_path);
-		public signal void device_updated (UsbDto device);
+		public signal void device_updated (UsbDevice device);
 
 		public UsbService () {
-			devices = new Gee.ArrayList<UsbDto> ();
+			devices = new Gee.ArrayList<UsbDevice> ();
 		}
 
 		public async void init_async () {
@@ -54,7 +54,7 @@ namespace Tailor {
 			initialized ();
 		}
 
-		private void on_device_added (UsbDto device) {
+		private void on_device_added (UsbDevice device) {
 			devices.add (device);
 			device_added (device);
 		}
@@ -69,7 +69,7 @@ namespace Tailor {
 			devices.remove (removed);
 		}
 
-		private void on_device_updated (UsbDto device) {
+		private void on_device_updated (UsbDevice device) {
 			var old = devices.first_match (d => d.object_path == device.object_path);
 			if (old == null)
 				return;

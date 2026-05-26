@@ -41,7 +41,7 @@ namespace Tailor {
 
 		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
 
-		public void add_device (UsbDto device) {
+		public void add_device (UsbDevice device) {
 			var card = new DeviceCard ();
 			card.device_name = device.name;
 			card.filesystem = device.filesystem;
@@ -64,7 +64,7 @@ namespace Tailor {
 				devices_box.visible = false;
 		}
 
-		public void update_device (UsbDto device) {
+		public void update_device (UsbDevice device) {
 			var card = cards[device.object_path];
 			if (card == null)
 				return;
