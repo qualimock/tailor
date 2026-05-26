@@ -40,20 +40,14 @@ template $TailorHomePage : Adw.NavigationPage {
 					name: "write";
 					title: _("Write");
 					icon-name: "media-optical-symbolic";
-
-					child: $TailorWritePage write_page {
-						service: bind template.service;
-					};
+					child: $TailorWritePage write_page { service: bind template.service; };
 				}
 
 				Adw.ViewStackPage {
 					name: "devices";
 					title: _("Devices");
 					icon-name: "drive-harddisk-usb-symbolic";
-
-					child: $TailorDevicesPage devices_page {
-						service: bind template.service;
-					};
+					child: $TailorDevicesPage devices_page { service: bind template.service; };
 				}
 			};
 

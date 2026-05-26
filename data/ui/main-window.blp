@@ -7,20 +7,9 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 	title: _("Tailor");
 
 	content: Adw.NavigationView {
-		$TailorHomePage home_page {
-			service: bind template.service;
-		}
-
-		$TailorDownloadPage download_page {
-			service: bind template.service;
-		}
-
-		$TailorImagePage image_page {
-			service: bind template.service;
-		}
-
-		$TailorOsPage os_page {
-			service: bind template.service;
-		}
+		$TailorHomePage home_page { service: bind template.service; }
+		$TailorDownloadPage download_page { service: bind template.service; }
+		$TailorImagePage image_page { service: bind template.service; }
+		$TailorOsPage os_page { service: bind template.service; }
 	};
 }
