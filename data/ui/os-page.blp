@@ -151,7 +151,8 @@ template $TailorOsPage : Adw.NavigationPage {
 						Adw.ExpanderRow {
 							title: _("System Requirements");
 							selectable: false;
-							enable-expansion: bind template.has-requirements;
+							sensitive: bind template.has-requirements;
+							expanded: false;
 							subtitle: bind $requirements_subtitle (template.has-requirements) as <string>;
 
 							Adw.ActionRow {
