@@ -30,6 +30,7 @@ namespace Tailor {
 		static construct {
 			typeof (HomePage).ensure ();
 			typeof (DownloadPage).ensure ();
+			typeof (OsPage).ensure ();
 			typeof (ImagePage).ensure ();
 		}
 

@@ -23,10 +23,6 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
-		[GtkChild] private unowned OsPage os_page;
-
-		[GtkChild] private unowned Adw.NavigationView nav_view;
-
 		[GtkChild] private unowned Gtk.Box os_box;
 		[GtkChild] private unowned Adw.StatusPage download_error;
 
@@ -54,10 +50,6 @@ namespace Tailor {
 		private string? arch_filter = null;
 		private string search_query = "";
 
-		static construct {
-			typeof (OsPage).ensure ();
-		}
-
 		[GtkCallback] private bool logical_not (bool value) { return !value; }
 		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
@@ -73,12 +65,19 @@ namespace Tailor {
 			on_filter_changed ();
 		}
 
+		private void configure_os_page (OsFamily family, Os os) {
+			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+			var page = (OsPage) view.find_page ("os-page");
+			page.configure (family, os);
+			view.push (page);
+		}
+
 		[GtkCallback]
 		private void configure_os_page_from_os (Gtk.ListBoxRow row) {
 			var os = (Os) primary_model.get_item (row.get_index ());
 			var family = service.osinfo.families[os.family];
-			os_page.configure (family, os);
-			nav_view.push (os_page);
+
+			configure_os_page (family, os);
 		}
 
 		[GtkCallback]
@@ -93,8 +92,7 @@ namespace Tailor {
 				if (pick == null) pick = os;
 			}
 
-			os_page.configure (family, pick);
-			nav_view.push (os_page);
+			configure_os_page (family, pick);
 		}
 
 		public void populate () {
