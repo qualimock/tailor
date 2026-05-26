@@ -69,7 +69,7 @@ namespace Tailor {
 		private bool updating = false;
 
 		[GtkCallback]
-		private string? stringify (Gtk.StringObject? obj) {
+		private string stringify (Gtk.StringObject? obj) {
 			return obj?.string ?? "";
 		}
 
