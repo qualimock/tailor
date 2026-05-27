@@ -1,0 +1,8 @@
+using Gtk 4.0;
+
+template $TailorProgressLine : $TailorStatusLine {
+	styles [ "accent" ]
+
+	title: _("Starting");
+	status: bind template.progress;
+}

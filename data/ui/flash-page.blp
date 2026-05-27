@@ -54,24 +54,14 @@ template $TailorFlashPage : Adw.NavigationPage {
 						orientation: vertical;
 						spacing: 12;
 
-						ProgressBar {
+						ProgressBar progress_bar {
 							text: _("Installing");
 							ellipsize: start;
 							fraction: 0.75;
 						}
 
-						Box {
-							homogeneous: true;
-
-							Label stage_label {
-								styles [ "accent" ]
-								halign: start;
-							}
-
-							Label progress_label {
-								styles [ "accent" ]
-								halign: end;
-							}
+						$TailorProgressLine progress_status {
+							progress: bind $fraction_to_string (progress_bar.fraction) as <string>;
 						}
 
 						Separator {}

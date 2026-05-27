@@ -1,4 +1,4 @@
-/* status-line.vala
+/* progress-line.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,14 +20,34 @@
 
 namespace Tailor {
 
-	[GtkTemplate (ui = "/org/altlinux/Tailor/status-line.ui")]
-	public class StatusLine : Gtk.Box {
+	[GtkTemplate (ui = "/org/altlinux/Tailor/progress-line.ui")]
+	public class ProgressLine : StatusLine {
+		private string _progress;
 
-		public string title { get; set; default = ""; }
-		public string status { get; protected set; default = _("Awaiting"); }
+		public string progress {
+			get { return _progress; }
+			set {
+				if (!is_valid (value)) {
+					critical ("Value should be between 0 and 100, current: %s", value);
+					return;
+				}
 
-		public sealed void set_in_progress () { status = _("In progress"); }
-		public void set_finished () { status = _("Finished"); }
-		public void set_failed () { status = _("Failed"); }
+				_progress = @"$value%";
+			}
+		}
+
+		private bool is_valid (string input) {
+			var s = input.strip ();
+
+			int value;
+			unowned string rest;
+			if (!int.try_parse (s, out value, out rest, 10))
+				return false;
+
+			if (rest != "")
+				return false;
+
+			return value >= 0 && value <= 100;
+		}
 	}
 }

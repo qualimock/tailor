@@ -31,6 +31,7 @@ namespace Tailor {
 
 		static construct {
 			typeof (StatusLine).ensure ();
+			typeof (ProgressLine).ensure ();
 		}
 
 		[GtkCallback]
@@ -41,6 +42,11 @@ namespace Tailor {
 		[GtkCallback]
 		private void on_breakpoint_unapply () {
 			os_statuspage.remove_css_class ("compact");
+		}
+
+		[GtkCallback]
+		private string fraction_to_string (double value) {
+			return (value * 100).to_string ();
 		}
 
 		public void configure_from_image (File image) {
