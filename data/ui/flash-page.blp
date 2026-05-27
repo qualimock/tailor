@@ -1,0 +1,105 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorFlashPage : Adw.NavigationPage {
+	title: _("Write");
+	tag: "flash-page";
+	can-pop: false;
+
+	child: Adw.BreakpointBin {
+		height-request: 1;
+		width-request: 1;
+
+		Adw.Breakpoint breakpoint {
+			condition ("max-width: 599")
+
+			apply => $on_breakpoint_apply ();
+			unapply => $on_breakpoint_unapply ();
+		}
+
+		child: Adw.ToolbarView {
+			[top]
+			Adw.HeaderBar {
+				[end]
+				Button {
+					styles [ "flat" ]
+
+					tooltip-text: _("");
+					icon-name: "open-menu-symbolic";
+				}
+			}
+
+			content: Adw.Clamp {
+				valign: center;
+				margin-top: 24;
+				margin-bottom: 24;
+				margin-start: 12;
+				margin-end: 24;
+				maximum-size: 600;
+
+				child: Box {
+					orientation: vertical;
+					spacing: 24;
+
+					Adw.StatusPage os_statuspage {
+						styles [ "tl-with-badge" ]
+
+						child: Label os_info_label {
+							styles [ "accent", "tl-badge" ]
+							halign: center;
+						};
+					}
+
+					Box progress_box {
+						orientation: vertical;
+						spacing: 12;
+
+						ProgressBar {
+							text: _("Installing");
+							ellipsize: start;
+							fraction: 0.75;
+						}
+
+						Box {
+							homogeneous: true;
+
+							Label stage_label {
+								styles [ "accent" ]
+								halign: start;
+							}
+
+							Label progress_label {
+								styles [ "accent" ]
+								halign: end;
+							}
+						}
+
+						Separator {}
+
+						$TailorStatusLine download_status {}
+						$TailorStatusLine prepare_status { title: _("Preparing device"); }
+						$TailorStatusLine write_status { title: _("Writing image to device"); }
+						$TailorStatusLine verify_status { title: _("Verifying installation"); }
+					}
+
+					Box buttons_box {
+						homogeneous: true;
+						margin-top: 12;
+						spacing: 12;
+
+						Button {
+							styles [ "destructive-action" ]
+
+							label: _("Cancel");
+							action-name: "navigation.pop";
+						}
+
+						Button {
+							label: _("Pause");
+						}
+					}
+				};
+			};
+		};
+	};
+}

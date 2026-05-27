@@ -12,6 +12,7 @@ app_sources = files(
 	'ui' / 'os-page.vala',
 	'ui' / 'image-page.vala',
 	'ui' / 'status-line.vala',
+	'ui' / 'flash-page.vala',
 
 	'osinfo' / 'osinfo-provider.vala',
 	'osinfo' / 'osinfo-service.vala',

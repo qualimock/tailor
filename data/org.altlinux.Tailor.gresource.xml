@@ -11,6 +11,7 @@
 		<file alias="download-page.ui" preprocess="xml-stripblanks">ui/download-page.ui</file>
 		<file alias="os-page.ui" preprocess="xml-stripblanks">ui/os-page.ui</file>
 		<file alias="image-page.ui" preprocess="xml-stripblanks">ui/image-page.ui</file>
+		<file alias="flash-page.ui" preprocess="xml-stripblanks">ui/flash-page.ui</file>
 
 		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
 		<file alias="status-line.ui" preprocess="xml-stripblanks">ui/status-line.ui</file>

@@ -8,4 +8,5 @@ blueprints = files(
 	'os-page.blp',
 	'image-page.blp',
 	'status-line.blp',
+	'flash-page.blp',
 )
