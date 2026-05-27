@@ -76,10 +76,27 @@ template $TailorFlashPage : Adw.NavigationPage {
 
 						Separator {}
 
-						$TailorStatusLine download_status {}
-						$TailorStatusLine prepare_status { title: _("Preparing device"); }
-						$TailorStatusLine write_status { title: _("Writing image to device"); }
-						$TailorStatusLine verify_status { title: _("Verifying installation"); }
+						$TailorStatusLine download_status {
+							styles [ "dimmed" ]
+						}
+
+						$TailorStatusLine prepare_status {
+							styles [ "dimmed" ]
+
+							title: _("Preparing device");
+						}
+
+						$TailorStatusLine write_status {
+							styles [ "dimmed" ]
+
+							title: _("Writing image to device");
+						}
+
+						$TailorStatusLine verify_status {
+							styles [ "dimmed" ]
+
+							title: _("Verifying installation");
+						}
 					}
 
 					Box buttons_box {
