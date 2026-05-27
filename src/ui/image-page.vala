@@ -76,6 +76,14 @@ namespace Tailor {
 			service.notify["image-file"].connect (configure);
 		}
 
+		[GtkCallback]
+		private void open_flash_page () {
+			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+			var page = (FlashPage) view.find_page ("flash-page");
+			page.configure_from_image (service.image_file);
+			view.push (page);
+		}
+
 		private void configure () {
 			if (service.image_file == null)
 				return;

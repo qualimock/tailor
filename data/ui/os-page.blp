@@ -242,6 +242,18 @@ template $TailorOsPage : Adw.NavigationPage {
 					}
 				};
 			}
+
+			[overlay]
+			Button {
+				styles [ "suggested-action", "pill" ]
+
+				margin-bottom: 24;
+				halign: center;
+				valign: end;
+
+				label: _("Create Bootable USB");
+				clicked => $open_flash_page ();
+			}
 		};
 	};
 }

@@ -64,6 +64,7 @@ namespace Tailor {
 		public string? selected_arch { get; set; }
 
 		private OsFamily current_family { get; private set; }
+		private Os current_os { get; private set; }
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
 		private bool updating = false;
@@ -93,6 +94,14 @@ namespace Tailor {
 			}
 
 			return false;
+		}
+
+		[GtkCallback]
+		private void open_flash_page () {
+			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+			var page = (FlashPage) view.find_page ("flash-page");
+			page.configure_from_os (current_family, current_os);
+			view.push (page);
 		}
 
 		construct {
@@ -149,6 +158,8 @@ namespace Tailor {
 			release_label.label = os.release_date ?? "";
 			media_type_label.label = os.media_type ?? "";
 			codename_label.label = os.codename ?? "";
+
+			current_os = os;
 		}
 
 		public void configure (OsFamily family, Os selected) {
