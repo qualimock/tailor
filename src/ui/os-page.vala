@@ -173,7 +173,7 @@ namespace Tailor {
 		}
 
 		[GtkCallback]
-		private void reconfigure_by_edition () {
+		private void on_edition_selected () {
 			if (updating)
 				return;
 
@@ -181,11 +181,21 @@ namespace Tailor {
 		}
 
 		[GtkCallback]
-		private void reconfigure_by_version () {
+		private void on_version_selected () {
 			if (updating)
 				return;
 
 			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+		}
+
+		[GtkCallback]
+		private void on_arch_selected () {
+			if (updating)
+				return;
+
+			var os = find_selected_os ();
+			if (os != null)
+				update_os_info (os);
 		}
 
 		private void populate_versions (string edition, string preferred) {
@@ -235,12 +245,6 @@ namespace Tailor {
 			var selected = arches.contains (preferred) ? preferred : arches.first ();
 
 			populate_dropdown (arch_dropdown, arches, selected);
-
-			if (!updating) {
-				var os = find_selected_os ();
-				if (os != null)
-					update_os_info (os);
-			}
 		}
 
 		private void populate_dropdown (Gtk.DropDown dropdown, Gee.TreeSet<string> items, string selected) {

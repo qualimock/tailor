@@ -9,8 +9,9 @@ template $TailorOsPage : Adw.NavigationPage {
 	selected-version: bind $stringify(version_dropdown.selected-item as <Gtk.StringObject>) as <string>;
 	selected-arch: bind $stringify(arch_dropdown.selected-item as <Gtk.StringObject>) as <string>;
 
-	notify::selected-edition => $reconfigure_by_edition ();
-	notify::selected-version => $reconfigure_by_version ();
+	notify::selected-edition => $on_edition_selected ();
+	notify::selected-version => $on_version_selected ();
+	notify::selected-arch => $on_arch_selected ();
 
 	child: Adw.ToolbarView {
 		[top]
