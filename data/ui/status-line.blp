@@ -1,0 +1,19 @@
+using Gtk 4.0;
+
+template $TailorStatusLine : Box {
+	styles [ "dimmed" ]
+
+	Label {
+		halign: start;
+		hexpand: true;
+
+		label: bind template.title;
+	}
+
+	Label {
+		styles [ "heading" ]
+
+		halign: end;
+		label: bind template.status;
+	}
+}

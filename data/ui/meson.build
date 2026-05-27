@@ -7,4 +7,5 @@ blueprints = files(
 	'device-card.blp',
 	'os-page.blp',
 	'image-page.blp',
+	'status-line.blp',
 )

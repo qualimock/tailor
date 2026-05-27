@@ -13,6 +13,7 @@
 		<file alias="image-page.ui" preprocess="xml-stripblanks">ui/image-page.ui</file>
 
 		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
+		<file alias="status-line.ui" preprocess="xml-stripblanks">ui/status-line.ui</file>
 
 		<file preprocess="xml-stripblanks">icons/scalable/actions/drawer-symbolic.svg</file>
 		<file preprocess="xml-stripblanks">icons/scalable/actions/sad-computer-symbolic.svg</file>
