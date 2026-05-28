@@ -23,35 +23,10 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/write-page.ui")]
 	public class WritePage : Adw.Bin {
 
-		[GtkChild] private unowned Gtk.Label from_file_title;
-		[GtkChild] private unowned Gtk.Label download_title;
-		[GtkChild] private unowned Gtk.Label from_file_subtitle;
-		[GtkChild] private unowned Gtk.Label download_subtitle;
-
 		public ServiceContext service { get; construct set; }
 
-		[GtkCallback]
-		private void increase_cards_text_size () {
-			switch_css_class (from_file_title, "title-4", "title-2");
-			switch_css_class (download_title, "title-4", "title-2");
-			from_file_subtitle.add_css_class ("tl-text-large");
-			download_subtitle.add_css_class ("tl-text-large");
-		}
-
-		[GtkCallback]
-		private void decrease_cards_text_size () {
-			switch_css_class (from_file_title, "title-2", "title-4");
-			switch_css_class (download_title, "title-2", "title-4");
-			from_file_subtitle.remove_css_class ("tl-text-large");
-			download_subtitle.remove_css_class ("tl-text-large");
-		}
-
-		private void switch_css_class (Gtk.Label label, string current, string preferred) {
-			if (!label.has_css_class (current))
-				return;
-
-			label.remove_css_class (current);
-			label.add_css_class (preferred);
+		static construct {
+			typeof (ButtonCard).ensure ();
 		}
 
 		[GtkCallback]

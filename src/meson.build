@@ -15,6 +15,7 @@ app_sources = files(
 	'ui' / 'progress-line.vala',
 	'ui' / 'flash-page.vala',
 	'ui' / 'status-page-with-badge.vala',
+	'ui' / 'button-card.vala',
 
 	'osinfo' / 'osinfo-provider.vala',
 	'osinfo' / 'osinfo-service.vala',

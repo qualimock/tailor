@@ -1,0 +1,40 @@
+using Gtk 4.0;
+
+template $TailorButtonCard : Button {
+	styles [ "card" ]
+
+	notify::large => $resize_labels ();
+
+	child: Box {
+		orientation: vertical;
+		margin-top: 24;
+		margin-bottom: 24;
+		margin-start: 24;
+		margin-end: 24;
+		spacing: 12;
+
+		Image card_icon {
+			styles [ "dimmed" ]
+
+			margin-bottom: 6;
+
+			pixel-size: bind $get_icon_size (template.large) as <int>;
+			icon-name: bind template.icon-name;
+			accessible-role: presentation;
+		}
+
+		Label title_label {
+			styles [ "title-4" ]
+
+			label: bind template.title;
+		}
+
+		Label description_label {
+			styles [ "dimmed" ]
+
+			wrap: true;
+			justify: center;
+			label: bind template.description;
+		}
+	};
+}

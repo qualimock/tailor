@@ -11,4 +11,5 @@ blueprints = files(
 	'progress-line.blp',
 	'flash-page.blp',
 	'status-page-with-badge.blp',
+	'button-card.blp',
 )
