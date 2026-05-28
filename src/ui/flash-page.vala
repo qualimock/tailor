@@ -23,8 +23,7 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/flash-page.ui")]
 	public class FlashPage : Adw.NavigationPage {
 
-		[GtkChild] private unowned Adw.StatusPage os_statuspage;
-		[GtkChild] private unowned Gtk.Label os_info_label;
+		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 		[GtkChild] private unowned StatusLine download_status;
 
 		public ServiceContext service { get; construct set; }
@@ -32,16 +31,6 @@ namespace Tailor {
 		static construct {
 			typeof (StatusLine).ensure ();
 			typeof (ProgressLine).ensure ();
-		}
-
-		[GtkCallback]
-		private void on_breakpoint_apply () {
-			os_statuspage.add_css_class ("compact");
-		}
-
-		[GtkCallback]
-		private void on_breakpoint_unapply () {
-			os_statuspage.remove_css_class ("compact");
 		}
 
 		[GtkCallback]
@@ -58,9 +47,9 @@ namespace Tailor {
 				var info = image.query_info (
 					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
 				);
-				os_info_label.label = format_size (info.get_size ());
+				os_statuspage.badge = format_size (info.get_size ());
 			} catch (Error e) {
-				os_info_label.visible = false;
+				os_statuspage.badge_visible = false;
 			}
 
 			download_status.visible = false;
@@ -75,7 +64,7 @@ namespace Tailor {
 			);
 
 			os_statuspage.description = family.vendor;
-			os_info_label.label = os.arch;
+			os_statuspage.badge = os.arch;
 
 			download_status.title = _("Downloading image %s").printf (Path.get_basename (os.url));
 		}

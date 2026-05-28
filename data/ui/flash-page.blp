@@ -13,8 +13,9 @@ template $TailorFlashPage : Adw.NavigationPage {
 		Adw.Breakpoint breakpoint {
 			condition ("max-width: 599")
 
-			apply => $on_breakpoint_apply ();
-			unapply => $on_breakpoint_unapply ();
+			setters {
+				os_statuspage.compact: true;
+			}
 		}
 
 		child: Adw.ToolbarView {
@@ -41,14 +42,7 @@ template $TailorFlashPage : Adw.NavigationPage {
 					orientation: vertical;
 					spacing: 24;
 
-					Adw.StatusPage os_statuspage {
-						styles [ "tl-with-badge" ]
-
-						child: Label os_info_label {
-							styles [ "accent", "tl-badge" ]
-							halign: center;
-						};
-					}
+					$TailorStatusPageWithBadge os_statuspage {}
 
 					Box progress_box {
 						orientation: vertical;

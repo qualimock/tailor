@@ -1,0 +1,21 @@
+using Gtk 4.0;
+using Adw 1;
+
+template $TailorStatusPageWithBadge : Adw.Bin {
+
+	notify::compact => $switch_compact ();
+
+	child: Adw.StatusPage statuspage {
+		styles [ "tl-with-badge" ]
+		title: bind template.title;
+		description: bind template.description;
+		icon-name: bind template.icon-name;
+
+		child: Label badge {
+			styles [ "accent", "tl-badge" ]
+			halign: center;
+			label: bind template.badge;
+			visible: bind template.badge_visible;
+		};
+	};
+}

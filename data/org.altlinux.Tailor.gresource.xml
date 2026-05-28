@@ -16,6 +16,7 @@
 		<file alias="device-card.ui" preprocess="xml-stripblanks">ui/device-card.ui</file>
 		<file alias="status-line.ui" preprocess="xml-stripblanks">ui/status-line.ui</file>
 		<file alias="progress-line.ui" preprocess="xml-stripblanks">ui/progress-line.ui</file>
+		<file alias="status-page-with-badge.ui" preprocess="xml-stripblanks">ui/status-page-with-badge.ui</file>
 
 		<file preprocess="xml-stripblanks">icons/scalable/actions/drawer-symbolic.svg</file>
 		<file preprocess="xml-stripblanks">icons/scalable/actions/sad-computer-symbolic.svg</file>

@@ -33,6 +33,7 @@ namespace Tailor {
 			typeof (OsPage).ensure ();
 			typeof (ImagePage).ensure ();
 			typeof (FlashPage).ensure ();
+			typeof (StatusPageWithBadge).ensure ();
 		}
 
 		public MainWindow (Tailor.Application app, ServiceContext service) {

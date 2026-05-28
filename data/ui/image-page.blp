@@ -31,18 +31,9 @@ template $TailorImagePage : Adw.NavigationPage {
 				orientation: vertical;
 				valign: center;
 
-				Adw.StatusPage image_info {
-					styles [ "tl-with-badge" ]
-
+				$TailorStatusPageWithBadge image_info {
 					icon-name: "media-optical-symbolic";
-					title: _("very-long-image-file.iso");
 					description: _("Local file");
-
-					child: Label size_label {
-						styles [ "accent", "tl-badge" ]
-						label: _("10 Gb");
-						halign: center;
-					};
 				}
 
 				Box device_box {

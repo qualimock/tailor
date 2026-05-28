@@ -23,8 +23,7 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/image-page.ui")]
 	public class ImagePage : Adw.NavigationPage {
 
-		[GtkChild] private unowned Adw.StatusPage image_info;
-		[GtkChild] private unowned Gtk.Label size_label;
+		[GtkChild] private unowned StatusPageWithBadge image_info;
 		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
 		private ServiceContext _service;
@@ -93,9 +92,9 @@ namespace Tailor {
 				var info = service.image_file.query_info (
 					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
 				);
-				size_label.label = format_size (info.get_size ());
+				image_info.badge = format_size (info.get_size ());
 			} catch (Error e) {
-				size_label.label = _("Unknown");
+				image_info.badge = _("Unknown");
 				warning ("Failed to get file size: %s", e.message);
 			}
 		}
