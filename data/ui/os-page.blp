@@ -5,9 +5,9 @@ template $TailorOsPage : Adw.NavigationPage {
 	title: _("OS Info");
 	tag: "os-page";
 
-	selected-edition: bind $stringify(edition_dropdown.selected-item as <Gtk.StringObject>) as <string>;
-	selected-version: bind $stringify(version_dropdown.selected-item as <Gtk.StringObject>) as <string>;
-	selected-arch: bind $stringify(arch_dropdown.selected-item as <Gtk.StringObject>) as <string>;
+	selected-edition: bind $stringify(edition_dropdown.selected-item as <StringObject>) as <string>;
+	selected-version: bind $stringify(version_dropdown.selected-item as <StringObject>) as <string>;
+	selected-arch: bind $stringify(arch_dropdown.selected-item as <StringObject>) as <string>;
 	selected-device: bind devices_dropdown.model as <SingleSelection>;
 
 	notify::selected-edition => $on_edition_selected ();
