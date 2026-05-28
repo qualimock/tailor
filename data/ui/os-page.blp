@@ -65,7 +65,7 @@ template $TailorOsPage : Adw.NavigationPage {
 							Adw.ActionRow {
 								title: _("Edition");
 								selectable: false;
-								visible: bind template.has_editions;
+								visible: bind template.has-editions;
 
 								[suffix]
 								DropDown edition_dropdown {
@@ -78,7 +78,7 @@ template $TailorOsPage : Adw.NavigationPage {
 							Adw.ActionRow {
 								title: _("Version");
 								selectable: false;
-								visible: bind template.has_versions;
+								visible: bind template.has-versions;
 
 								[suffix]
 								DropDown version_dropdown {
@@ -91,7 +91,7 @@ template $TailorOsPage : Adw.NavigationPage {
 							Adw.ActionRow {
 								title: _("Architecture");
 								selectable: false;
-								visible: bind template.has_arches;
+								visible: bind template.has-arches;
 
 								[suffix]
 								DropDown arch_dropdown {
