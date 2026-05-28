@@ -27,6 +27,7 @@ namespace Tailor {
 		[GtkChild] private unowned StatusLine download_status;
 
 		public ServiceContext service { get; construct set; }
+		private UsbDevice device { get; set; }
 
 		static construct {
 			typeof (StatusLine).ensure ();
@@ -38,7 +39,7 @@ namespace Tailor {
 			return (value * 100).to_string ();
 		}
 
-		public void configure_from_image (File image) {
+		public void configure_from_image (File image, UsbDevice device) {
 			os_statuspage.title = "%s".printf (image.get_basename ());
 			os_statuspage.icon_name = "media-optical-symbolic";
 			os_statuspage.description = _("Local file");
@@ -53,9 +54,10 @@ namespace Tailor {
 			}
 
 			download_status.visible = false;
+			this.device = device;
 		}
 
-		public void configure_from_os (OsFamily family, Os os) {
+		public void configure_from_os (OsFamily family, Os os, UsbDevice device) {
 			os_statuspage.title = "%s %s %s %s".printf (
 				family.display_name,
 				os.edition ?? "",
@@ -67,6 +69,7 @@ namespace Tailor {
 			os_statuspage.badge = os.arch;
 
 			download_status.title = _("Downloading image %s").printf (Path.get_basename (os.url));
+			this.device = device;
 		}
 	}
 }

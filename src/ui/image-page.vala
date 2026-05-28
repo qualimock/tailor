@@ -43,6 +43,8 @@ namespace Tailor {
 			}
 		}
 
+		public Gtk.SingleSelection? selected_device { get; set; }
+
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
 
 		[GtkCallback]
@@ -79,7 +81,15 @@ namespace Tailor {
 		private void open_flash_page () {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (FlashPage) view.find_page ("flash-page");
-			page.configure_from_image (service.image_file);
+
+			if (selected_device == null)
+				return;
+
+			page.configure_from_image (
+				service.image_file,
+				(UsbDevice) selected_device.selected_item
+			);
+
 			view.push (page);
 		}
 

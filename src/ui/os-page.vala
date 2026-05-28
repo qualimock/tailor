@@ -62,6 +62,7 @@ namespace Tailor {
 		public string? selected_edition { get; set; }
 		public string? selected_version { get; set; }
 		public string? selected_arch { get; set; }
+		public Gtk.SingleSelection? selected_device { get; set; }
 
 		private OsFamily current_family { get; private set; }
 		private Os current_os { get; private set; }
@@ -100,7 +101,14 @@ namespace Tailor {
 		private void open_flash_page () {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (FlashPage) view.find_page ("flash-page");
-			page.configure_from_os (current_family, current_os);
+
+			if (selected_device == null)
+				return;
+
+			page.configure_from_os (
+				current_family, current_os,
+				(UsbDevice) selected_device.selected_item
+			);
 			view.push (page);
 		}
 
