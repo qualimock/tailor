@@ -7,6 +7,7 @@ template $TailorImagePage : Adw.NavigationPage {
 
 	notify::service => $on_service_load ();
 
+	has-devices: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 0) as <bool>;
 	selected-device: bind devices_dropdown.model as <SingleSelection>;
 
 	child: Adw.ToolbarView {
@@ -81,6 +82,7 @@ template $TailorImagePage : Adw.NavigationPage {
 				label: _("Create Bootable USB");
 				halign: center;
 				clicked => $open_flash_page ();
+				sensitive: bind template.has-devices;
 			}
 		};
 	};

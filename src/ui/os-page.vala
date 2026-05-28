@@ -58,6 +58,7 @@ namespace Tailor {
 		public bool has_versions { get; private set; default = false; }
 		public bool has_arches { get; private set; default = false; }
 		public bool has_requirements { get; private set; default = false; }
+		public bool has_devices { get; set; default = false; }
 
 		public string? selected_edition { get; set; }
 		public string? selected_version { get; set; }

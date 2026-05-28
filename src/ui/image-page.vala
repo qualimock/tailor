@@ -43,6 +43,7 @@ namespace Tailor {
 			}
 		}
 
+		public bool has_devices { get; set; default = false; }
 		public Gtk.SingleSelection? selected_device { get; set; }
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));

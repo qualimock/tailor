@@ -14,6 +14,8 @@ template $TailorOsPage : Adw.NavigationPage {
 	notify::selected-version => $on_version_selected ();
 	notify::selected-arch => $on_arch_selected ();
 
+	has-devices: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 0) as <bool>;
+
 	child: Adw.ToolbarView {
 		[top]
 		Adw.HeaderBar {
@@ -215,6 +217,7 @@ template $TailorOsPage : Adw.NavigationPage {
 								DropDown devices_dropdown {
 									valign: center;
 									sensitive: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+									sensitive: bind template.has-devices;
 									show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
 								}
 							}
@@ -253,6 +256,7 @@ template $TailorOsPage : Adw.NavigationPage {
 				valign: end;
 
 				label: _("Create Bootable USB");
+				sensitive: bind template.has-devices;
 				clicked => $open_flash_page ();
 			}
 		};
