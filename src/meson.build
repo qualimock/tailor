@@ -1,9 +1,10 @@
 app_sources = files(
 	'main.vala',
 	'application.vala',
-	'service-context.vala',
-	'download-operation.vala',
-	'flash-operation.vala',
+
+	'service' / 'service-context.vala',
+	'service' / 'download-operation.vala',
+	'service' / 'flash-operation.vala',
 
 	'ui' / 'main-window.vala',
 	'ui' / 'home-page.vala',
