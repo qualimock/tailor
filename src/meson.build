@@ -2,6 +2,7 @@ app_sources = files(
 	'main.vala',
 	'application.vala',
 	'service-context.vala',
+	'flash-operation.vala',
 
 	'ui' / 'main-window.vala',
 	'ui' / 'home-page.vala',
@@ -40,6 +41,7 @@ app_dependencies = [
 	dependency('gee-0.8'),
 	dependency('gio-2.0'),
 	dependency('udisks2'),
+	dependency('gio-unix-2.0'),
 ]
 
 executable(

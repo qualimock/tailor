@@ -1,0 +1,176 @@
+/* flash-operation.vala
+ *
+ * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ */
+
+namespace Tailor {
+
+	public enum FlashStage {
+		PREPARING,
+		WRITING,
+		VERIFYING
+	}
+
+	public class FlashOperation : Object {
+
+		private UDisks.Block block;
+		private DBusObjectManager object_manager;
+		private File image;
+		private Cancellable cancellable;
+		private SourceFunc? resume_func = null;
+
+		private int64 bytes_written = 0;
+		private int64 total_bytes = 0;
+
+		private bool paused = false;
+
+		public signal void progress (int64 bytes_written, int64 total);
+		public signal void stage_changed (FlashStage stage);
+		public signal void completed ();
+		public signal void failed (string message);
+
+		public FlashOperation (
+			UDisks.Block block,
+			DBusObjectManager object_manager,
+			File image,
+			Cancellable cancellable
+		) {
+			this.block = block;
+			this.object_manager = object_manager;
+			this.image = image;
+			this.cancellable = cancellable;
+		}
+
+		public void pause () {
+			paused = true;
+		}
+
+		public void resume () {
+			paused = false;
+			if (resume_func != null) {
+				var func = (owned) resume_func;
+				resume_func = null;
+				func ();
+			}
+		}
+
+		private async void wait_for_resume () {
+			resume_func = wait_for_resume.callback;
+			yield;
+		}
+
+		public async void run_async () throws Error {
+			FileInputStream? input = null;
+			UnixOutputStream? output = null;
+
+			try {
+				yield unmount ();
+
+				FileInfo info;
+				input = yield get_input (out info);
+				output = yield get_output ();
+				total_bytes = (int64) info.get_size ();
+
+				stage_changed (FlashStage.WRITING);
+				yield stream (input, output);
+			} catch (Error e) {
+				if (output != null) yield output.close_async (Priority.DEFAULT, null);
+				if (input != null) yield input.close_async (Priority.DEFAULT, null);
+
+				if (!(e is IOError.CANCELLED))
+					failed (e.message);
+
+				throw e;
+			}
+
+			yield output.close_async (Priority.DEFAULT, null);
+			yield input.close_async (Priority.DEFAULT, null);
+			completed ();
+		}
+
+		private async void unmount () throws Error {
+			stage_changed (FlashStage.PREPARING);
+
+			foreach (var obj in object_manager.get_objects ()) {
+				var udisks_obj = obj as UDisks.Object;
+				if (udisks_obj == null)
+					continue;
+
+				var blk = udisks_obj.block;
+				if (blk == null || blk.drive != block.drive)
+					continue;
+
+				var filesystem = udisks_obj.filesystem;
+				if (filesystem == null || filesystem.mount_points.length == 0)
+					continue;
+
+				yield filesystem.call_unmount (new Variant ("a{sv}", null), cancellable);
+			}
+		}
+
+		private async FileInputStream get_input (out FileInfo file_info) throws Error {
+			file_info = yield image.query_info_async (
+				FileAttribute.STANDARD_SIZE,
+				FileQueryInfoFlags.NONE,
+				Priority.DEFAULT,
+				cancellable
+			);
+
+			return yield image.read_async (Priority.DEFAULT, cancellable);
+		}
+
+		private async UnixOutputStream get_output () throws Error {
+			UnixFDList fd_list;
+			Variant out_fd;
+			yield block.call_open_for_restore (
+				new Variant ("a{sv}", null),
+				null,
+				cancellable,
+				out out_fd,
+				out fd_list
+			);
+			var fd = fd_list.get (out_fd.get_handle ());
+			return new UnixOutputStream (fd, true);
+		}
+
+		private async void stream (FileInputStream input, UnixOutputStream output) throws Error {
+			var buf = new uint8[1024 * 1024];
+			ssize_t n;
+
+			while ((n = yield input.read_async (buf, Priority.DEFAULT, cancellable)) > 0) {
+				if (paused)
+					yield wait_for_resume ();
+
+				size_t written;
+
+				yield output.write_all_async (
+					buf[0:n],
+					Priority.DEFAULT,
+					cancellable,
+					out written
+				);
+
+				bytes_written += written;
+
+				progress (bytes_written, total_bytes);
+			}
+
+			yield output.flush_async (Priority.DEFAULT, cancellable);
+		}
+	}
+}

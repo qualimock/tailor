@@ -82,5 +82,13 @@ namespace Tailor {
 
 			device_updated (old);
 		}
+
+		public FlashOperation create_flash_operation (
+			UsbDevice device,
+			File image,
+			Cancellable cancellable
+		) throws Error {
+			return provider.create_flash_operation (device, image, cancellable);
+		}
 	}
 }

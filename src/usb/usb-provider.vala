@@ -89,5 +89,22 @@ namespace Tailor {
 			foreach (var obj in client.get_object_manager ().get_objects ())
 				emit_updated_for_path (obj.get_object_path ());
 		}
+
+		public FlashOperation create_flash_operation (
+			UsbDevice device,
+			File image,
+			Cancellable cancellable
+		) throws Error {
+			var udisks_obj = client.get_object (device.object_path);
+			if (udisks_obj == null)
+				throw new IOError.NOT_FOUND ("Device not found: %s", device.object_path);
+
+			var block = udisks_obj.get_block ();
+			if (block == null)
+				throw new IOError.NOT_FOUND ("No block interface for: %s", device.object_path);
+
+			var object_manager = client.get_object_manager ();
+			return new FlashOperation (block, object_manager, image, cancellable);
+		}
 	}
 }
