@@ -28,6 +28,8 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
+		[GtkChild] private unowned Adw.SwitchRow trash_switch;
+
 		[GtkChild] private unowned Gtk.Label cpu_label;
 		[GtkChild] private unowned Gtk.Label ram_label;
 		[GtkChild] private unowned Gtk.Label free_space_label;
@@ -108,7 +110,8 @@ namespace Tailor {
 
 			page.configure_from_os (
 				current_family, current_os,
-				(UsbDevice) selected_device.selected_item
+				(UsbDevice) selected_device.selected_item,
+				trash_switch.active
 			);
 			view.push (page);
 		}

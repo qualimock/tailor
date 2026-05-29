@@ -4,7 +4,9 @@ using Adw 1;
 template $TailorFlashPage : Adw.NavigationPage {
 	title: _("Write");
 	tag: "flash-page";
-	can-pop: false;
+	can-pop: bind template.finished;
+
+	map => $start_flashing ();
 
 	child: Adw.BreakpointBin {
 		height-request: 1;
@@ -51,11 +53,17 @@ template $TailorFlashPage : Adw.NavigationPage {
 						ProgressBar progress_bar {
 							text: _("Installing");
 							ellipsize: start;
-							fraction: 0.75;
+							fraction: 0;
+						}
+
+						Label flash_result_label {
+							visible: bind template.finished;
+							wrap: true;
 						}
 
 						$TailorProgressLine progress_status {
 							progress: bind $fraction_to_string (progress_bar.fraction) as <string>;
+							visible: bind flash_result_label.visible inverted;
 						}
 
 						Separator {}
@@ -83,20 +91,47 @@ template $TailorFlashPage : Adw.NavigationPage {
 						}
 					}
 
-					Box buttons_box {
+					Box {
 						homogeneous: true;
 						margin-top: 12;
 						spacing: 12;
+						visible: bind template.finished inverted;
 
 						Button {
 							styles [ "destructive-action" ]
 
 							label: _("Cancel");
-							action-name: "navigation.pop";
+							clicked => $cancel_flashing ();
+						}
+
+						Button pause_button {
+							label: bind $get_paused_label (template.paused);
+							clicked => $toggle_pause ();
+						}
+					}
+
+					Box {
+						homogeneous: true;
+						margin-top: 12;
+						spacing: 12;
+						visible: bind template.finished;
+
+						Button {
+							styles [ "suggested-action" ]
+							label: _("Details");
+							visible: bind exit_button.visible inverted;
 						}
 
 						Button {
-							label: _("Pause");
+							label: _("Retry");
+							clicked => $start_flashing ();
+							visible: bind exit_button.visible inverted;
+						}
+
+						Button exit_button {
+							label: _("Go Back");
+							action-name: "navigation.pop";
+							visible: bind template.success;
 						}
 					}
 				};
