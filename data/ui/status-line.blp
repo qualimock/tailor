@@ -1,6 +1,8 @@
 using Gtk 4.0;
 
 template $TailorStatusLine : Box {
+	notify::state => $state_to_status ();
+
 	Label {
 		halign: start;
 		hexpand: true;

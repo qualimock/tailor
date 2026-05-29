@@ -20,14 +20,42 @@
 
 namespace Tailor {
 
+	public enum StatusState {
+		NONE,
+		PENDING,
+		ACTIVE,
+		FINISHED,
+		FAILED,
+		ABORTED
+	}
+
 	[GtkTemplate (ui = "/org/altlinux/Tailor/status-line.ui")]
 	public class StatusLine : Gtk.Box {
 
 		public string title { get; set; default = ""; }
-		public string status { get; protected set; default = _("Awaiting"); }
+		public string status { get; protected set; }
+		public StatusState state { get; set; default = StatusState.PENDING; }
 
-		public sealed void set_in_progress () { status = _("In progress"); }
-		public void set_finished () { status = _("Finished"); }
-		public void set_failed () { status = _("Failed"); }
+		[GtkCallback]
+		private void state_to_status () {
+			status = status_from_state ();
+		}
+
+		construct {
+			status = status_from_state ();
+		}
+
+		private string status_from_state () {
+			switch (state) {
+				case StatusState.PENDING: return _("Pending");
+				case StatusState.ACTIVE: return _("In progress");
+				case StatusState.FINISHED: return _("Finished");
+				case StatusState.FAILED: return _("Failed");
+				case StatusState.ABORTED: return _("Aborted");
+
+				case StatusState.NONE:
+				default: return "";
+			}
+		}
 	}
 }
