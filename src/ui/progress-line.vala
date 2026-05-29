@@ -37,7 +37,7 @@ namespace Tailor {
 		}
 
 		private bool is_valid (string input) {
-			var s = input.strip ();
+			var s = input[0:input.last_index_of (".")];
 
 			int value;
 			unowned string rest;
