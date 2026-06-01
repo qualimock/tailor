@@ -22,16 +22,10 @@ namespace Tailor {
 
 	public class OsinfoService {
 
-		private OsinfoProvider provider;
+		private OsinfoProvider provider = new OsinfoProvider ();
 
-		public Gee.HashMap<string, OsFamily> families { get; private set; }
-		public Gee.TreeSet<string> arches { get; private set; }
-
-		public OsinfoService () {
-			provider = new OsinfoProvider ();
-			families = new Gee.HashMap<string, OsFamily> ();
-			arches = new Gee.TreeSet<string> ();
-		}
+		public Gee.HashMap<string, OsFamily> families = new Gee.HashMap<string, OsFamily> ();
+		public Gee.TreeSet<string> arches = new Gee.TreeSet<string> ();
 
 		public signal void loaded ();
 		public signal void load_failed (Error e);
@@ -44,52 +38,56 @@ namespace Tailor {
 				return;
 			}
 
-			collect_oses (primary_distro);
+			build_families (primary_distro);
 
 			loaded ();
 		}
 
-		private void collect_oses (string primary_distro) {
-			families.clear ();
-			arches.clear ();
+		private void build_families (string primary_distro) {
+			families = new Gee.HashMap<string, OsFamily> ();
+			arches = new Gee.TreeSet<string> ();
 
 			foreach (var os in provider.get_os_list ()) {
 				if (os.distro == null || is_at_eol (os)) {
 					continue;
 				}
 
-				var os_family_dto = OsMapper.family_from_osinfo (os, primary_distro);
-
-				foreach (var entity in os.get_media_list ().get_elements ()) {
-					var media = (Osinfo.Media) entity;
-					if (!is_downloadable (media))
-						continue;
-
-					var os_dto = OsMapper.os_from_osinfo (os, media, primary_distro);
-
-					os_family_dto.distros.add (os_dto);
-					if (os_dto.arch != null)
-						arches.add (os_dto.arch);
-				}
-
-				if (os_family_dto.distros.is_empty)
+				var family = build_family (os, primary_distro);
+				if (family == null)
 					continue;
 
-				if (families.has_key (os_family_dto.family))
-					families[os_family_dto.family].distros.add_all (os_family_dto.distros);
+				if (families.has_key (family.family))
+					families[family.family].distros.add_all (family.distros);
 				else
-					families.set (os_family_dto.family, os_family_dto);
+					families.set (family.family, family);
 			}
 
 			foreach (var family in families.values)
 				family.build_index ();
 		}
 
-		// TODO: add OS detection in .iso file
+		private OsFamily? build_family (Osinfo.Os os, string primary_distro) {
+			var family = OsMapper.family_from_osinfo (os, primary_distro);
 
-		private bool is_downloadable (Osinfo.Media media) {
-			return media.get_url () != null;
+			foreach (var entity in os.get_media_list ().get_elements ()) {
+				var media = (Osinfo.Media) entity;
+				if (media.url == null)
+					continue;
+
+				var os_dto = OsMapper.os_from_osinfo (os, media, primary_distro);
+
+				family.distros.add (os_dto);
+				if (os_dto.arch != null)
+					arches.add (os_dto.arch);
+			}
+
+			if (!family.distros.is_empty)
+				return family;
+
+			return null;
 		}
+
+		// TODO: add OS detection in .iso file
 
 		private bool is_at_eol (Osinfo.Os os) {
 			var eol = os.get_eol_date ();
