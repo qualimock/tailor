@@ -83,16 +83,9 @@ namespace Tailor {
 		[GtkCallback]
 		private void configure_os_page_from_family (Gtk.ListBoxRow row) {
 			var family = (OsFamily) other_model.get_item (row.get_index ());
-			Os? pick = null;
 
 			var arch_obj = arch_dropdown.selected_item as Gtk.StringObject;
-			var preferred_arch = arch_obj?.string ?? service.host_arch;
-			foreach (var os in family.get_fresh_oses ().values) {
-				if (os.arch == preferred_arch) { pick = os; break; }
-				if (pick == null) pick = os;
-			}
-
-			configure_os_page (family, pick);
+			configure_os_page (family, family.get_preferred_os (arch_obj?.string, service.host_arch));
 		}
 
 		public void populate () {
