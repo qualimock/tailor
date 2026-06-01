@@ -48,5 +48,19 @@ namespace Tailor {
 		public Os (string id) {
 			Object (id: id);
 		}
+
+		public async bool check_downloadable () {
+			var session = new Soup.Session ();
+			session.timeout = 3;
+
+			var msg = new Soup.Message ("HEAD", url);
+			try {
+				yield session.send_async (msg, Priority.DEFAULT, null);
+
+				return msg.status_code / 100 == 2 || msg.status_code / 100 == 3;
+			} catch {
+				return false;
+			}
+		}
 	}
 }
