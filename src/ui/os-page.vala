@@ -71,7 +71,7 @@ namespace Tailor {
 		private Os current_os { get; private set; }
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
-		private bool updating = false;
+		private bool configuring = false;
 
 		[GtkCallback]
 		private string stringify (Gtk.StringObject? obj) {
@@ -177,7 +177,7 @@ namespace Tailor {
 		public void configure (OsFamily family, Os selected) {
 			current_family = family;
 			title = family.display_name;
-			updating = true;
+			configuring = true;
 
 			var editions = new Gee.TreeSet<string> ();
 			editions.add_all (family.editions.keys);
@@ -192,12 +192,12 @@ namespace Tailor {
 
 			update_os_info (selected);
 
-			updating = false;
+			configuring = false;
 		}
 
 		[GtkCallback]
 		private void on_edition_selected () {
-			if (updating)
+			if (configuring)
 				return;
 
 			populate_versions (selected_edition ?? "", selected_version ?? "");
@@ -205,7 +205,7 @@ namespace Tailor {
 
 		[GtkCallback]
 		private void on_version_selected () {
-			if (updating)
+			if (configuring)
 				return;
 
 			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
@@ -213,7 +213,7 @@ namespace Tailor {
 
 		[GtkCallback]
 		private void on_arch_selected () {
-			if (updating)
+			if (configuring)
 				return;
 
 			var os = find_selected_os ();
