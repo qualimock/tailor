@@ -31,6 +31,14 @@ namespace Tailor {
 		public new string icon_name { get; set; }
 		public bool large { get; set; default = false; }
 
+		private void switch_css_class (Gtk.Label label, string current, string preferred) {
+			if (!label.has_css_class (current))
+				return;
+
+			label.remove_css_class (current);
+			label.add_css_class (preferred);
+		}
+
 		[GtkCallback]
 		private int get_icon_size (bool is_large) {
 			if (is_large)
@@ -48,14 +56,6 @@ namespace Tailor {
 				switch_css_class (title_label, "title-2", "title-4");
 				description_label.remove_css_class ("tl-text-large");
 			}
-		}
-
-		private void switch_css_class (Gtk.Label label, string current, string preferred) {
-			if (!label.has_css_class (current))
-				return;
-
-			label.remove_css_class (current);
-			label.add_css_class (preferred);
 		}
 	}
 }

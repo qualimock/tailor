@@ -40,56 +40,6 @@ namespace Tailor {
 				on_object_added (obj);
 		}
 
-		private void on_object_added (DBusObject object) {
-			var device = UsbMapper.from_udisks (object, client);
-
-			if (device != null)
-				device_added (device);
-
-			var parent_path = get_parent_path (object);
-			if (parent_path != null)
-				emit_updated_for_path (parent_path);
-		}
-
-		private string? get_parent_path (DBusObject object) {
-			var udisks_obj = object as UDisks.Object;
-			if (udisks_obj == null)
-				return null;
-
-			var partition = udisks_obj.get_partition ();
-			if (partition == null || partition.is_container)
-				return null;
-
-			return partition.table;
-		}
-
-		private void on_object_removed (DBusObject object) {
-			var path = object.get_object_path ();
-			var parent_path = get_parent_path (object);
-
-			device_removed (path);
-
-			if (parent_path != null)
-				emit_updated_for_path (parent_path);
-		}
-
-		private void emit_updated_for_path (string path) {
-			var obj = client.get_object_manager ().get_object (path);
-			if (obj == null)
-				return;
-
-			var updated = UsbMapper.from_udisks (obj, client);
-			if (updated == null)
-				return;
-
-			device_updated (updated);
-		}
-
-		private void on_client_changed () {
-			foreach (var obj in client.get_object_manager ().get_objects ())
-				emit_updated_for_path (obj.get_object_path ());
-		}
-
 		public FlashOperation create_flash_operation (
 			UsbDevice device,
 			File image,
@@ -105,6 +55,56 @@ namespace Tailor {
 
 			var object_manager = client.get_object_manager ();
 			return new FlashOperation (block, object_manager, image, cancellable);
+		}
+
+		private void on_object_added (DBusObject object) {
+			var device = UsbMapper.from_udisks (object, client);
+
+			if (device != null)
+				device_added (device);
+
+			var parent_path = get_parent_path (object);
+			if (parent_path != null)
+				emit_updated_for_path (parent_path);
+		}
+
+		private void on_object_removed (DBusObject object) {
+			var path = object.get_object_path ();
+			var parent_path = get_parent_path (object);
+
+			device_removed (path);
+
+			if (parent_path != null)
+				emit_updated_for_path (parent_path);
+		}
+
+		private void on_client_changed () {
+			foreach (var obj in client.get_object_manager ().get_objects ())
+				emit_updated_for_path (obj.get_object_path ());
+		}
+
+		private string? get_parent_path (DBusObject object) {
+			var udisks_obj = object as UDisks.Object;
+			if (udisks_obj == null)
+				return null;
+
+			var partition = udisks_obj.get_partition ();
+			if (partition == null || partition.is_container)
+				return null;
+
+			return partition.table;
+		}
+
+		private void emit_updated_for_path (string path) {
+			var obj = client.get_object_manager ().get_object (path);
+			if (obj == null)
+				return;
+
+			var updated = UsbMapper.from_udisks (obj, client);
+			if (updated == null)
+				return;
+
+			device_updated (updated);
 		}
 	}
 }

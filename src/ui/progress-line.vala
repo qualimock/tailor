@@ -22,8 +22,8 @@ namespace Tailor {
 
 	[GtkTemplate (ui = "/org/altlinux/Tailor/progress-line.ui")]
 	public class ProgressLine : StatusLine {
-		private string _progress;
 
+		private string _progress;
 		public string progress {
 			get { return _progress; }
 			set {

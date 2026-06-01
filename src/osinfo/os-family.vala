@@ -41,19 +41,22 @@ namespace Tailor {
 			distros = new Gee.ArrayList<Os> ();
 		}
 
-		private static int compare_versions (string? a, string? b) {
-			var a_parts = (a ?? "0").split (".");
-			var b_parts = (b ?? "0").split (".");
-			var len = int.max (a_parts.length, b_parts.length);
+		public void build_index () {
+			editions = new Gee.HashMap<string, Gee.HashMap<string, Gee.TreeSet<string>>> ();
 
-			for (int i = 0; i < len; i++) {
-				var a_value = i < a_parts.length ? int.parse (a_parts[i]) : 0;
-				var b_value = i < b_parts.length ? int.parse (b_parts[i]) : 0;
-				if (a_value != b_value)
-					return a_value - b_value;
+			foreach (var os in distros) {
+				var edition = os.edition ?? "";
+				var version = os.version ?? "";
+
+				if (!editions.has_key (edition))
+					editions[edition] = new Gee.HashMap<string, Gee.TreeSet<string>> ();
+
+				if (!editions[edition].has_key (version))
+					editions[edition][version] = new Gee.TreeSet<string> ();
+
+				if (os.arch != null)
+					editions[edition][version].add (os.arch);
 			}
-
-			return 0;
 		}
 
 		public Gee.HashMap<string, Os> get_fresh_oses () {
@@ -96,22 +99,19 @@ namespace Tailor {
 			return pick;
 		}
 
-		public void build_index () {
-			editions = new Gee.HashMap<string, Gee.HashMap<string, Gee.TreeSet<string>>> ();
+		private static int compare_versions (string? a, string? b) {
+			var a_parts = (a ?? "0").split (".");
+			var b_parts = (b ?? "0").split (".");
+			var len = int.max (a_parts.length, b_parts.length);
 
-			foreach (var os in distros) {
-				var edition = os.edition ?? "";
-				var version = os.version ?? "";
-
-				if (!editions.has_key (edition))
-					editions[edition] = new Gee.HashMap<string, Gee.TreeSet<string>> ();
-
-				if (!editions[edition].has_key (version))
-					editions[edition][version] = new Gee.TreeSet<string> ();
-
-				if (os.arch != null)
-					editions[edition][version].add (os.arch);
+			for (int i = 0; i < len; i++) {
+				var a_value = i < a_parts.length ? int.parse (a_parts[i]) : 0;
+				var b_value = i < b_parts.length ? int.parse (b_parts[i]) : 0;
+				if (a_value != b_value)
+					return a_value - b_value;
 			}
+
+			return 0;
 		}
 	}
 }

@@ -23,6 +23,12 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/os-page.ui")]
 	public class OsPage : Adw.NavigationPage {
 
+		private ListStore device_store = new ListStore (typeof (UsbDevice));
+		private OsFamily current_family;
+		private Os current_os;
+
+		private bool repopulating = false;
+
 		[GtkChild] private unowned Gtk.DropDown edition_dropdown;
 		[GtkChild] private unowned Gtk.DropDown version_dropdown;
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
@@ -38,6 +44,20 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.Label release_label;
 		[GtkChild] private unowned Gtk.Label media_type_label;
 		[GtkChild] private unowned Gtk.Label codename_label;
+
+		public bool has_editions { get; private set; default = false; }
+		public bool has_versions { get; private set; default = false; }
+		public bool has_arches { get; private set; default = false; }
+		public bool has_requirements { get; private set; default = false; }
+		public bool has_devices { get; set; default = false; }
+
+		public string? selected_edition { get; set; }
+		public string? selected_version { get; set; }
+		public string? selected_arch { get; set; }
+		public Gtk.SingleSelection? selected_device { get; set; }
+
+		public bool checking { get; set; default = true; }
+		public bool available { get; set; default = false; }
 
 		private signal void populated ();
 
@@ -58,77 +78,18 @@ namespace Tailor {
 			}
 		}
 
-		public bool has_editions { get; private set; default = false; }
-		public bool has_versions { get; private set; default = false; }
-		public bool has_arches { get; private set; default = false; }
-		public bool has_requirements { get; private set; default = false; }
-		public bool has_devices { get; set; default = false; }
-
-		public string? selected_edition { get; set; }
-		public string? selected_version { get; set; }
-		public string? selected_arch { get; set; }
-		public Gtk.SingleSelection? selected_device { get; set; }
-
-		private OsFamily current_family { get; private set; }
-		private Os current_os { get; private set; }
-
-		public bool checking { get; set; default = true; }
-		public bool available { get; set; default = false; }
-
-		private ListStore device_store = new ListStore (typeof (UsbDevice));
-		private bool repopulating = false;
-
-		[GtkCallback]
-		private string stringify (Gtk.StringObject? obj) {
-			return obj?.string ?? "";
-		}
-
-		[GtkCallback]
-		private bool greater_than (uint a, uint b) { return a > b; }
-
-		[GtkCallback]
-		private bool logical_and (bool a, bool b) { return a && b; }
-
-		[GtkCallback]
-		private string string_or_fallback (bool condition, string preferred, string fallback) {
-			return condition ? preferred : fallback;
-		}
-
-		[GtkCallback]
-		private bool is_not_empty_string (string str) { return str.length > 0; }
-
-		[GtkCallback]
-		private bool any (int count, ...) {
-			var args = va_list ();
-
-			for (int i = 0; i < count; i++) {
-				if (args.arg<bool> ()) return true;
-			}
-
-			return false;
-		}
-
-		[GtkCallback]
-		private void open_flash_page () {
-			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
-			var page = (FlashPage) view.find_page ("flash-page");
-
-			if (selected_device == null)
-				return;
-
-			page.configure_from_os (
-				current_family, current_os,
-				(UsbDevice) selected_device.selected_item,
-				trash_switch.active
-			);
-			view.push (page);
-		}
-
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
 			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDevice), null, "name");
 
 			populated.connect (update_os_info);
+		}
+
+		public void configure (OsFamily family, Os selected) {
+			current_family = family;
+			title = family.display_name;
+
+			populate_editions (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
 		}
 
 		public void add_device (UsbDevice device) {
@@ -143,94 +104,6 @@ namespace Tailor {
 			uint index;
 			if (device_store.find (match, out index))
 				device_store.remove (index);
-		}
-
-		private static string format_hertz (int64 hz) {
-			if (hz < Osinfo.MEGAHERTZ * 1000)
-				return _("%.0f MHz").printf ((double) hz / Osinfo.MEGAHERTZ);
-
-			return _("%.1f GHz").printf ((double) hz / (Osinfo.MEGAHERTZ * 1000));
-		}
-
-		private static string format_bytes (int64 bytes) {
-			if (bytes < Osinfo.GIBIBYTES)
-				return _("%.0f MiB").printf ((double) bytes / Osinfo.MEBIBYTES);
-
-			return _("%.1f GiB").printf ((double) bytes / Osinfo.GIBIBYTES);
-		}
-
-		private void update_os_info () {
-			var os = current_family.distros.first_match (os =>
-				(os.edition ?? "") == (selected_edition ?? "") &&
-				(os.version ?? "") == (selected_version ?? "") &&
-				(os.arch ?? "") == (selected_arch ?? "")
-			);
-
-			if (os == null)
-				return;
-
-			has_requirements = os.resources.cpu > 0 ||
-			                   os.resources.ram > 0 ||
-			                   os.resources.storage > 0;
-
-			cpu_label.label = os.resources.cpu > 0
-				? format_hertz (os.resources.cpu)
-				: _("Not available");
-
-			ram_label.label = os.resources.ram > 0
-				? format_bytes (os.resources.ram)
-				: _("Not available");
-
-			free_space_label.label = os.resources.storage > 0
-				? format_bytes (os.resources.storage)
-				: _("Not available");
-
-			size_label.label = os.volume_size > 0 ? format_bytes (os.volume_size) : "";
-			release_label.label = os.release_date ?? "";
-			media_type_label.label = os.media_type ?? "";
-			codename_label.label = os.codename ?? "";
-
-			current_os = os;
-
-			checking = true;
-			available = false;
-			os.check_downloadable.begin ((_, res) => {
-				available = os.check_downloadable.end (res);
-				checking = false;
-			});
-		}
-
-		public void configure (OsFamily family, Os selected) {
-			current_family = family;
-			title = family.display_name;
-
-			populate_editions (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
-		}
-
-		[GtkCallback]
-		private void on_edition_selected () {
-			if (repopulating)
-				return;
-
-			repopulating = true;
-			populate_versions (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
-		}
-
-		[GtkCallback]
-		private void on_version_selected () {
-			if (repopulating)
-				return;
-
-			repopulating = true;
-			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
-		}
-
-		[GtkCallback]
-		private void on_arch_selected () {
-			if (repopulating)
-				return;
-
-			populated ();
 		}
 
 		private void populate_editions (string preferred, string preferred_version, string preferred_arch) {
@@ -333,6 +206,133 @@ namespace Tailor {
 			dropdown.expression = new Gtk.PropertyExpression (typeof (Gtk.StringObject), null, "string");
 			if (selected_idx != Gtk.INVALID_LIST_POSITION)
 				dropdown.selected = selected_idx;
+		}
+
+		private void update_os_info () {
+			var os = current_family.distros.first_match (os =>
+				(os.edition ?? "") == (selected_edition ?? "") &&
+				(os.version ?? "") == (selected_version ?? "") &&
+				(os.arch ?? "") == (selected_arch ?? "")
+			);
+
+			if (os == null)
+				return;
+
+			has_requirements = os.resources.cpu > 0 ||
+			                   os.resources.ram > 0 ||
+			                   os.resources.storage > 0;
+
+			cpu_label.label = os.resources.cpu > 0
+				? format_hertz (os.resources.cpu)
+				: _("Not available");
+
+			ram_label.label = os.resources.ram > 0
+				? format_bytes (os.resources.ram)
+				: _("Not available");
+
+			free_space_label.label = os.resources.storage > 0
+				? format_bytes (os.resources.storage)
+				: _("Not available");
+
+			size_label.label = os.volume_size > 0 ? format_bytes (os.volume_size) : "";
+			release_label.label = os.release_date ?? "";
+			media_type_label.label = os.media_type ?? "";
+			codename_label.label = os.codename ?? "";
+
+			current_os = os;
+
+			checking = true;
+			available = false;
+			os.check_downloadable.begin ((_, res) => {
+				available = os.check_downloadable.end (res);
+				checking = false;
+			});
+		}
+
+		private static string format_hertz (int64 hz) {
+			if (hz < Osinfo.MEGAHERTZ * 1000)
+				return _("%.0f MHz").printf ((double) hz / Osinfo.MEGAHERTZ);
+
+			return _("%.1f GHz").printf ((double) hz / (Osinfo.MEGAHERTZ * 1000));
+		}
+
+		private static string format_bytes (int64 bytes) {
+			if (bytes < Osinfo.GIBIBYTES)
+				return _("%.0f MiB").printf ((double) bytes / Osinfo.MEBIBYTES);
+
+			return _("%.1f GiB").printf ((double) bytes / Osinfo.GIBIBYTES);
+		}
+
+		[GtkCallback]
+		private string stringify (Gtk.StringObject? obj) {
+			return obj?.string ?? "";
+		}
+
+		[GtkCallback]
+		private bool greater_than (uint a, uint b) { return a > b; }
+
+		[GtkCallback]
+		private bool logical_and (bool a, bool b) { return a && b; }
+
+		[GtkCallback]
+		private string string_or_fallback (bool condition, string preferred, string fallback) {
+			return condition ? preferred : fallback;
+		}
+
+		[GtkCallback]
+		private bool is_not_empty_string (string str) { return str.length > 0; }
+
+		[GtkCallback]
+		private bool any (int count, ...) {
+			var args = va_list ();
+
+			for (int i = 0; i < count; i++) {
+				if (args.arg<bool> ()) return true;
+			}
+
+			return false;
+		}
+
+		[GtkCallback]
+		private void on_edition_selected () {
+			if (repopulating)
+				return;
+
+			repopulating = true;
+			populate_versions (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+		}
+
+		[GtkCallback]
+		private void on_version_selected () {
+			if (repopulating)
+				return;
+
+			repopulating = true;
+			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+		}
+
+		[GtkCallback]
+		private void on_arch_selected () {
+			if (repopulating)
+				return;
+
+			populated ();
+		}
+
+		[GtkCallback]
+		private void open_flash_page () {
+			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+			var page = (FlashPage) view.find_page ("flash-page");
+
+			if (selected_device == null)
+				return;
+
+			page.configure_from_os (
+				current_family, current_os,
+				(UsbDevice) selected_device.selected_item,
+				trash_switch.active
+			);
+			view.push (page);
 		}
 	}
 }

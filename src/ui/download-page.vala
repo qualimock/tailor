@@ -23,6 +23,18 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page.ui")]
 	public class DownloadPage : Adw.NavigationPage {
 
+		private ListStore os_store = new ListStore (typeof (Os));
+		private ListStore family_store = new ListStore (typeof (OsFamily));
+		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
+
+		private Gtk.FilterListModel primary_model;
+		private Gtk.FilterListModel other_model;
+		private Gtk.CustomFilter os_filter = null;
+		private Gtk.CustomFilter family_filter = null;
+
+		private string? arch_filter = null;
+		private string search_query = "";
+
 		[GtkChild] private unowned Gtk.Box os_box;
 		[GtkChild] private unowned Adw.StatusPage download_error;
 
@@ -39,54 +51,6 @@ namespace Tailor {
 
 		public ServiceContext service { get; construct set; }
 		public string primary_os_title { get; construct set; default = ""; }
-
-		private ListStore os_store = new ListStore (typeof (Os));
-		private ListStore family_store = new ListStore (typeof (OsFamily));
-		private Gee.ArrayList<string> arches_list = new Gee.ArrayList<string> ();
-		private Gtk.FilterListModel primary_model;
-		private Gtk.FilterListModel other_model;
-		private Gtk.CustomFilter os_filter = null;
-		private Gtk.CustomFilter family_filter = null;
-		private string? arch_filter = null;
-		private string search_query = "";
-
-		[GtkCallback] private bool logical_not (bool value) { return !value; }
-		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
-
-		[GtkCallback]
-		private void on_arch_dropdown_selected () {
-			arch_filter = arches_list[(int) arch_dropdown.selected];
-			on_filter_changed ();
-		}
-
-		[GtkCallback]
-		private void on_search_entry_changed () {
-			search_query = search_entry.text;
-			on_filter_changed ();
-		}
-
-		private void configure_os_page (OsFamily family, Os os) {
-			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
-			var page = (OsPage) view.find_page ("os-page");
-			page.configure (family, os);
-			view.push (page);
-		}
-
-		[GtkCallback]
-		private void configure_os_page_from_os (Gtk.ListBoxRow row) {
-			var os = (Os) primary_model.get_item (row.get_index ());
-			var family = service.osinfo.families[os.family];
-
-			configure_os_page (family, os);
-		}
-
-		[GtkCallback]
-		private void configure_os_page_from_family (Gtk.ListBoxRow row) {
-			var family = (OsFamily) other_model.get_item (row.get_index ());
-
-			var arch_obj = arch_dropdown.selected_item as Gtk.StringObject;
-			configure_os_page (family, family.get_preferred_os (arch_obj?.string, service.host_arch));
-		}
 
 		public void populate () {
 			primary_os_label.label = primary_os_title;
@@ -124,17 +88,6 @@ namespace Tailor {
 			download_error.visible = true;
 		}
 
-		private void on_filter_changed () {
-			os_filter.changed (Gtk.FilterChange.DIFFERENT);
-			family_filter.changed (Gtk.FilterChange.DIFFERENT);
-			update_box_visibility ();
-		}
-
-		private void update_box_visibility () {
-			primary_os_box.visible = primary_model.n_items > 0;
-			other_os_box.visible = other_model.n_items > 0;
-		}
-
 		private void setup_models () {
 			os_filter = new Gtk.CustomFilter ((obj) => {
 				var os = obj as Os;
@@ -150,6 +103,33 @@ namespace Tailor {
 
 			primary_os_list.bind_model (primary_model, make_os_row);
 			other_os_list.bind_model (other_model, make_family_row);
+		}
+
+		private void setup_arch_dropdown () {
+			if (arches_list.is_empty) {
+				critical ("Empty arches list");
+				return;
+			}
+
+			var model = new Gtk.StringList (null);
+			foreach (var arch in arches_list)
+				model.append (arch);
+
+			arch_dropdown.model = model;
+
+			arch_filter = arches_list.contains (service.host_arch) ? service.host_arch : arches_list[0];
+			arch_dropdown.selected = (uint) arches_list.index_of (arch_filter);
+		}
+
+		private void on_filter_changed () {
+			os_filter.changed (Gtk.FilterChange.DIFFERENT);
+			family_filter.changed (Gtk.FilterChange.DIFFERENT);
+			update_box_visibility ();
+		}
+
+		private void update_box_visibility () {
+			primary_os_box.visible = primary_model.n_items > 0;
+			other_os_box.visible = other_model.n_items > 0;
 		}
 
 		private bool family_arches_matches (OsFamily family) {
@@ -200,20 +180,42 @@ namespace Tailor {
 			return row;
 		}
 
-		private void setup_arch_dropdown () {
-			if (arches_list.is_empty) {
-				critical ("Empty arches list");
-				return;
-			}
+		private void configure_os_page (OsFamily family, Os os) {
+			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+			var page = (OsPage) view.find_page ("os-page");
+			page.configure (family, os);
+			view.push (page);
+		}
 
-			var model = new Gtk.StringList (null);
-			foreach (var arch in arches_list)
-				model.append (arch);
+		[GtkCallback] private bool logical_not (bool value) { return !value; }
+		[GtkCallback] private bool logical_or (bool a, bool b) { return a || b; }
 
-			arch_dropdown.model = model;
+		[GtkCallback]
+		private void on_arch_dropdown_selected () {
+			arch_filter = arches_list[(int) arch_dropdown.selected];
+			on_filter_changed ();
+		}
 
-			arch_filter = arches_list.contains (service.host_arch) ? service.host_arch : arches_list[0];
-			arch_dropdown.selected = (uint) arches_list.index_of (arch_filter);
+		[GtkCallback]
+		private void on_search_entry_changed () {
+			search_query = search_entry.text;
+			on_filter_changed ();
+		}
+
+		[GtkCallback]
+		private void configure_os_page_from_os (Gtk.ListBoxRow row) {
+			var os = (Os) primary_model.get_item (row.get_index ());
+			var family = service.osinfo.families[os.family];
+
+			configure_os_page (family, os);
+		}
+
+		[GtkCallback]
+		private void configure_os_page_from_family (Gtk.ListBoxRow row) {
+			var family = (OsFamily) other_model.get_item (row.get_index ());
+
+			var arch_obj = arch_dropdown.selected_item as Gtk.StringObject;
+			configure_os_page (family, family.get_preferred_os (arch_obj?.string, service.host_arch));
 		}
 	}
 }

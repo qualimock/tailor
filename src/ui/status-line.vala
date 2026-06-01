@@ -36,11 +36,6 @@ namespace Tailor {
 		public string status { get; protected set; }
 		public StatusState state { get; set; default = StatusState.PENDING; }
 
-		[GtkCallback]
-		private void state_to_status () {
-			status = status_from_state ();
-		}
-
 		construct {
 			status = status_from_state ();
 		}
@@ -56,6 +51,11 @@ namespace Tailor {
 				case StatusState.NONE:
 				default: return "";
 			}
+		}
+
+		[GtkCallback]
+		private void state_to_status () {
+			status = status_from_state ();
 		}
 	}
 }

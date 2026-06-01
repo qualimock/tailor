@@ -65,32 +65,6 @@ namespace Tailor {
 			}
 		}
 
-		private async void wait_for_resume () {
-			resume_func = wait_for_resume.callback;
-			yield;
-		}
-
-		private void start_stall_timer () {
-			stall_timeout_id = Timeout.add_seconds (10, () => {
-				if (bytes_written == last_bytes) {
-					stall_timeout_id = 0;
-					stalled = true;
-					cancellable.cancel ();
-					return Source.REMOVE;
-				}
-				last_bytes = bytes_written;
-				return Source.CONTINUE;
-			});
-		}
-
-		private void stop_stall_timer () {
-			if (stall_timeout_id != 0) {
-				Source.remove (stall_timeout_id);
-				stall_timeout_id = 0;
-				stalled = false;
-			}
-		}
-
 		public async void run_async () throws Error {
 			if (os.url == null)
 				throw new IOError.INVALID_ARGUMENT ("OS has no download URL");
@@ -114,6 +88,32 @@ namespace Tailor {
 					failed (stalled ? _("Connection lost") : e.message);
 
 				throw e;
+			}
+		}
+
+		private async void wait_for_resume () {
+			resume_func = wait_for_resume.callback;
+			yield;
+		}
+
+		private void start_stall_timer () {
+			stall_timeout_id = Timeout.add_seconds (10, () => {
+				if (bytes_written == last_bytes) {
+					stall_timeout_id = 0;
+					stalled = true;
+					cancellable.cancel ();
+					return Source.REMOVE;
+				}
+				last_bytes = bytes_written;
+				return Source.CONTINUE;
+			});
+		}
+
+		private void stop_stall_timer () {
+			if (stall_timeout_id != 0) {
+				Source.remove (stall_timeout_id);
+				stall_timeout_id = 0;
+				stalled = false;
 			}
 		}
 

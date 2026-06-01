@@ -69,11 +69,6 @@ namespace Tailor {
 			}
 		}
 
-		private async void wait_for_resume () {
-			resume_func = wait_for_resume.callback;
-			yield;
-		}
-
 		public async void run_async () throws Error {
 			FileInputStream? input = null;
 			UnixOutputStream? output = null;
@@ -101,6 +96,11 @@ namespace Tailor {
 			yield output.close_async (Priority.DEFAULT, null);
 			yield input.close_async (Priority.DEFAULT, null);
 			completed ();
+		}
+
+		private async void wait_for_resume () {
+			resume_func = wait_for_resume.callback;
+			yield;
 		}
 
 		private async void unmount () throws Error {

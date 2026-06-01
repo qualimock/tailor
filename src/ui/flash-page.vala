@@ -23,6 +23,16 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/flash-page.ui")]
 	public class FlashPage : Adw.NavigationPage {
 
+		private UsbDevice device;
+		private Os? selected_os = null;
+		private File? temp_file;
+		private bool flashing = false;
+		private Cancellable cancellable;
+		private bool trash_after_flashing = false;
+
+		private DownloadOperation? active_download = null;
+		private FlashOperation? active_flash = null;
+
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
 		[GtkChild] private unowned Gtk.ProgressBar progress_bar;
@@ -39,89 +49,74 @@ namespace Tailor {
 		public bool finished { get; private set; default = false; }
 		public bool paused { get; private set; default = false; }
 
-		private UsbDevice device;
-		private Os? selected_os = null;
-		private File? temp_file;
-		private bool flashing = false;
-		private Cancellable cancellable;
-		private bool trash_after_flashing = false;
-
-		private DownloadOperation? active_download = null;
-		private FlashOperation? active_flash = null;
-
 		static construct {
 			typeof (StatusLine).ensure ();
 			typeof (ProgressLine).ensure ();
 		}
 
-		[GtkCallback]
-		private string fraction_to_string (double value) {
-			return "%.0f".printf (value * 100);
-		}
-
-		[GtkCallback]
-		private string get_paused_label (bool is_paused) {
-			return is_paused ? _("Resume") : _("Pause");
-		}
-
-		[GtkCallback]
-		private void toggle_pause () {
-			paused = !paused;
-			if (paused) {
-				active_download?.pause ();
-				active_flash?.pause ();
-				progress_status.title = _("Paused");
-				set_progress_css_class ("dimmed");
-			} else {
-				active_download?.resume ();
-				active_flash?.resume ();
-				progress_status.title = _("Resuming");
-				set_progress_css_class ("accent");
-			}
-		}
-
-		[GtkCallback]
-		private void start_flashing () {
-			if (flashing)
-				return;
-
+		public void configure_from_image (File image, UsbDevice device) {
 			reset ();
 
-			flashing = true;
-			cancellable = new Cancellable ();
+			this.device = device;
 
-			if (selected_os == null) {
-				flash (service.image_file, cancellable);
-				return;
+			try {
+				var info = image.query_info (
+					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
+				);
+
+				os_statuspage.badge = format_size (info.get_size ());
+			} catch (Error e) {
+				os_statuspage.badge_visible = false;
 			}
 
-			download_status.state = StatusState.ACTIVE;
-
-			var op = new DownloadOperation (selected_os, cancellable);
-			active_download = op;
-
-			op.progress.connect (on_download_progress);
-			op.failed.connect (on_failed);
-
-			op.completed.connect ((tmp_file) => {
-				download_status.state = StatusState.FINISHED;
-				temp_file = tmp_file;
-				flash (tmp_file, cancellable);
-			});
-
-			op.run_async.begin ((obj, res) => {
-				try { op.run_async.end (res); }
-				catch (Error e) {}
-			});
+			os_statuspage.title = "%s".printf (image.get_basename ());
+			os_statuspage.description = _("Local file");
+			os_statuspage.icon_name = "media-optical-symbolic";
+			download_status.visible = false;
 		}
 
-		[GtkCallback]
-		private void cancel_flashing () {
-			if (cancellable == null)
-				return;
+		public void configure_from_os (OsFamily family, Os os, UsbDevice selected_device, bool trash_download) {
+			reset ();
 
-			cancellable.cancel ();
-			on_cancel ();
+			device = selected_device;
+			trash_after_flashing = trash_download;
+			selected_os = os;
+
+			os_statuspage.title = "%s %s %s %s".printf (
+				family.display_name,
+				os.edition ?? "",
+				os.version ?? "",
+				os.codename != null ? @"($(os.codename))" : ""
+			).strip ();
+
+			os_statuspage.description = family.vendor;
+			os_statuspage.icon_name = ""; // TODO: add OS icons
+			os_statuspage.badge = os.arch;
+			os_statuspage.badge_visible = true;
+
+			download_status.title = _("Downloading image %s").printf (Path.get_basename (os.url));
+			download_status.visible = true;
+		}
+
+		private void reset () {
+			flashing = false;
+			finished = false;
+			success = false;
+			paused = false;
+
+			progress_bar.fraction = 0;
+
+			active_download = null;
+			active_flash = null;
+			temp_file = null;
+
+			download_status.state = StatusState.PENDING;
+			prepare_status.state = StatusState.PENDING;
+			write_status.state = StatusState.PENDING;
+			verify_status.state = StatusState.PENDING;
+
+			set_progress_css_class ("accent");
+			progress_status.title = _("Starting");
 		}
 
 		private void flash (File image, Cancellable cancellable) {
@@ -228,6 +223,14 @@ namespace Tailor {
 			temp_file = null;
 		}
 
+		private void set_progress_css_class (string css_class) {
+			reset_css_classes (progress_bar);
+			reset_css_classes (flash_result_label);
+
+			progress_bar.add_css_class (css_class);
+			flash_result_label.add_css_class (css_class);
+		}
+
 		private void reset_css_classes (Gtk.Widget widget) {
 			string[] classes = { "accent", "success", "warning", "error", "dimmed" };
 
@@ -236,14 +239,6 @@ namespace Tailor {
 					widget.remove_css_class (css);
 				}
 			}
-		}
-
-		private void set_progress_css_class (string css_class) {
-			reset_css_classes (progress_bar);
-			reset_css_classes (flash_result_label);
-
-			progress_bar.add_css_class (css_class);
-			flash_result_label.add_css_class (css_class);
 		}
 
 		private void set_state_on_active (StatusState state) {
@@ -260,69 +255,74 @@ namespace Tailor {
 				verify_status.state = state;
 		}
 
-		private void reset () {
-			flashing = false;
-			finished = false;
-			success = false;
-			paused = false;
-
-			progress_bar.fraction = 0;
-
-			active_download = null;
-			active_flash = null;
-			temp_file = null;
-
-			download_status.state = StatusState.PENDING;
-			prepare_status.state = StatusState.PENDING;
-			write_status.state = StatusState.PENDING;
-			verify_status.state = StatusState.PENDING;
-
-			set_progress_css_class ("accent");
-			progress_status.title = _("Starting");
+		[GtkCallback]
+		private string fraction_to_string (double value) {
+			return "%.0f".printf (value * 100);
 		}
 
-		public void configure_from_image (File image, UsbDevice device) {
+		[GtkCallback]
+		private string get_paused_label (bool is_paused) {
+			return is_paused ? _("Resume") : _("Pause");
+		}
+
+		[GtkCallback]
+		private void start_flashing () {
+			if (flashing)
+				return;
+
 			reset ();
 
-			this.device = device;
+			flashing = true;
+			cancellable = new Cancellable ();
 
-			try {
-				var info = image.query_info (
-					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
-				);
-
-				os_statuspage.badge = format_size (info.get_size ());
-			} catch (Error e) {
-				os_statuspage.badge_visible = false;
+			if (selected_os == null) {
+				flash (service.image_file, cancellable);
+				return;
 			}
 
-			os_statuspage.title = "%s".printf (image.get_basename ());
-			os_statuspage.description = _("Local file");
-			os_statuspage.icon_name = "media-optical-symbolic";
-			download_status.visible = false;
+			download_status.state = StatusState.ACTIVE;
+
+			var op = new DownloadOperation (selected_os, cancellable);
+			active_download = op;
+
+			op.progress.connect (on_download_progress);
+			op.failed.connect (on_failed);
+
+			op.completed.connect ((tmp_file) => {
+				download_status.state = StatusState.FINISHED;
+				temp_file = tmp_file;
+				flash (tmp_file, cancellable);
+			});
+
+			op.run_async.begin ((obj, res) => {
+				try { op.run_async.end (res); }
+				catch (Error e) {}
+			});
 		}
 
-		public void configure_from_os (OsFamily family, Os os, UsbDevice selected_device, bool trash_download) {
-			reset ();
+		[GtkCallback]
+		private void cancel_flashing () {
+			if (cancellable == null)
+				return;
 
-			device = selected_device;
-			trash_after_flashing = trash_download;
-			selected_os = os;
+			cancellable.cancel ();
+			on_cancel ();
+		}
 
-			os_statuspage.title = "%s %s %s %s".printf (
-				family.display_name,
-				os.edition ?? "",
-				os.version ?? "",
-				os.codename != null ? @"($(os.codename))" : ""
-			).strip ();
-
-			os_statuspage.description = family.vendor;
-			os_statuspage.icon_name = ""; // TODO: add OS icons
-			os_statuspage.badge = os.arch;
-			os_statuspage.badge_visible = true;
-
-			download_status.title = _("Downloading image %s").printf (Path.get_basename (os.url));
-			download_status.visible = true;
+		[GtkCallback]
+		private void toggle_pause () {
+			paused = !paused;
+			if (paused) {
+				active_download?.pause ();
+				active_flash?.pause ();
+				progress_status.title = _("Paused");
+				set_progress_css_class ("dimmed");
+			} else {
+				active_download?.resume ();
+				active_flash?.resume ();
+				progress_status.title = _("Resuming");
+				set_progress_css_class ("accent");
+			}
 		}
 	}
 }

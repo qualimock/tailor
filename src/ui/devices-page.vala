@@ -23,6 +23,8 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/devices-page.ui")]
 	public class DevicesPage : Adw.Bin {
 
+		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
+
 		[GtkChild] private unowned Gtk.Box devices_box;
 
 		private ServiceContext _service;
@@ -43,8 +45,6 @@ namespace Tailor {
 				value.usb.device_updated.connect (update_device);
 			}
 		}
-
-		private Gee.HashMap<string, DeviceCard> cards = new Gee.HashMap<string, DeviceCard> ();
 
 		public void add_device (UsbDevice device) {
 			var card = new DeviceCard ();

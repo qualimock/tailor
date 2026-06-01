@@ -98,32 +98,6 @@ namespace Tailor {
 			return { used_bytes, partition_count };
 		}
 
-		private static string get_filesystem_label (UDisks.Block block, uint partitions) {
-			if (partitions > 0)
-				return ngettext ("%u partition", "%u partitions", partitions)
-					.printf (partitions);
-
-			return (block.id_type != null && block.id_type != "")
-				? block.id_type
-				: _("No filesystem");
-		}
-
-		private static string get_drive_display_size (string total_space, string? used_space) {
-			if (used_space == null)
-				return total_space;
-
-			var used_parts = used_space.split (" ");
-			var total_parts = total_space.split (" ");
-
-			if (used_parts.length < 2 || total_parts.length < 2)
-				return @"$(used_space)/$(total_space)";
-
-			if (used_parts[1] != total_parts[1])
-				return @"$(used_space)/$(total_space)";
-
-			return @"$(used_parts[0])/$(total_space)";
-		}
-
 		private static uint64 get_drive_used_bytes (DBusObject drive, string drive_path) {
 			var udisks_obj = drive as UDisks.Object;
 			if (udisks_obj == null)
@@ -166,6 +140,32 @@ namespace Tailor {
 				return false;
 
 			return true;
+		}
+
+		private static string get_filesystem_label (UDisks.Block block, uint partitions) {
+			if (partitions > 0)
+				return ngettext ("%u partition", "%u partitions", partitions)
+					.printf (partitions);
+
+			return (block.id_type != null && block.id_type != "")
+				? block.id_type
+				: _("No filesystem");
+		}
+
+		private static string get_drive_display_size (string total_space, string? used_space) {
+			if (used_space == null)
+				return total_space;
+
+			var used_parts = used_space.split (" ");
+			var total_parts = total_space.split (" ");
+
+			if (used_parts.length < 2 || total_parts.length < 2)
+				return @"$(used_space)/$(total_space)";
+
+			if (used_parts[1] != total_parts[1])
+				return @"$(used_space)/$(total_space)";
+
+			return @"$(used_parts[0])/$(total_space)";
 		}
 	}
 }

@@ -36,15 +36,15 @@ namespace Tailor {
 			typeof (StatusPageWithBadge).ensure ();
 		}
 
+		construct {
+			service.osinfo.loaded.connect (download_page.populate);
+			service.osinfo.load_failed.connect (download_page.show_error);
+		}
+
 		public MainWindow (Tailor.Application app, ServiceContext service) {
 			Object (application: app, service: service);
 
 			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
-		}
-
-		construct {
-			service.osinfo.loaded.connect (download_page.populate);
-			service.osinfo.load_failed.connect (download_page.show_error);
 		}
 	}
 }

@@ -54,6 +54,14 @@ namespace Tailor {
 			initialized ();
 		}
 
+		public FlashOperation create_flash_operation (
+			UsbDevice device,
+			File image,
+			Cancellable cancellable
+		) throws Error {
+			return provider.create_flash_operation (device, image, cancellable);
+		}
+
 		private void on_device_added (UsbDevice device) {
 			devices.add (device);
 			device_added (device);
@@ -81,14 +89,6 @@ namespace Tailor {
 			old.filesystem = device.filesystem;
 
 			device_updated (old);
-		}
-
-		public FlashOperation create_flash_operation (
-			UsbDevice device,
-			File image,
-			Cancellable cancellable
-		) throws Error {
-			return provider.create_flash_operation (device, image, cancellable);
 		}
 	}
 }
