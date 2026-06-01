@@ -84,6 +84,18 @@ namespace Tailor {
 			return fresh;
 		}
 
+		public Os? get_preferred_os (string? preferred_arch, string arch_fallback) {
+			Os? pick = null;
+
+			var arch = preferred_arch ?? arch_fallback;
+			foreach (var os in get_fresh_oses ().values) {
+				if (os.arch == arch) { pick = os; break; }
+				if (pick == null) pick = os;
+			}
+
+			return pick;
+		}
+
 		public void build_index () {
 			editions = new Gee.HashMap<string, Gee.HashMap<string, Gee.TreeSet<string>>> ();
 
