@@ -155,7 +155,7 @@ template $TailorOsPage : Adw.NavigationPage {
 								selectable: false;
 								sensitive: bind template.has-requirements;
 								expanded: false;
-								subtitle: bind $requirements_subtitle (template.has-requirements) as <string>;
+								subtitle: bind $string_or_fallback (template.has-requirements, "", _("Not Available")) as <string>;
 
 								Adw.ActionRow {
 									title: _("CPU");
@@ -251,9 +251,24 @@ template $TailorOsPage : Adw.NavigationPage {
 				halign: center;
 				valign: end;
 
-				label: _("Create Bootable USB");
-				sensitive: bind template.has-devices;
+				sensitive: bind $logical_and (template.has-devices, template.available) as <bool>;
 				clicked => $open_flash_page ();
+
+				child: Box {
+					spacing: 12;
+
+					Adw.Spinner {
+						visible: bind template.checking;
+					}
+
+					Label {
+						label: bind $string_or_fallback (
+							template.checking,
+							_("Checking OS…"),
+							$string_or_fallback (template.available, _("Create Bootable USB"), _("OS not Available")) as <string>
+						) as <string>;
+					}
+				};
 			}
 		};
 	};

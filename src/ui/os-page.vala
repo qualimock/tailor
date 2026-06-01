@@ -72,6 +72,9 @@ namespace Tailor {
 		private OsFamily current_family { get; private set; }
 		private Os current_os { get; private set; }
 
+		public bool checking { get; set; default = true; }
+		public bool available { get; set; default = false; }
+
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
 		private bool repopulating = false;
 
@@ -84,8 +87,11 @@ namespace Tailor {
 		private bool greater_than (uint a, uint b) { return a > b; }
 
 		[GtkCallback]
-		private string requirements_subtitle (bool has) {
-			return has ? "" : _("Not available");
+		private bool logical_and (bool a, bool b) { return a && b; }
+
+		[GtkCallback]
+		private string string_or_fallback (bool condition, string preferred, string fallback) {
+			return condition ? preferred : fallback;
 		}
 
 		[GtkCallback]
