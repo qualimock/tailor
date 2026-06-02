@@ -68,7 +68,7 @@ template $TailorImagePage : Adw.NavigationPage {
 							[suffix]
 							DropDown devices_dropdown {
 								valign: center;
-								sensitive: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+								sensitive: bind template.has-devices;
 								show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
 							}
 						}
