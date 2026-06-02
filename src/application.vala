@@ -30,10 +30,10 @@ namespace Tailor {
 
 		private MainWindow main_window;
 
-		public Settings settings { get; private set; }
+		private OsinfoService osinfo_service = new OsinfoService ();
+		private UsbService usb_service = new UsbService ();
 
-		private OsinfoService osinfo_service { get; private set; }
-		private UsbService usb_service { get; private set; }
+		public Settings settings { get; private set; }
 		private ServiceContext service_context { get; private set; }
 
 		public Application () {
@@ -45,8 +45,6 @@ namespace Tailor {
 			base.startup ();
 
 			settings = new Settings (Tailor.ID);
-			osinfo_service = new OsinfoService ();
-			usb_service = new UsbService ();
 
 			service_context = new ServiceContext (
 				osinfo_service,
