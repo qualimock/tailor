@@ -16,7 +16,13 @@ jobs:
       - name: Install dependencies
         run: |
           apt-get update
-          apt-get install -y meson vala blueprint-compiler "pkgconfig(libadwaita-1)" gettext-tools
+          apt-get install -y meson vala blueprint-compiler \
+          'pkgconfig(libadwaita-1)' \
+          'pkgconfig(libosinfo-1.0)' \
+          'pkgconfig(gee-0.8)' \
+          'pkgconfig(udisks2)' \
+          'pkgconfig(libsoup-3.0)' \
+          gettext-tools
 
       - name: Checkout repository
         uses: actions/checkout@v4
