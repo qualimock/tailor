@@ -1,0 +1,38 @@
+name: Flatpak
+
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - 'main'
+
+jobs:
+  flatpak-build:
+    name: Flatpak Build
+    runs-on: alt-sisyphus
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install flatpak tools
+        run: |
+          apt-get update
+          apt-get install -y flatpak flatpak-builder
+
+      - name: Add Flathub remote
+        run: |
+          flatpak remote-add --if-not-exists flathub \
+            https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Install runtime and SDK
+        run: |
+          flatpak install -y flathub \
+            org.gnome.Platform//50 \
+            org.gnome.Sdk//50
+
+      - name: Build
+        run: |
+          flatpak-builder --repo=repo --force-clean builddir \
+            build-aux/flatpak/org.altlinux.Tailor.json
