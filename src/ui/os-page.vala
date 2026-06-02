@@ -209,12 +209,7 @@ namespace Tailor {
 		}
 
 		private void update_os_info () {
-			var os = current_family.distros.first_match (os =>
-				(os.edition ?? "") == (selected_edition ?? "") &&
-				(os.version ?? "") == (selected_version ?? "") &&
-				(os.arch ?? "") == (selected_arch ?? "")
-			);
-
+			var os = current_family.distros.first_match (os => os_matches (os));
 			if (os == null)
 				return;
 
@@ -247,6 +242,14 @@ namespace Tailor {
 				available = os.check_downloadable.end (res);
 				checking = false;
 			});
+		}
+
+		private bool os_matches (Os os) {
+			var has_edition = !has_editions || (os.edition ?? "") == (selected_edition ?? "");
+			var has_version = !has_versions || (os.version ?? "") == (selected_version ?? "");
+			var has_arch = !has_arches || (os.arch ?? "") == (selected_arch ?? "");
+
+			return has_edition && has_version && has_arch;
 		}
 
 		private static string format_hertz (int64 hz) {
