@@ -12,7 +12,8 @@
         "--system-talk-name=org.freedesktop.UDisks2",
         "--device=all",
         "--filesystem=home:ro",
-        "--filesystem=xdg-download"
+        "--filesystem=xdg-download",
+        "--talk-name=org.freedesktop.Flatpak"
     ],
     "modules" : [
         {

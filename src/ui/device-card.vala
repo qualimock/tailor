@@ -64,19 +64,62 @@ namespace Tailor {
 			}
 		}
 
-		[GtkCallback]
-		private void on_more_in_disks_clicked () {
+		private async void open_in_disks () {
 			try {
-				var app = AppInfo.create_from_commandline (
-					"gnome-disks --block-device " + _address,
-					null,
-					AppInfoCreateFlags.NONE
-				);
-				app.launch (null, null);
+				if (FileUtils.test ("/.flatpak-info", FileTest.EXISTS)) {
+					yield open_in_disks_from_flatpak ();
+				} else {
+					yield open_in_disks_native ();
+				}
 			} catch (Error e) {
 				warning ("Failed to open gnome-disks: %s", e.message);
 			}
 		}
 
+		private async void open_in_disks_native () throws Error {
+			try {
+				new Subprocess.newv ({
+						"gnome-disks", "--block-device", address
+					},
+					SubprocessFlags.NONE
+				);
+			} catch (Error e) {
+				new Subprocess.newv ({
+						"flatpak", "run",
+						"org.gnome.DiskUtility", "--block-device", address
+					},
+					SubprocessFlags.NONE
+				);
+			}
+		}
+
+		private async void open_in_disks_from_flatpak () throws Error {
+			var probe = new Subprocess.newv ({
+					"flatpak-spawn", "--host",
+					"sh", "-c", "command -v gnome-disks"
+				},
+				SubprocessFlags.NONE
+			);
+			yield probe.wait_async (null);
+
+			string[] cmd;
+			if (probe.get_exit_status () == 0) {
+				cmd = {
+					"flatpak-spawn", "--host",
+					"gnome-disks", "--block-device", address
+				};
+			} else {
+				cmd = {
+					"flatpak-spawn", "--host",
+					"flatpak", "run", "org.gnome.DiskUtility", "--block-device", address
+				};
+			}
+			new Subprocess.newv (cmd, SubprocessFlags.NONE);
+		}
+
+		[GtkCallback]
+		private void on_more_in_disks_clicked () {
+			open_in_disks.begin ();
+		}
 	}
 }
