@@ -40,6 +40,7 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.Label flash_result_label;
 
 		[GtkChild] private unowned StatusLine download_status;
+		[GtkChild] private unowned StatusLine checksum_status;
 		[GtkChild] private unowned StatusLine prepare_status;
 		[GtkChild] private unowned StatusLine write_status;
 		[GtkChild] private unowned StatusLine verify_status;
@@ -48,6 +49,7 @@ namespace Tailor {
 		public bool success { get; private set; default = false; }
 		public bool finished { get; private set; default = false; }
 		public bool paused { get; private set; default = false; }
+		public bool has_checksum { get; set; default = false; }
 
 		static construct {
 			typeof (StatusLine).ensure ();
@@ -103,6 +105,7 @@ namespace Tailor {
 			finished = false;
 			success = false;
 			paused = false;
+			has_checksum = false;
 
 			progress_bar.fraction = 0;
 
@@ -111,6 +114,7 @@ namespace Tailor {
 			temp_file = null;
 
 			download_status.state = StatusState.PENDING;
+			checksum_status.state = StatusState.PENDING;
 			prepare_status.state = StatusState.PENDING;
 			write_status.state = StatusState.PENDING;
 			verify_status.state = StatusState.PENDING;
@@ -245,6 +249,9 @@ namespace Tailor {
 			if (download_status.state == StatusState.ACTIVE)
 				download_status.state = state;
 
+			if (checksum_status.state == StatusState.ACTIVE)
+				checksum_status.state = state;
+
 			if (prepare_status.state == StatusState.ACTIVE)
 				prepare_status.state = state;
 
@@ -280,6 +287,7 @@ namespace Tailor {
 				return;
 			}
 
+			has_checksum = selected_os?.checksum != null;
 			download_status.state = StatusState.ACTIVE;
 
 			var op = new DownloadOperation (selected_os, cancellable);
@@ -291,7 +299,30 @@ namespace Tailor {
 			op.completed.connect ((tmp_file) => {
 				download_status.state = StatusState.FINISHED;
 				temp_file = tmp_file;
-				flash (tmp_file, cancellable);
+
+				if (selected_os.checksum != null) {
+					checksum_status.state = StatusState.ACTIVE;
+
+					var mismatch_str = _("Checksum mismatch - the download can be corrupted");
+					selected_os.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
+						try {
+							var verified = selected_os.verify_checksum.end (res);
+
+							if (!verified) {
+								on_failed (mismatch_str);
+								return;
+							}
+						} catch (Error e) {
+							on_failed (e.message);
+							return;
+						}
+
+						checksum_status.state = StatusState.FINISHED;
+						flash (tmp_file, cancellable);
+					});
+				} else {
+					flash (tmp_file, cancellable);
+				}
 			});
 
 			op.run_async.begin ((obj, res) => {

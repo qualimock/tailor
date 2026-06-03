@@ -72,6 +72,13 @@ template $TailorFlashPage : Adw.NavigationPage {
 							styles [ "dimmed" ]
 						}
 
+						$TailorStatusLine checksum_status {
+							styles [ "dimmed" ]
+							visible: bind template.has-checksum;
+
+							title: _("Verifying checksum");
+						}
+
 						$TailorStatusLine prepare_status {
 							styles [ "dimmed" ]
 
