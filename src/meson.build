@@ -5,6 +5,7 @@ app_sources = files(
 	'service' / 'service-context.vala',
 	'service' / 'download-operation.vala',
 	'service' / 'flash-operation.vala',
+	'service' / 'availability-checker.vala',
 
 	'ui' / 'main-window.vala',
 	'ui' / 'home-page.vala',
