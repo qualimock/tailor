@@ -6,6 +6,8 @@ app_sources = files(
 	'service' / 'download-operation.vala',
 	'service' / 'flash-operation.vala',
 	'service' / 'availability-checker.vala',
+	'service' / 'checksum-resolver.vala',
+	'service' / 'checksum-fetcher.vala',
 
 	'ui' / 'main-window.vala',
 	'ui' / 'home-page.vala',
