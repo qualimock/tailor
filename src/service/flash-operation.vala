@@ -37,6 +37,8 @@ namespace Tailor {
 		private int64 bytes_written = 0;
 		private int64 total_bytes = 0;
 
+		private Checksum source_checksum = new Checksum (ChecksumType.SHA256);
+
 		private bool paused = false;
 
 		public signal void progress (int64 bytes_written, int64 total);
@@ -95,6 +97,16 @@ namespace Tailor {
 
 			yield output.close_async (Priority.DEFAULT, null);
 			yield input.close_async (Priority.DEFAULT, null);
+
+			try {
+				yield verify ();
+			} catch (Error e) {
+				if (!(e is IOError.CANCELLED))
+					failed (e.message);
+
+				return;
+			}
+
 			completed ();
 		}
 
@@ -166,11 +178,62 @@ namespace Tailor {
 				);
 
 				bytes_written += written;
+				source_checksum.update (buf[0:n], n);
 
 				progress (bytes_written, total_bytes);
 			}
 
 			yield output.flush_async (Priority.DEFAULT, cancellable);
+		}
+
+		private async void verify () throws Error {
+			stage_changed (FlashStage.VERIFYING);
+
+			UnixFDList fd_list;
+			Variant out_fd;
+			yield block.call_open_for_backup (
+				new Variant ("a{sv}", null),
+				null,
+				cancellable,
+				out out_fd,
+				out fd_list
+			);
+
+			var fd = fd_list.get (out_fd.get_handle ());
+			var input = new UnixInputStream (fd, true);
+
+			var device_checksum = new Checksum (ChecksumType.SHA256);
+			var buf = new uint8[1024 * 1024];
+			int64 bytes_verified = 0;
+			Error? read_error = null;
+
+			ssize_t n;
+			while (bytes_verified < total_bytes) {
+				var remaining = total_bytes - bytes_verified;
+				var chunk_size = (size_t) int64.min (remaining, buf.length);
+
+				try {
+					n = yield input.read_async (buf[0:chunk_size], Priority.DEFAULT, cancellable);
+				} catch (Error e) {
+					read_error = e;
+					break;
+				}
+
+				if (n == 0)
+					break;
+
+				device_checksum.update (buf[0:n], n);
+				bytes_verified += n;
+				progress (bytes_verified, total_bytes);
+			}
+
+			yield input.close_async (Priority.DEFAULT, cancellable);
+
+			if (read_error != null)
+				throw read_error;
+
+			if (source_checksum.get_string () != device_checksum.get_string ())
+				throw new IOError.FAILED (_("Verification failed: written data does not match source"));
 		}
 	}
 }
