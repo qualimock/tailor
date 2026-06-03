@@ -26,7 +26,6 @@ namespace Tailor {
 		private UsbDevice device;
 		private Os? selected_os = null;
 		private File? temp_file;
-		private bool flashing = false;
 		private Cancellable cancellable;
 		private bool trash_after_flashing = false;
 
@@ -45,6 +44,7 @@ namespace Tailor {
 		[GtkChild] private unowned StatusLine verify_status;
 
 		public ServiceContext service { get; construct set; }
+		public bool flashing { get; private set; default = false; }
 		public bool success { get; private set; default = false; }
 		public bool finished { get; private set; default = false; }
 		public bool paused { get; private set; default = false; }
@@ -240,6 +240,7 @@ namespace Tailor {
 		private void on_completed () {
 			finished = true;
 			success = true;
+			flashing = false;
 
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
@@ -274,6 +275,7 @@ namespace Tailor {
 		private void on_cancel () {
 			finished = true;
 			success = false;
+			flashing = false;
 
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");

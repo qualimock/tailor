@@ -6,6 +6,8 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 	default-height: 800;
 	title: _("Tailor");
 
+	deletable: bind flash_page.flashing inverted;
+
 	content: Adw.NavigationView {
 		$TailorHomePage home_page { service: bind template.service; }
 		$TailorDownloadPage download_page { service: bind template.service; }
