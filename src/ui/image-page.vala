@@ -102,12 +102,27 @@ namespace Tailor {
 			if (selected_device == null)
 				return;
 
-			page.configure_from_image (
-				service.image_file,
-				(UsbDevice) selected_device.selected_item
+			var dialog = new Adw.AlertDialog (
+				_("Tailor the Image?"),
+				_("All device data will be erased!")
 			);
+			dialog.add_response ("cancel", _("Cancel"));
+			dialog.add_response ("proceed", _("Proceed"));
 
-			view.push (page);
+			dialog.set_default_response ("cancel");
+			dialog.set_close_response ("cancel");
+			dialog.set_response_appearance ("proceed", Adw.ResponseAppearance.DESTRUCTIVE);
+
+			dialog.response["proceed"].connect (() => {
+				page.configure_from_image (
+					service.image_file,
+					(UsbDevice) selected_device.selected_item
+				);
+
+				view.push (page);
+			});
+
+			dialog.present (this);
 		}
 	}
 }
