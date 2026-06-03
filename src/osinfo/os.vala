@@ -28,7 +28,9 @@ namespace Tailor {
 
 	public class Os : Object {
 
+		private ChecksumFetcher checksum_fetcher = new ChecksumFetcher ();
 		private AvailabilityChecker checker = new AvailabilityChecker ();
+		private ChecksumType checksum_type = ChecksumType.SHA256;
 
 		public string id { get; construct; }
 		public string display_name { get; set; }
@@ -47,8 +49,40 @@ namespace Tailor {
 		public string? release_date { get; set; default = null; }
 		public string? codename { get; set; default = null; }
 
+		public string? checksum { get; private set; default = null; }
+
 		public Os (string id) {
 			Object (id: id);
+		}
+
+		public async void fetch_checksum (Cancellable? cancellable = null) {
+			if (url == null)
+				return;
+
+			var result = yield checksum_fetcher.fetch_async (url, cancellable);
+
+			if (result == null)
+				return;
+
+			checksum_type = result.type;
+			checksum = result.hash;
+		}
+
+		public async bool verify_checksum (File file, Cancellable? cancellable = null) throws Error {
+			if (checksum == null)
+				return true;
+
+			var chsum = new Checksum (checksum_type);
+			var stream = yield file.read_async (Priority.DEFAULT, cancellable);
+			var buf = new uint8[65536];
+			ssize_t n;
+
+			while ((n = yield stream.read_async (buf, Priority.DEFAULT, cancellable)) > 0)
+				chsum.update (buf[0:n], n);
+
+			yield stream.close_async (Priority.DEFAULT, cancellable);
+
+			return chsum.get_string () == checksum;
 		}
 
 		public async bool check_downloadable () {
