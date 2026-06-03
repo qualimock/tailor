@@ -24,8 +24,9 @@ template $TailorDownloadPage : Adw.NavigationPage {
 				Button {
 					styles [ "flat" ]
 
-					tooltip-text: _("");
-					icon-name: "open-menu-symbolic";
+					tooltip-text: _("About");
+					icon-name: "help-about-symbolic";
+					action-name: "app.about";
 				}
 			}
 
@@ -60,25 +61,29 @@ template $TailorDownloadPage : Adw.NavigationPage {
 					hexpand: true;
 					visible: false;
 
-					Box search_box {
-						styles [ "linked" ]
+					Adw.Clamp {
+						maximum-size: 800;
 
-						orientation: horizontal;
-						margin-top: 8;
-						margin-bottom: 12;
-						margin-start: 12;
-						margin-end: 12;
+						Box search_box {
+							styles [ "linked" ]
 
-						Entry search_entry {
-							placeholder-text: _("Search");
-							primary-icon-name: "system-search";
-							hexpand: true;
+							orientation: horizontal;
+							margin-top: 8;
+							margin-bottom: 12;
+							margin-start: 12;
+							margin-end: 12;
 
-							changed => $on_search_entry_changed();
-						}
+							Entry search_entry {
+								placeholder-text: _("Search");
+								primary-icon-name: "system-search";
+								hexpand: true;
 
-						DropDown arch_dropdown {
-							notify::selected => $on_arch_dropdown_selected ();
+								changed => $on_search_entry_changed();
+							}
+
+							DropDown arch_dropdown {
+								notify::selected => $on_arch_dropdown_selected ();
+							}
 						}
 					}
 
@@ -100,49 +105,53 @@ template $TailorDownloadPage : Adw.NavigationPage {
 							other_os_box.visible
 						) as <bool>;
 
-						child: Box {
-							orientation: vertical;
-							margin-top: 12;
-							margin-bottom: 12;
-							margin-start: 12;
-							margin-end: 12;
-							spacing: 24;
+						child: Adw.Clamp {
+							maximum-size: 800;
 
-							Box primary_os_box {
+							child: Box {
 								orientation: vertical;
-								spacing: 12;
+								margin-top: 12;
+								margin-bottom: 12;
+								margin-start: 12;
+								margin-end: 12;
+								spacing: 24;
 
-								Label primary_os_label {
-									styles [ "title-4" ]
-									halign: start;
+								Box primary_os_box {
+									orientation: vertical;
+									spacing: 12;
 
-									label: _("Primary OS");
+									Label primary_os_label {
+										styles [ "title-4" ]
+										halign: start;
+
+										label: _("Primary OS");
+									}
+
+									ListBox primary_os_list {
+										styles [ "boxed-list" ]
+										hexpand: true;
+										row-activated => $configure_os_page_from_os ();
+									}
 								}
 
-								ListBox primary_os_list {
-									styles [ "boxed-list" ]
-									hexpand: true;
-									row-activated => $configure_os_page_from_os ();
+								Box other_os_box {
+									orientation: vertical;
+									spacing: 12;
+
+									Label {
+										styles [ "title-4" ]
+										halign: start;
+
+										label: _("Other operating systems");
+									}
+
+									ListBox other_os_list {
+										styles [ "boxed-list" ]
+										hexpand: true;
+										row-activated => $configure_os_page_from_family ();
+									}
 								}
-							}
-
-							Box other_os_box {
-								orientation: vertical;
-								spacing: 12;
-
-								Label {
-									styles [ "title-4" ]
-									halign: start;
-
-									label: _("Other operating systems");
-								}
-
-								ListBox other_os_list {
-									styles [ "boxed-list" ]
-									hexpand: true;
-									row-activated => $configure_os_page_from_family ();
-								}
-							}
+							};
 						};
 					}
 				}

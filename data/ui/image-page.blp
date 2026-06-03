@@ -17,8 +17,9 @@ template $TailorImagePage : Adw.NavigationPage {
 			Button {
 				styles [ "flat" ]
 
-				tooltip-text: _("");
-				icon-name: "open-menu-symbolic";
+				tooltip-text: _("About");
+				icon-name: "help-about-symbolic";
+				action-name: "app.about";
 			}
 		}
 
@@ -56,6 +57,7 @@ template $TailorImagePage : Adw.NavigationPage {
 
 						label: _("CAUTION: All data will be deleted. Check the media for important data.");
 						halign: start;
+						ellipsize: end;
 					}
 
 					ListBox {
