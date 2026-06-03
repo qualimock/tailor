@@ -20,25 +20,18 @@
 
 namespace Tailor {
 
-	public class DownloadOperation : Object {
+	public class DownloadOperation : Operation {
 
 		private Os os;
-		private Cancellable cancellable;
 		private Soup.Session session;
 		private FileIOStream? iostream = null;
-		private SourceFunc? resume_func = null;
 
-		private int64 bytes_written = 0;
-		private int64 total_bytes = 0;
 		private int64 last_bytes = 0;
 		private uint stall_timeout_id = 0;
 
 		private bool stalled = false;
-		private bool paused = false;
 
-		public signal void progress (int64 bytes_written, int64 total);
 		public signal void completed (File temp_file);
-		public signal void failed (string message);
 
 		public DownloadOperation (Os os, Cancellable cancellable) {
 			this.os = os;
@@ -49,25 +42,21 @@ namespace Tailor {
 			session.user_agent = @"$(Tailor.ID)/$(Tailor.VERSION)";
 		}
 
-		public void pause () {
-			paused = true;
+		public override void pause () {
+			base.pause ();
 			stop_stall_timer ();
 		}
 
-		public void resume () {
-			paused = false;
+		public override void resume () {
+			base.resume ();
 			start_stall_timer ();
-
-			if (resume_func != null) {
-				var func = (owned) resume_func;
-				resume_func = null;
-				func ();
-			}
 		}
 
-		public async void run_async () throws Error {
+		public override async void run_async () throws Error {
 			if (os.url == null)
 				throw new IOError.INVALID_ARGUMENT ("OS has no download URL");
+
+			state = State.DOWNLOADING;
 
 			var tmp_file = yield create_temp_file ();
 
@@ -89,11 +78,6 @@ namespace Tailor {
 
 				throw e;
 			}
-		}
-
-		private async void wait_for_resume () {
-			resume_func = wait_for_resume.callback;
-			yield;
 		}
 
 		private void start_stall_timer () {

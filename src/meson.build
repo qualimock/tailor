@@ -3,11 +3,13 @@ app_sources = files(
 	'application.vala',
 
 	'service' / 'service-context.vala',
-	'service' / 'download-operation.vala',
-	'service' / 'flash-operation.vala',
 	'service' / 'availability-checker.vala',
 	'service' / 'checksum-resolver.vala',
 	'service' / 'checksum-fetcher.vala',
+
+	'service' / 'operation' / 'operation.vala',
+	'service' / 'operation' / 'download-operation.vala',
+	'service' / 'operation' / 'flash-operation.vala',
 
 	'ui' / 'main-window.vala',
 	'ui' / 'home-page.vala',

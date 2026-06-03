@@ -20,31 +20,15 @@
 
 namespace Tailor {
 
-	public enum FlashStage {
-		PREPARING,
-		WRITING,
-		VERIFYING
-	}
-
-	public class FlashOperation : Object {
+	public class FlashOperation : Operation {
 
 		private UDisks.Block block;
 		private DBusObjectManager object_manager;
 		private File image;
-		private Cancellable cancellable;
-		private SourceFunc? resume_func = null;
-
-		private int64 bytes_written = 0;
-		private int64 total_bytes = 0;
 
 		private Checksum source_checksum = new Checksum (ChecksumType.SHA256);
 
-		private bool paused = false;
-
-		public signal void progress (int64 bytes_written, int64 total);
-		public signal void stage_changed (FlashStage stage);
 		public signal void completed ();
-		public signal void failed (string message);
 
 		public FlashOperation (
 			UDisks.Block block,
@@ -58,20 +42,7 @@ namespace Tailor {
 			this.cancellable = cancellable;
 		}
 
-		public void pause () {
-			paused = true;
-		}
-
-		public void resume () {
-			paused = false;
-			if (resume_func != null) {
-				var func = (owned) resume_func;
-				resume_func = null;
-				func ();
-			}
-		}
-
-		public async void run_async () throws Error {
+		public override async void run_async () throws Error {
 			FileInputStream? input = null;
 			UnixOutputStream? output = null;
 
@@ -83,7 +54,7 @@ namespace Tailor {
 				output = yield get_output ();
 				total_bytes = (int64) info.get_size ();
 
-				stage_changed (FlashStage.WRITING);
+				state = State.WRITING;
 				yield stream (input, output);
 			} catch (Error e) {
 				if (output != null) yield output.close_async (Priority.DEFAULT, null);
@@ -110,13 +81,8 @@ namespace Tailor {
 			completed ();
 		}
 
-		private async void wait_for_resume () {
-			resume_func = wait_for_resume.callback;
-			yield;
-		}
-
 		private async void unmount () throws Error {
-			stage_changed (FlashStage.PREPARING);
+			state = State.PREPARING;
 
 			foreach (var obj in object_manager.get_objects ()) {
 				var udisks_obj = obj as UDisks.Object;
@@ -187,7 +153,7 @@ namespace Tailor {
 		}
 
 		private async void verify () throws Error {
-			stage_changed (FlashStage.VERIFYING);
+			state = State.VERIFYING;
 
 			UnixFDList fd_list;
 			Variant out_fd;
