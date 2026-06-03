@@ -273,7 +273,7 @@ namespace Tailor {
 
 		private void on_cancel () {
 			finished = true;
-			success = true;
+			success = false;
 
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
