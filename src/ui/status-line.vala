@@ -26,7 +26,8 @@ namespace Tailor {
 		ACTIVE,
 		FINISHED,
 		FAILED,
-		ABORTED
+		ABORTED,
+		PAUSED
 	}
 
 	[GtkTemplate (ui = "/org/altlinux/Tailor/status-line.ui")]
@@ -47,6 +48,7 @@ namespace Tailor {
 				case StatusState.FINISHED: return _("Finished");
 				case StatusState.FAILED: return _("Failed");
 				case StatusState.ABORTED: return _("Aborted");
+				case StatusState.PAUSED: return _("Paused");
 
 				case StatusState.NONE:
 				default: return "";
