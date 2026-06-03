@@ -30,8 +30,7 @@ namespace Tailor {
 		private Cancellable cancellable;
 		private bool trash_after_flashing = false;
 
-		private DownloadOperation? active_download = null;
-		private FlashOperation? active_flash = null;
+		private Operation? active_operation = null;
 
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
@@ -60,6 +59,7 @@ namespace Tailor {
 			reset ();
 
 			this.device = device;
+			selected_os = null;
 
 			try {
 				var info = image.query_info (
@@ -109,8 +109,7 @@ namespace Tailor {
 
 			progress_bar.fraction = 0;
 
-			active_download = null;
-			active_flash = null;
+			active_operation = null;
 			temp_file = null;
 
 			download_status.state = StatusState.PENDING;
@@ -123,25 +122,72 @@ namespace Tailor {
 			progress_status.title = _("Starting");
 		}
 
+		private void download_and_flash () {
+			has_checksum = selected_os?.checksum != null;
+			download_status.state = StatusState.ACTIVE;
+
+			var op = new DownloadOperation (selected_os, cancellable);
+			active_operation = op;
+
+			op.progress.connect (on_download_progress);
+			op.failed.connect (on_failed);
+			op.completed.connect (on_downloaded);
+			op.notify["state"].connect (on_operation_state_changed);
+
+			op.run_async.begin ((obj, res) => {
+				try { op.run_async.end (res); }
+				catch (Error e) {}
+			});
+		}
+
 		private void flash (File image, Cancellable cancellable) {
 			FlashOperation op;
 			try {
 				op = service.usb.create_flash_operation (device, image, cancellable);
-				active_flash = op;
+				active_operation = op;
 			} catch (Error e) {
 				on_failed (e.message);
 				return;
 			}
 
 			op.progress.connect (on_flash_progress);
-			op.stage_changed.connect (on_stage_changed);
 			op.completed.connect (on_completed);
 			op.failed.connect (on_failed);
+			op.notify["state"].connect (on_operation_state_changed);
 
 			op.run_async.begin ((obj, res) => {
 				try { op.run_async.end (res); }
 				catch (Error e) {}
 			});
+		}
+
+		private void on_downloaded (File tmp_file) {
+			download_status.state = StatusState.FINISHED;
+			temp_file = tmp_file;
+
+			if (selected_os.checksum != null) {
+				checksum_status.state = StatusState.ACTIVE;
+
+				var mismatch_str = _("Checksum mismatch - the download can be corrupted");
+				selected_os.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
+					try {
+						var verified = selected_os.verify_checksum.end (res);
+
+						if (!verified) {
+							on_failed (mismatch_str);
+							return;
+						}
+					} catch (Error e) {
+						on_failed (e.message);
+						return;
+					}
+
+					checksum_status.state = StatusState.FINISHED;
+					flash (tmp_file, cancellable);
+				});
+			} else {
+				flash (tmp_file, cancellable);
+			}
 		}
 
 		private void on_download_progress (int64 written, int64 total) {
@@ -159,23 +205,36 @@ namespace Tailor {
 				progress_bar.pulse ();
 		}
 
-		private void on_stage_changed (FlashStage stage) {
-			switch (stage) {
-			case FlashStage.PREPARING:
-				progress_status.title = _("Preparing device");
+		private void on_operation_state_changed () {
+			switch (active_operation.state) {
+			case Operation.State.PREPARING:
+				active_operation.title = _("Preparing device");
 				prepare_status.state = StatusState.ACTIVE;
 				break;
-			case FlashStage.WRITING:
-				progress_status.title = _("Writing image");
+
+			case Operation.State.WRITING:
+				active_operation.title = _("Writing image");
 				prepare_status.state = StatusState.FINISHED;
 				write_status.state = StatusState.ACTIVE;
 				break;
-			case FlashStage.VERIFYING:
-				progress_status.title = _("Verifying installation");
+
+			case Operation.State.VERIFYING:
+				active_operation.title = _("Verifying installation");
 				write_status.state = StatusState.FINISHED;
 				verify_status.state = StatusState.ACTIVE;
 				break;
+
+			case Operation.State.DOWNLOADING:
+				download_status.state = StatusState.ACTIVE;
+				break;
+
+			case Operation.State.PAUSED:
+				progress_status.title = _("Paused");
+				set_state_on (StatusState.PAUSED, StatusState.ACTIVE);
+				return;
 			}
+
+			progress_status.title = active_operation.title;
 		}
 
 		private void on_completed () {
@@ -185,7 +244,7 @@ namespace Tailor {
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
 
-			set_state_on_active (StatusState.FINISHED);
+			set_state_on (StatusState.FINISHED, StatusState.ACTIVE);
 
 			if (trash_after_flashing && temp_file != null)
 				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
@@ -204,7 +263,7 @@ namespace Tailor {
 			set_progress_css_class ("error");
 			flash_result_label.label = _("An error occurred during writing process: %s").printf (message);
 
-			set_state_on_active (StatusState.FAILED);
+			set_state_on (StatusState.FAILED, StatusState.ACTIVE);
 
 			if (temp_file != null)
 				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
@@ -219,7 +278,7 @@ namespace Tailor {
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
 
-			set_state_on_active (StatusState.ABORTED);
+			set_state_on (StatusState.ABORTED, StatusState.PAUSED);
 
 			if (temp_file != null)
 				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
@@ -245,20 +304,20 @@ namespace Tailor {
 			}
 		}
 
-		private void set_state_on_active (StatusState state) {
-			if (download_status.state == StatusState.ACTIVE)
+		private void set_state_on (StatusState state, StatusState current) {
+			if (download_status.state == current)
 				download_status.state = state;
 
-			if (checksum_status.state == StatusState.ACTIVE)
+			if (checksum_status.state == current)
 				checksum_status.state = state;
 
-			if (prepare_status.state == StatusState.ACTIVE)
+			if (prepare_status.state == current)
 				prepare_status.state = state;
 
-			if (write_status.state == StatusState.ACTIVE)
+			if (write_status.state == current)
 				write_status.state = state;
 
-			if (verify_status.state == StatusState.ACTIVE)
+			if (verify_status.state == current)
 				verify_status.state = state;
 		}
 
@@ -287,48 +346,7 @@ namespace Tailor {
 				return;
 			}
 
-			has_checksum = selected_os?.checksum != null;
-			download_status.state = StatusState.ACTIVE;
-
-			var op = new DownloadOperation (selected_os, cancellable);
-			active_download = op;
-
-			op.progress.connect (on_download_progress);
-			op.failed.connect (on_failed);
-
-			op.completed.connect ((tmp_file) => {
-				download_status.state = StatusState.FINISHED;
-				temp_file = tmp_file;
-
-				if (selected_os.checksum != null) {
-					checksum_status.state = StatusState.ACTIVE;
-
-					var mismatch_str = _("Checksum mismatch - the download can be corrupted");
-					selected_os.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
-						try {
-							var verified = selected_os.verify_checksum.end (res);
-
-							if (!verified) {
-								on_failed (mismatch_str);
-								return;
-							}
-						} catch (Error e) {
-							on_failed (e.message);
-							return;
-						}
-
-						checksum_status.state = StatusState.FINISHED;
-						flash (tmp_file, cancellable);
-					});
-				} else {
-					flash (tmp_file, cancellable);
-				}
-			});
-
-			op.run_async.begin ((obj, res) => {
-				try { op.run_async.end (res); }
-				catch (Error e) {}
-			});
+			download_and_flash ();
 		}
 
 		[GtkCallback]
@@ -336,22 +354,43 @@ namespace Tailor {
 			if (cancellable == null)
 				return;
 
-			cancellable.cancel ();
-			on_cancel ();
+			toggle_pause ();
+
+			var dialog = new Adw.AlertDialog (
+				_("Cancel tailoring?"),
+				_("The device may be left in an incomplete state and fail to boot.")
+			);
+			dialog.add_response ("continue", _("Continue"));
+			dialog.add_response ("cancel", _("Cancel Anyway"));
+
+			dialog.set_default_response ("continue");
+			dialog.set_close_response ("continue");
+			dialog.set_response_appearance ("cancel", Adw.ResponseAppearance.DESTRUCTIVE);
+
+			if (download_status.state == StatusState.ACTIVE ||
+			    checksum_status.state == StatusState.ACTIVE) {
+				dialog.heading = _("Cancel download?");
+				dialog.body = _("The device won't be affected.");
+			}
+
+			dialog.response["cancel"].connect (() => {
+				cancellable.cancel ();
+				on_cancel ();
+			});
+
+			dialog.response["continue"].connect (toggle_pause);
+
+			dialog.present (this);
 		}
 
 		[GtkCallback]
 		private void toggle_pause () {
 			paused = !paused;
 			if (paused) {
-				active_download?.pause ();
-				active_flash?.pause ();
-				progress_status.title = _("Paused");
+				active_operation?.pause ();
 				set_progress_css_class ("dimmed");
 			} else {
-				active_download?.resume ();
-				active_flash?.resume ();
-				progress_status.title = _("Resuming");
+				active_operation?.resume ();
 				set_progress_css_class ("accent");
 			}
 		}
