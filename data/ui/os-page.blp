@@ -29,6 +29,12 @@ template $TailorOsPage : Adw.NavigationPage {
 		}
 
 		content: Overlay {
+
+			Adw.Banner {
+				visible: bind template.has-checksum;
+				title: _("Checksum not available - download integrity cannot be verified");
+			}
+
 			ScrolledWindow {
 				hscrollbar-policy: never;
 
@@ -251,7 +257,10 @@ template $TailorOsPage : Adw.NavigationPage {
 				halign: center;
 				valign: end;
 
-				sensitive: bind $logical_and (template.has-devices, template.available) as <bool>;
+				sensitive: bind $logical_and (
+					$logical_and (template.has-devices, template.available) as <bool>,
+					$logical_not (template.checking) as <bool>
+				) as <bool>;
 				clicked => $open_flash_page ();
 
 				child: Box {
@@ -264,8 +273,18 @@ template $TailorOsPage : Adw.NavigationPage {
 					Label {
 						label: bind $string_or_fallback (
 							template.checking,
-							_("Checking OS…"),
-							$string_or_fallback (template.available, _("Create Bootable USB"), _("OS not Available")) as <string>
+
+							$string_or_fallback (
+								$logical_and (template.checking, template.available) as <bool>,
+								_("Fetching checksum…"),
+								_("Checking OS…")
+							) as <string>,
+
+							$string_or_fallback (
+								template.available,
+								_("Create Bootable USB"),
+								_("OS not Available")
+							) as <string>
 						) as <string>;
 					}
 				};

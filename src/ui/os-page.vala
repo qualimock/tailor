@@ -50,6 +50,7 @@ namespace Tailor {
 		public bool has_arches { get; private set; default = false; }
 		public bool has_requirements { get; private set; default = false; }
 		public bool has_devices { get; set; default = false; }
+		public bool has_checksum { get; set; default = false; }
 
 		public string? selected_edition { get; set; }
 		public string? selected_version { get; set; }
@@ -234,14 +235,26 @@ namespace Tailor {
 			media_type_label.label = os.media_type ?? "";
 			codename_label.label = os.codename ?? "";
 
-			current_os = os;
-
 			checking = true;
 			available = false;
+			has_checksum = false;
+
 			os.check_downloadable.begin ((_, res) => {
 				available = os.check_downloadable.end (res);
-				checking = false;
+
+				if (!available) {
+					checking = false;
+					return;
+				}
+
+				os.fetch_checksum.begin (null, (_, res) => {
+					os.fetch_checksum.end (res);
+					has_checksum = os.checksum != null;
+					checking = false;
+				});
 			});
+
+			current_os = os;
 		}
 
 		private bool os_matches (Os os) {
@@ -276,6 +289,9 @@ namespace Tailor {
 
 		[GtkCallback]
 		private bool logical_and (bool a, bool b) { return a && b; }
+
+		[GtkCallback]
+		private bool logical_not (bool val) { return !val; }
 
 		[GtkCallback]
 		private string string_or_fallback (bool condition, string preferred, string fallback) {
