@@ -17,7 +17,7 @@ template $TailorHomePage : Adw.NavigationPage {
 			}
 		}
 
-		Adw.ToolbarView {
+		child: Adw.ToolbarView {
 			[top]
 			Adw.HeaderBar header_bar {
 				title-widget: Adw.ViewSwitcher {
@@ -55,7 +55,6 @@ template $TailorHomePage : Adw.NavigationPage {
 			Adw.ViewSwitcherBar switcher_bar {
 				stack: stack;
 			}
-		}
+		};
 	};
 }
-

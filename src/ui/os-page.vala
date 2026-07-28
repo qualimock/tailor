@@ -25,7 +25,6 @@ namespace Tailor {
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
 		private OsFamily current_family;
-		private Os current_os;
 
 		private bool repopulating = false;
 
@@ -45,16 +44,21 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.Label media_type_label;
 		[GtkChild] private unowned Gtk.Label codename_label;
 
-		public bool has_editions { get; private set; default = false; }
-		public bool has_versions { get; private set; default = false; }
-		public bool has_arches { get; private set; default = false; }
+		public ListStore edition_store { get; private set; }
+		public ListStore version_store { get; private set; }
+		public ListStore image_store { get; private set; }
+
+		public uint n_editions { get; set; }
+		public uint n_versions { get; set; }
+		public uint n_arches { get; set; }
+		public uint n_devices { get; set; }
+
 		public bool has_requirements { get; private set; default = false; }
-		public bool has_devices { get; set; default = false; }
 		public bool has_checksum { get; set; default = false; }
 
-		public string? selected_edition { get; set; }
-		public string? selected_version { get; set; }
-		public string? selected_arch { get; set; }
+		public OsEdition? selected_edition { get; set; }
+		public OsVersion? selected_version { get; set; }
+		public OsImage? selected_image { get; set; }
 		public Gtk.SingleSelection? selected_device { get; set; }
 
 		public bool checking { get; set; default = true; }
@@ -80,17 +84,30 @@ namespace Tailor {
 		}
 
 		construct {
+			edition_store = new ListStore (typeof (OsEdition));
+			edition_dropdown.model = edition_store;
+
+			version_store = new ListStore (typeof (OsVersion));
+			version_dropdown.model = version_store;
+
+			image_store = new ListStore (typeof (OsImage));
+			arch_dropdown.model = image_store;
+
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
 			devices_dropdown.expression = new Gtk.PropertyExpression (typeof (UsbDevice), null, "name");
+
+			edition_dropdown.expression = new Gtk.PropertyExpression (typeof (OsEdition), null, "name");
+			version_dropdown.expression = new Gtk.PropertyExpression (typeof (OsVersion), null, "version");
+			arch_dropdown.expression = new Gtk.PropertyExpression (typeof (OsImage), null, "arch");
 
 			populated.connect (update_os_info);
 		}
 
-		public void configure (OsFamily family, Os selected) {
+		public void configure (OsFamily family, OsEdition? preferred_edition) {
 			current_family = family;
-			title = family.display_name;
+			title = family.name;
 
-			populate_editions (selected.edition ?? "", selected.version ?? "", selected.arch ?? "");
+			populate_editions (preferred_edition?.id);
 		}
 
 		public void add_device (UsbDevice device) {
@@ -107,162 +124,163 @@ namespace Tailor {
 				device_store.remove (index);
 		}
 
-		private void populate_editions (string preferred, string preferred_version, string preferred_arch) {
+		private void populate_editions (string? preferred_id) {
 			repopulating = true;
-			has_editions = false;
 
 			if (current_family == null) {
 				repopulating = false;
 				return;
 			}
 
-			var editions = new Gee.TreeSet<string> ();
-			editions.add_all (current_family.editions.keys);
-			editions.remove ("");
-
-			has_editions = !editions.is_empty;
-			if (!has_editions) {
-				populate_versions ("", preferred_version, preferred_arch);
-				return;
+			var by_id = new Gee.HashMap<string, OsEdition> ();
+			foreach (var version in current_family.versions.values) {
+				foreach (var edition in version.editions.values)
+					by_id.set (edition.id, edition);
 			}
 
-			var selected = editions.contains (preferred) ? preferred : editions.first ();
-			populate_dropdown (edition_dropdown, editions, selected);
+			var editions = new Gee.ArrayList<OsEdition> ();
+			editions.add_all (by_id.values);
+			editions.sort ((a, b) => strcmp (a.name, b.name));
 
-			populate_versions (selected, preferred_version, preferred_arch);
+			edition_store.remove_all ();
+
+			uint selected = 0;
+			uint index = 0;
+			foreach (var edition in editions) {
+				edition_store.append (edition);
+				if (preferred_id != null && edition.id == preferred_id)
+					selected = index;
+
+				index++;
+			}
+
+			edition_dropdown.selected = selected;
+
+			populate_versions (null);
 		}
 
-		private void populate_versions (string edition, string preferred, string preferred_arch) {
-			has_versions = false;
-
-			if (current_family == null || !current_family.editions.has_key (edition)) {
+		private void populate_versions (string? preferred) {
+			if (selected_edition == null) {
 				repopulating = false;
 				return;
 			}
 
-			var versions = new Gee.TreeSet<string> ();
-			versions.add_all (current_family.editions[edition].keys);
-			versions.remove ("");
+			var versions = new Gee.ArrayList<OsVersion> ();
+			foreach (var version in current_family.versions.values) {
+				if (version.editions.has_key (selected_edition.id))
+					versions.add (version);
+			}
+			versions.sort ((a, b) => service.osinfo.compare_versions (a.version, b.version));
 
-			has_versions = !versions.is_empty;
-			if (!has_versions) {
-				populate_arches (edition, "", preferred_arch);
-				return;
+			version_store.remove_all ();
+
+			uint selected = 0;
+			uint index = 0;
+			bool found = false;
+			foreach (var version in versions) {
+				version_store.append (version);
+				if (preferred != null && version.version == preferred) {
+					selected = index;
+					found = true;
+				}
+
+				index++;
 			}
 
-			var selected = versions.contains (preferred) ? preferred : versions.first ();
-			populate_dropdown (version_dropdown, versions, selected);
+			if (!found)
+				selected = version_store.n_items > 0 ? version_store.n_items - 1 : 0;
 
-			populate_arches (edition, selected, preferred_arch);
+			version_dropdown.selected = selected;
+
+			populate_arches (null);
 		}
 
-		private void populate_arches (string edition, string version, string preferred) {
-			has_arches = false;
-
-			if (current_family == null || !current_family.editions.has_key (edition)) {
+		private void populate_arches (string? preferred) {
+			if (selected_version == null) {
 				repopulating = false;
 				populated ();
 				return;
 			}
 
-			var edition_versions = current_family.editions[edition];
-			if (!edition_versions.has_key (version)) {
-				repopulating = false;
-				populated ();
-				return;
+			var edition = selected_version.editions.get (selected_edition.id);
+			var images = new Gee.ArrayList<OsImage> ();
+			if (edition != null)
+				images.add_all (edition.images);
+
+			images.sort ((a, b) => strcmp (a.arch ?? "", b.arch ?? ""));
+
+			image_store.remove_all ();
+
+			uint selected = 0;
+			uint index = 0;
+			foreach (var image in images) {
+				image_store.append (image);
+				if (preferred != null && image.arch == preferred)
+					selected = index;
+				else if (preferred == null && image.arch == service.host_arch)
+					selected = index;
+
+				index++;
 			}
 
-			var arches = new Gee.TreeSet<string> ();
-			arches.add_all (edition_versions[version]);
-			arches.remove ("");
-
-			has_arches = !arches.is_empty;
-			if (!has_arches) {
-				repopulating = false;
-				populated ();
-				return;
-			}
-
-			var selected = arches.contains (preferred) ? preferred : arches.first ();
-			populate_dropdown (arch_dropdown, arches, selected);
+			arch_dropdown.selected = selected;
 
 			repopulating = false;
 			populated ();
 		}
 
-		private void populate_dropdown (Gtk.DropDown dropdown, Gee.TreeSet<string> items, string selected) {
-			var model = new Gtk.StringList (null);
-			uint i = 0;
-			uint selected_idx = Gtk.INVALID_LIST_POSITION;
-
-			foreach (var item in items) {
-				model.append (item);
-				if (selected != null && item == selected)
-					selected_idx = i;
-
-				i++;
-			}
-
-			dropdown.model = model;
-			dropdown.expression = new Gtk.PropertyExpression (typeof (Gtk.StringObject), null, "string");
-			if (selected_idx != Gtk.INVALID_LIST_POSITION)
-				dropdown.selected = selected_idx;
-		}
-
 		private void update_os_info () {
-			var os = current_family.distros.first_match (os => os_matches (os));
-			if (os == null)
+			if (selected_image == null)
 				return;
 
-			has_requirements = os.resources.cpu > 0 ||
-			                   os.resources.ram > 0 ||
-			                   os.resources.storage > 0;
+			var image = selected_image;
+			var version = selected_version;
 
-			cpu_label.label = os.resources.cpu > 0
-				? format_hertz (os.resources.cpu)
+			has_requirements = image.resources.cpu > 0 ||
+			                   image.resources.ram > 0 ||
+			                   image.resources.storage > 0;
+
+			cpu_label.label = image.resources.cpu > 0
+				? format_hertz (image.resources.cpu)
 				: _("Not available");
 
-			ram_label.label = os.resources.ram > 0
-				? format_bytes (os.resources.ram)
+			ram_label.label = image.resources.ram > 0
+				? format_bytes (image.resources.ram)
 				: _("Not available");
 
-			free_space_label.label = os.resources.storage > 0
-				? format_bytes (os.resources.storage)
+			free_space_label.label = image.resources.storage > 0
+				? format_bytes (image.resources.storage)
 				: _("Not available");
 
-			size_label.label = os.volume_size > 0 ? format_bytes (os.volume_size) : "";
-			release_label.label = os.release_date ?? "";
-			media_type_label.label = os.media_type ?? "";
-			codename_label.label = os.codename ?? "";
+			size_label.label = image.volume_size > 0
+				? format_bytes (image.volume_size)
+				: "";
+
+			media_type_label.label = image.media_type ?? "";
+
+			if (version != null) {
+				release_label.label = version.release_date ?? "";
+				codename_label.label = version.codename ?? "";
+			}
 
 			checking = true;
 			available = false;
 			has_checksum = false;
 
-			os.check_downloadable.begin ((_, res) => {
-				available = os.check_downloadable.end (res);
+			image.check_downloadable.begin ((_, res) => {
+				available = image.check_downloadable.end (res);
 
 				if (!available) {
 					checking = false;
 					return;
 				}
 
-				os.fetch_checksum.begin (null, (_, res) => {
-					os.fetch_checksum.end (res);
-					has_checksum = os.checksum != null;
+				image.fetch_checksum.begin (null, (_, res) => {
+					image.fetch_checksum.end (res);
+					has_checksum = image.checksum != null;
 					checking = false;
 				});
 			});
-
-			current_os = os;
-		}
-
-		private bool os_matches (Os os) {
-			var has_edition = !has_editions || (os.edition ?? "") == (selected_edition ?? "");
-			var has_version = !has_versions || (os.version ?? "") == (selected_version ?? "");
-			var has_arch = !has_arches || (os.arch ?? "") == (selected_arch ?? "");
-
-			return has_edition && has_version && has_arch;
 		}
 
 		private static string format_hertz (int64 hz) {
@@ -277,11 +295,6 @@ namespace Tailor {
 				return _("%.0f MiB").printf ((double) bytes / Osinfo.MEBIBYTES);
 
 			return _("%.1f GiB").printf ((double) bytes / Osinfo.GIBIBYTES);
-		}
-
-		[GtkCallback]
-		private string stringify (Gtk.StringObject? obj) {
-			return obj?.string ?? "";
 		}
 
 		[GtkCallback]
@@ -318,7 +331,7 @@ namespace Tailor {
 				return;
 
 			repopulating = true;
-			populate_versions (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+			populate_versions (null);
 		}
 
 		[GtkCallback]
@@ -327,7 +340,7 @@ namespace Tailor {
 				return;
 
 			repopulating = true;
-			populate_arches (selected_edition ?? "", selected_version ?? "", selected_arch ?? "");
+			populate_arches (null);
 		}
 
 		[GtkCallback]
@@ -359,7 +372,8 @@ namespace Tailor {
 
 			dialog.response["proceed"].connect (() => {
 				page.configure_from_os (
-					current_family, current_os,
+					current_family,
+					selected_edition, selected_version, selected_image,
 					(UsbDevice) selected_device.selected_item,
 					trash_switch.active
 				);

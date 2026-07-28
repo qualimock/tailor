@@ -16,6 +16,7 @@ app_sources = files(
 	'ui' / 'write-page.vala',
 	'ui' / 'devices-page.vala',
 	'ui' / 'download-page.vala',
+	'ui' / 'download-page-row.vala',
 	'ui' / 'device-card.vala',
 	'ui' / 'os-page.vala',
 	'ui' / 'image-page.vala',
@@ -27,8 +28,11 @@ app_sources = files(
 
 	'osinfo' / 'osinfo-provider.vala',
 	'osinfo' / 'osinfo-service.vala',
+	'osinfo' / 'os-parser.vala',
 	'osinfo' / 'os-mapper.vala',
-	'osinfo' / 'os.vala',
+	'osinfo' / 'os-image.vala',
+	'osinfo' / 'os-version.vala',
+	'osinfo' / 'os-edition.vala',
 	'osinfo' / 'os-family.vala',
 
 	'usb' / 'usb-provider.vala',

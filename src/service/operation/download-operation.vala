@@ -22,7 +22,7 @@ namespace Tailor {
 
 	public class DownloadOperation : Operation {
 
-		private Os os;
+		private OsImage image;
 		private Soup.Session session;
 		private FileIOStream? iostream = null;
 
@@ -33,8 +33,8 @@ namespace Tailor {
 
 		public signal void completed (File temp_file);
 
-		public DownloadOperation (Os os, Cancellable cancellable) {
-			this.os = os;
+		public DownloadOperation (OsImage image, Cancellable cancellable) {
+			this.image = image;
 			this.cancellable = cancellable;
 
 			session = new Soup.Session ();
@@ -53,7 +53,7 @@ namespace Tailor {
 		}
 
 		public override async void run_async () throws Error {
-			if (os.url == null)
+			if (image.url == null)
 				throw new IOError.INVALID_ARGUMENT ("OS has no download URL");
 
 			state = State.DOWNLOADING;
@@ -111,7 +111,7 @@ namespace Tailor {
 		}
 
 		private async InputStream open_source () throws Error {
-			var msg = new Soup.Message ("GET", os.url);
+			var msg = new Soup.Message ("GET", image.url);
 			msg.request_headers.append ("Accept", "*/*");
 			var input = yield session.send_async (msg, Priority.DEFAULT, cancellable);
 

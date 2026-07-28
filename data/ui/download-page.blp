@@ -130,7 +130,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 									ListBox primary_os_list {
 										styles [ "boxed-list" ]
 										hexpand: true;
-										row-activated => $configure_os_page_from_os ();
+										row-activated => $configure_os_page ();
 									}
 								}
 
@@ -148,7 +148,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 									ListBox other_os_list {
 										styles [ "boxed-list" ]
 										hexpand: true;
-										row-activated => $configure_os_page_from_family ();
+										row-activated => $configure_os_page ();
 									}
 								}
 							};

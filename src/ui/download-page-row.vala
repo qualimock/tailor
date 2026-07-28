@@ -1,4 +1,4 @@
-/* os-family.vala
+/* primary-os-row.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,17 +20,28 @@
 
 namespace Tailor {
 
-	public class OsFamily : Object {
+	[GtkTemplate (ui = "/org/altlinux/Tailor/download-page-row.ui")]
+	public class DownloadPageRow : Adw.ActionRow {
 
-		public Gee.HashMap<string, OsVersion> versions = new Gee.HashMap<string, OsVersion> ();
+		public bool is_primary { get; construct; }
 
-		public string id { get; construct; }
-		public string vendor { get; construct; }
-		public string name { get; set; }
-		public bool primary { get; set; }
+		public OsFamily family { get; construct; }
+		public OsEdition? edition { get; construct; default = null; }
 
-		public OsFamily (string id, string vendor) {
-			Object (id: id, vendor: vendor);
+		public DownloadPageRow.primary (OsFamily family, OsEdition edition) {
+			Object (is_primary: true, family: family, edition: edition);
+		}
+
+		public DownloadPageRow.other (OsFamily family) {
+			Object (is_primary: false, family: family);
+		}
+
+		construct {
+			title = is_primary && edition != null
+				? @"$(family.name) $(edition.name)"
+				: family.name;
+
+			subtitle = family.vendor;
 		}
 	}
 }

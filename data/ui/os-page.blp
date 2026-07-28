@@ -1,20 +1,24 @@
 using Gtk 4.0;
 using Adw 1;
+using Gio 2.0;
 
 template $TailorOsPage : Adw.NavigationPage {
 	title: _("OS Info");
 	tag: "os-page";
 
-	selected-edition: bind $stringify(edition_dropdown.selected-item as <StringObject>) as <string>;
-	selected-version: bind $stringify(version_dropdown.selected-item as <StringObject>) as <string>;
-	selected-arch: bind $stringify(arch_dropdown.selected-item as <StringObject>) as <string>;
+	selected-edition: bind edition_dropdown.selected-item as <$OsEdition>;
+	selected-version: bind version_dropdown.selected-item as <$OsVersion>;
+	selected-image: bind arch_dropdown.selected-item as <$OsImage>;
 	selected-device: bind devices_dropdown.model as <SingleSelection>;
+
+	n-editions: bind (template.edition-store as <Gio.ListStore>).n-items;
+	n-versions: bind (template.version-store as <Gio.ListStore>).n-items;
+	n-arches: bind (template.image-store as <Gio.ListStore>).n-items;
+	n-devices: bind (devices_dropdown.model as <SingleSelection>).n-items;
 
 	notify::selected-edition => $on_edition_selected ();
 	notify::selected-version => $on_version_selected ();
-	notify::selected-arch => $on_arch_selected ();
-
-	has-devices: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 0) as <bool>;
+	notify::selected-image => $on_arch_selected ();
 
 	child: Adw.ToolbarView {
 		[top]
@@ -31,12 +35,14 @@ template $TailorOsPage : Adw.NavigationPage {
 
 		content: Overlay {
 
+			[overlay]
 			Adw.Banner {
-				visible: bind template.has-checksum;
+				visible: bind $logical_not (template.has-checksum);
+				can-target: false;
 				title: _("Checksum not available - download integrity cannot be verified");
 			}
 
-			ScrolledWindow {
+			child: ScrolledWindow {
 				hscrollbar-policy: never;
 
 				child: Box {
@@ -72,36 +78,36 @@ template $TailorOsPage : Adw.NavigationPage {
 							Adw.ActionRow {
 								title: _("Edition");
 								selectable: false;
-								visible: bind template.has-editions;
+								visible: bind $greater_than (template.n-editions, 0) as <bool>;
 
 								[suffix]
 								DropDown edition_dropdown {
 									valign: center;
-									show-arrow: bind $greater_than ((edition_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than (template.n-editions, 1) as <bool>;
 								}
 							}
 
 							Adw.ActionRow {
 								title: _("Version");
 								selectable: false;
-								visible: bind template.has-versions;
+								visible: bind $greater_than (template.n-versions, 0) as <bool>;
 
 								[suffix]
 								DropDown version_dropdown {
 									valign: center;
-									show-arrow: bind $greater_than ((version_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than (template.n-versions, 1) as <bool>;
 								}
 							}
 
 							Adw.ActionRow {
 								title: _("Architecture");
 								selectable: false;
-								visible: bind template.has-arches;
+								visible: bind $greater_than (template.n-arches, 0) as <bool>;
 
 								[suffix]
 								DropDown arch_dropdown {
 									valign: center;
-									show-arrow: bind $greater_than ((arch_dropdown.model as <StringList>).n-items, 1) as <bool>;
+									show-arrow: bind $greater_than (template.n-arches, 1) as <bool>;
 								}
 							}
 						}
@@ -221,8 +227,8 @@ template $TailorOsPage : Adw.NavigationPage {
 								[suffix]
 								DropDown devices_dropdown {
 									valign: center;
-									sensitive: bind template.has-devices;
-									show-arrow: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 1) as <bool>;
+									sensitive: bind $greater_than (template.n-devices, 0) as <bool>;
+									show-arrow: bind $greater_than (template.n-devices, 1) as <bool>;
 								}
 							}
 						}
@@ -249,7 +255,7 @@ template $TailorOsPage : Adw.NavigationPage {
 						}
 					}
 				};
-			}
+			};
 
 			[overlay]
 			Button {
@@ -260,7 +266,7 @@ template $TailorOsPage : Adw.NavigationPage {
 				valign: end;
 
 				sensitive: bind $logical_and (
-					$logical_and (template.has-devices, template.available) as <bool>,
+					$logical_and ($greater_than (template.n-devices, 0) as <bool>, template.available) as <bool>,
 					$logical_not (template.checking) as <bool>
 				) as <bool>;
 				clicked => $open_flash_page ();

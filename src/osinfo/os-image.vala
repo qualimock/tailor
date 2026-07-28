@@ -26,34 +26,19 @@ namespace Tailor {
 		int64 storage;
 	}
 
-	public class Os : Object {
+	public class OsImage : Object {
 
 		private ChecksumFetcher checksum_fetcher = new ChecksumFetcher ();
 		private AvailabilityChecker checker = new AvailabilityChecker ();
 		private ChecksumType checksum_type = ChecksumType.SHA256;
 
-		public string id { get; construct; }
-		public string display_name { get; set; }
-		public string edition { get; set; }
-		public string version { get; set; }
-		public string arch { get; set; }
-		public string family { get; set; }
-		public string vendor { get; set; }
+		public string? arch { get; set; default = null; }
 		public string url { get; set; }
-		public bool primary { get; set; }
 		public OsResources resources { get; set; }
 
-		// Release and volume info
 		public int64 volume_size { get; set; default = -1; }
 		public string? media_type { get; set; default = null; }
-		public string? release_date { get; set; default = null; }
-		public string? codename { get; set; default = null; }
-
 		public string? checksum { get; private set; default = null; }
-
-		public Os (string id) {
-			Object (id: id);
-		}
 
 		public async void fetch_checksum (Cancellable? cancellable = null) {
 			if (url == null)

@@ -24,7 +24,7 @@ namespace Tailor {
 	public class FlashPage : Adw.NavigationPage {
 
 		private UsbDevice device;
-		private Os? selected_os = null;
+		private OsImage? selected_image = null;
 		private File? temp_file;
 		private Cancellable cancellable;
 		private bool trash_after_flashing = false;
@@ -59,7 +59,7 @@ namespace Tailor {
 			reset ();
 
 			this.device = device;
-			selected_os = null;
+			selected_image = null;
 
 			try {
 				var info = image.query_info (
@@ -77,26 +77,33 @@ namespace Tailor {
 			download_status.visible = false;
 		}
 
-		public void configure_from_os (OsFamily family, Os os, UsbDevice selected_device, bool trash_download) {
+		public void configure_from_os (
+			OsFamily family,
+			OsEdition? edition,
+			OsVersion? version,
+			OsImage image,
+			UsbDevice selected_device,
+			bool trash_download
+		) {
 			reset ();
 
 			device = selected_device;
 			trash_after_flashing = trash_download;
-			selected_os = os;
+			selected_image = image;
 
 			os_statuspage.title = "%s %s %s %s".printf (
-				family.display_name,
-				os.edition ?? "",
-				os.version ?? "",
-				os.codename != null ? @"($(os.codename))" : ""
+				family.name,
+				edition?.name ?? "",
+				version?.version ?? "",
+				version?.codename != null ? @"($(version.codename))" : ""
 			).strip ();
 
 			os_statuspage.description = family.vendor;
 			os_statuspage.icon_name = ""; // TODO: add OS icons
-			os_statuspage.badge = os.arch;
+			os_statuspage.badge = image.arch;
 			os_statuspage.badge_visible = true;
 
-			download_status.title = _("Downloading image %s").printf (Path.get_basename (os.url));
+			download_status.title = _("Downloading image %s").printf (Path.get_basename (image.url));
 			download_status.visible = true;
 		}
 
@@ -123,10 +130,10 @@ namespace Tailor {
 		}
 
 		private void download_and_flash () {
-			has_checksum = selected_os?.checksum != null;
+			has_checksum = selected_image?.checksum != null;
 			download_status.state = StatusState.ACTIVE;
 
-			var op = new DownloadOperation (selected_os, cancellable);
+			var op = new DownloadOperation (selected_image, cancellable);
 			active_operation = op;
 
 			op.progress.connect (on_download_progress);
@@ -165,13 +172,13 @@ namespace Tailor {
 			download_status.state = StatusState.FINISHED;
 			temp_file = tmp_file;
 
-			if (selected_os.checksum != null) {
+			if (selected_image.checksum != null) {
 				checksum_status.state = StatusState.ACTIVE;
 
 				var mismatch_str = _("Checksum mismatch - the download can be corrupted");
-				selected_os.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
+				selected_image.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
 					try {
-						var verified = selected_os.verify_checksum.end (res);
+						var verified = selected_image.verify_checksum.end (res);
 
 						if (!verified) {
 							on_failed (mismatch_str);
@@ -343,7 +350,7 @@ namespace Tailor {
 			flashing = true;
 			cancellable = new Cancellable ();
 
-			if (selected_os == null) {
+			if (selected_image == null) {
 				flash (service.image_file, cancellable);
 				return;
 			}

@@ -1,4 +1,4 @@
-/* os-family.vala
+/* os-version.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,17 +20,18 @@
 
 namespace Tailor {
 
-	public class OsFamily : Object {
+	public class OsVersion : Object {
 
-		public Gee.HashMap<string, OsVersion> versions = new Gee.HashMap<string, OsVersion> ();
+		public Gee.HashMap<string, OsEdition> editions = new Gee.HashMap<string, OsEdition> ();
 
 		public string id { get; construct; }
-		public string vendor { get; construct; }
-		public string name { get; set; }
-		public bool primary { get; set; }
+		public string? version { get; set; default = null; }
+		public string? release_date { get; set; default = null; }
+		public string? codename { get; set; default = null; }
+		public bool has_number { get; set; default = true; }
 
-		public OsFamily (string id, string vendor) {
-			Object (id: id, vendor: vendor);
+		public OsVersion (string id) {
+			Object (id: id);
 		}
 	}
 }

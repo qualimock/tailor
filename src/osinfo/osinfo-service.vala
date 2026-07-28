@@ -43,48 +43,176 @@ namespace Tailor {
 			loaded ();
 		}
 
+		public Gee.ArrayList<OsEdition> get_primary_editions (OsFamily family) {
+			var versions = new Gee.ArrayList<OsVersion> ();
+			versions.add_all (family.versions.values);
+			versions.sort ((a, b) => compare_versions (a.version, b.version));
+
+			var latest = new Gee.HashMap<string, OsEdition> ();
+			foreach (var version in versions) {
+				foreach (var entry in version.editions.entries)
+					latest.set (entry.key, entry.value);
+			}
+
+			var result = new Gee.ArrayList<OsEdition> ();
+			result.add_all (latest.values);
+
+			return result;
+		}
+
+		public int compare_versions (string? a, string? b) {
+			var a_parts = (a ?? "0").split (".");
+			var b_parts = (b ?? "0").split (".");
+			var len = int.max (a_parts.length, b_parts.length);
+
+			for (int i = 0; i < len; i++) {
+				var a_value = i < a_parts.length ? int.parse (a_parts[i]) : 0;
+				var b_value = i < b_parts.length ? int.parse (b_parts[i]) : 0;
+				if (a_value != b_value)
+					return a_value - b_value;
+			}
+
+			return 0;
+		}
+
 		private void build_families (string primary_distro) {
 			families = new Gee.HashMap<string, OsFamily> ();
 			arches = new Gee.TreeSet<string> ();
 
 			foreach (var os in provider.get_os_list ()) {
-				if (os.distro == null || is_at_eol (os)) {
+				if (is_at_eol (os)) {
 					continue;
 				}
 
-				var family = build_family (os, primary_distro);
-				if (family == null)
+				var source_family = build_family (os, primary_distro);
+				if (source_family == null)
 					continue;
 
-				if (families.has_key (family.family))
-					families[family.family].distros.add_all (family.distros);
-				else
-					families.set (family.family, family);
+				if (!families.has_key (source_family.id)) {
+					families.set (source_family.id, source_family);
+					continue;
+				}
+
+				var target_family = families[source_family.id];
+
+				foreach (var e_version in source_family.versions.entries) {
+					var target_version = target_family.versions.get (e_version.key);
+
+					if (target_version == null) {
+						target_family.versions.set (e_version.key, e_version.value);
+						continue;
+					}
+
+					foreach (var e_edition in e_version.value.editions.entries) {
+						var target_edition = target_version.editions.get (e_edition.key);
+
+						if (target_edition == null)
+							target_version.editions.set (e_edition.key, e_edition.value);
+						else
+							target_edition.images.add_all (e_edition.value.images);
+					}
+				}
 			}
 
-			foreach (var family in families.values)
-				family.build_index ();
+			foreach (var family in families.values) {
+				foreach (var version in family.versions.values)
+					disambiguate_editions (version.editions.values);
+
+				finalize_base_editions (family);
+			}
 		}
 
 		private OsFamily? build_family (Osinfo.Os os, string primary_distro) {
 			var family = OsMapper.family_from_osinfo (os, primary_distro);
+
+			var version_id = os.version ?? "unknown";
+			OsVersion? version = null;
 
 			foreach (var entity in os.get_media_list ().get_elements ()) {
 				var media = (Osinfo.Media) entity;
 				if (media.url == null)
 					continue;
 
-				var os_dto = OsMapper.os_from_osinfo (os, media, primary_distro);
+				if (version == null) {
+					version = family.versions.get (version_id);
 
-				family.distros.add (os_dto);
-				if (os_dto.arch != null)
-					arches.add (os_dto.arch);
+					if (version == null) {
+						version = OsMapper.version_from_osinfo (version_id, os);
+						family.versions.set (version_id, version);
+					}
+				}
+
+				var edition_id = OsParser.get_edition_id (os, media);
+				var edition = version.editions.get (edition_id);
+				if (edition == null) {
+					edition = OsMapper.edition_from_osinfo (os, media);
+					version.editions.set (edition_id, edition);
+				}
+
+				edition.images.add (OsMapper.image_from_osinfo (os, media));
+
+				if (media.architecture != null)
+					arches.add (media.architecture);
 			}
 
-			if (!family.distros.is_empty)
-				return family;
+			return family.versions.is_empty ? null : family;
+		}
 
-			return null;
+		private void disambiguate_editions (Gee.Collection<OsEdition> editions) {
+			var by_name = new Gee.HashMap<string, Gee.ArrayList<OsEdition>> ();
+			foreach (var edition in editions) {
+				if (!by_name.has_key (edition.name))
+					by_name.set (edition.name, new Gee.ArrayList<OsEdition> ());
+
+				by_name.get (edition.name).add (edition);
+			}
+
+			foreach (var group in by_name.values) {
+				if (group.size < 2)
+					continue;
+
+				foreach (var edition in group) {
+					var token = OsParser.find_install_method_token (edition);
+
+					if (token != "") {
+						edition.name = "%s %s".printf (
+							edition.name,
+							OsParser.humanize_id (token)
+						);
+					} else if (!OsParser.id_redundant_with_name (edition.id, edition.name)) {
+						edition.name = "%s %s".printf (
+							edition.name,
+							OsParser.humanize_id (edition.id)
+						);
+					}
+				}
+			}
+		}
+
+		private void finalize_base_editions (OsFamily family) {
+			var only_base = true;
+
+			foreach (var version in family.versions.values) {
+				foreach (var id in version.editions.keys) {
+					if (id != OsParser.BASE_EDITION_ID) {
+						only_base = false;
+						break;
+					}
+				}
+
+				if (!only_base)
+					break;
+			}
+
+			if (!only_base)
+				return;
+
+			foreach (var version in family.versions.values) {
+				var base_edition = version.editions.get (OsParser.BASE_EDITION_ID);
+
+				if (base_edition != null)
+					base_edition.name = family.name;
+			}
 		}
 
 		// TODO: add OS detection in .iso file
