@@ -25,11 +25,11 @@ namespace Tailor {
 
 		private UsbDevice device;
 		private OsImage? selected_image = null;
-		private File? temp_file;
+		private File? image_file;
 		private Cancellable cancellable;
 		private bool trash_after_flashing = false;
-
-		private Operation? active_operation = null;
+		private StatusLine[] flash_steps;
+		private FlashOperation? operation = null;
 
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
@@ -44,6 +44,7 @@ namespace Tailor {
 		[GtkChild] private unowned StatusLine verify_status;
 
 		public ServiceContext service { get; construct set; }
+		public bool started { get; private set; default = false; }
 		public bool flashing { get; private set; default = false; }
 		public bool success { get; private set; default = false; }
 		public bool finished { get; private set; default = false; }
@@ -60,6 +61,9 @@ namespace Tailor {
 
 			this.device = device;
 			selected_image = null;
+			image_file = image;
+
+			build_flash_steps ();
 
 			try {
 				var info = image.query_info (
@@ -91,6 +95,8 @@ namespace Tailor {
 			trash_after_flashing = trash_download;
 			selected_image = image;
 
+			build_flash_steps ();
+
 			os_statuspage.title = "%s %s %s %s".printf (
 				family.name,
 				edition?.name ?? "",
@@ -107,7 +113,23 @@ namespace Tailor {
 			download_status.visible = true;
 		}
 
+		private void build_flash_steps () {
+			flash_steps = {};
+
+			if (selected_image != null) {
+				flash_steps += download_status;
+
+				if (selected_image.checksum != null)
+					flash_steps += checksum_status;
+			}
+
+			flash_steps += prepare_status;
+			flash_steps += write_status;
+			flash_steps += verify_status;
+		}
+
 		private void reset () {
+			started = false;
 			flashing = false;
 			finished = false;
 			success = false;
@@ -116,8 +138,8 @@ namespace Tailor {
 
 			progress_bar.fraction = 0;
 
-			active_operation = null;
-			temp_file = null;
+			cancellable = null;
+			operation = null;
 
 			download_status.state = StatusState.PENDING;
 			checksum_status.state = StatusState.PENDING;
@@ -129,135 +151,120 @@ namespace Tailor {
 			progress_status.title = _("Starting");
 		}
 
-		private void download_and_flash () {
+		private void flash () {
 			has_checksum = selected_image?.checksum != null;
-			download_status.state = StatusState.ACTIVE;
+			cancellable = new Cancellable ();
 
-			var op = new DownloadOperation (selected_image, cancellable);
-			active_operation = op;
-
-			op.progress.connect (on_download_progress);
-			op.failed.connect (on_failed);
-			op.completed.connect (on_downloaded);
-			op.notify["state"].connect (on_operation_state_changed);
-
-			op.run_async.begin ((obj, res) => {
-				try { op.run_async.end (res); }
-				catch (Error e) {}
-			});
-		}
-
-		private void flash (File image, Cancellable cancellable) {
-			FlashOperation op;
 			try {
-				op = service.usb.create_flash_operation (device, image, cancellable);
-				active_operation = op;
+				if (selected_image == null) {
+					operation = service.usb.create_flash_operation_with_file (
+						device, image_file, cancellable
+					);
+				} else {
+					operation = service.usb.create_flash_operation_with_download (
+						device, selected_image, cancellable
+					);
+				}
 			} catch (Error e) {
 				on_failed (e.message);
 				return;
 			}
 
-			op.progress.connect (on_flash_progress);
-			op.completed.connect (on_completed);
-			op.failed.connect (on_failed);
-			op.notify["state"].connect (on_operation_state_changed);
+			operation.progress.connect (on_progress);
+			operation.downloaded.connect ((file) => image_file = file);
+			operation.completed.connect (on_completed);
+			operation.failed.connect (on_failed);
+			operation.notify["state"].connect (on_operation_state_changed);
 
-			op.run_async.begin ((obj, res) => {
-				try { op.run_async.end (res); }
+			operation.run_async.begin ((obj, res) => {
+				try { operation.run_async.end (res); }
 				catch (Error e) {}
 			});
 		}
 
-		private void on_downloaded (File tmp_file) {
-			download_status.state = StatusState.FINISHED;
-			temp_file = tmp_file;
+		private void on_progress (int64 written, int64 total) {
+			if (total > 0)
+				progress_bar.fraction = (double) written / total;
+			else
+				progress_bar.pulse ();
+		}
 
-			if (selected_image.checksum != null) {
-				checksum_status.state = StatusState.ACTIVE;
+		private void activate_flash_step (StatusLine target) {
+			var reached = false;
+			foreach (var step in flash_steps) {
+				if (step == target) {
+					step.state = StatusState.ACTIVE;
+					reached = true;
+					continue;
+				}
 
-				var mismatch_str = _("Checksum mismatch - the download can be corrupted");
-				selected_image.verify_checksum.begin (tmp_file, cancellable, (_, res) => {
-					try {
-						var verified = selected_image.verify_checksum.end (res);
-
-						if (!verified) {
-							on_failed (mismatch_str);
-							return;
-						}
-					} catch (Error e) {
-						on_failed (e.message);
-						return;
-					}
-
-					checksum_status.state = StatusState.FINISHED;
-					flash (tmp_file, cancellable);
-				});
-			} else {
-				flash (tmp_file, cancellable);
+				step.state = reached
+					? StatusState.PENDING
+					: StatusState.FINISHED;
 			}
 		}
 
-		private void on_download_progress (int64 written, int64 total) {
-			progress_status.title = _("Downloading");
-			if (total > 0)
-				progress_bar.fraction = (double) written / total;
-			else
-				progress_bar.pulse ();
-		}
-
-		private void on_flash_progress (int64 written, int64 total) {
-			if (total > 0)
-				progress_bar.fraction = (double) written / total;
-			else
-				progress_bar.pulse ();
+		private void terminate_current_flash_step (StatusState terminal) {
+			foreach (var step in flash_steps) {
+				if (step.state == StatusState.ACTIVE || step.state == StatusState.PAUSED) {
+					step.state = terminal;
+					return;
+				}
+			}
 		}
 
 		private void on_operation_state_changed () {
-			switch (active_operation.state) {
+			switch (operation.state) {
+			case Operation.State.DOWNLOADING:
+				operation.title = _("Downloading");
+				activate_flash_step (download_status);
+				break;
+
+			case Operation.State.CHECKSUM:
+				operation.title = _("Verifying checksum");
+				activate_flash_step (checksum_status);
+				break;
+
 			case Operation.State.PREPARING:
-				active_operation.title = _("Preparing device");
-				prepare_status.state = StatusState.ACTIVE;
+				operation.title = _("Preparing device");
+				activate_flash_step (prepare_status);
 				break;
 
 			case Operation.State.WRITING:
-				active_operation.title = _("Writing image");
-				prepare_status.state = StatusState.FINISHED;
-				write_status.state = StatusState.ACTIVE;
+				operation.title = _("Writing image");
+				activate_flash_step (write_status);
+				flashing = true;
 				break;
 
 			case Operation.State.VERIFYING:
-				active_operation.title = _("Verifying installation");
-				write_status.state = StatusState.FINISHED;
-				verify_status.state = StatusState.ACTIVE;
-				break;
-
-			case Operation.State.DOWNLOADING:
-				download_status.state = StatusState.ACTIVE;
+				operation.title = _("Verifying installation");
+				activate_flash_step (verify_status);
 				break;
 
 			case Operation.State.PAUSED:
 				progress_status.title = _("Paused");
-				set_state_on (StatusState.PAUSED, StatusState.ACTIVE);
+				terminate_current_flash_step (StatusState.PAUSED);
 				return;
 			}
 
-			progress_status.title = active_operation.title;
+			progress_status.title = operation.title;
 		}
 
 		private void on_completed () {
 			finished = true;
 			success = true;
+			started = false;
 			flashing = false;
+
+			terminate_current_flash_step (StatusState.FINISHED);
 
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
 
-			set_state_on (StatusState.FINISHED, StatusState.ACTIVE);
+			if (trash_after_flashing && image_file != null)
+				image_file.delete_async.begin (Priority.DEFAULT, null, null);
 
-			if (trash_after_flashing && temp_file != null)
-				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			temp_file = null;
+			image_file = null;
 		}
 
 		private void on_failed (string message) {
@@ -266,33 +273,35 @@ namespace Tailor {
 
 			finished = true;
 			success = false;
+			started = false;
 			flashing = false;
+
+			terminate_current_flash_step (StatusState.FAILED);
 
 			set_progress_css_class ("error");
 			flash_result_label.label = _("An error occurred during writing process: %s").printf (message);
 
-			set_state_on (StatusState.FAILED, StatusState.ACTIVE);
+			if (image_file != null)
+				image_file.delete_async.begin (Priority.DEFAULT, null, null);
 
-			if (temp_file != null)
-				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			temp_file = null;
+			image_file = null;
 		}
 
 		private void on_cancel () {
 			finished = true;
 			success = false;
+			started = false;
 			flashing = false;
+
+			terminate_current_flash_step (StatusState.ABORTED);
 
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
 
-			set_state_on (StatusState.ABORTED, StatusState.PAUSED);
+			if (image_file != null)
+				image_file.delete_async.begin (Priority.DEFAULT, null, null);
 
-			if (temp_file != null)
-				temp_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			temp_file = null;
+			image_file = null;
 		}
 
 		private void set_progress_css_class (string css_class) {
@@ -313,23 +322,6 @@ namespace Tailor {
 			}
 		}
 
-		private void set_state_on (StatusState state, StatusState current) {
-			if (download_status.state == current)
-				download_status.state = state;
-
-			if (checksum_status.state == current)
-				checksum_status.state = state;
-
-			if (prepare_status.state == current)
-				prepare_status.state = state;
-
-			if (write_status.state == current)
-				write_status.state = state;
-
-			if (verify_status.state == current)
-				verify_status.state = state;
-		}
-
 		[GtkCallback]
 		private string fraction_to_string (double value) {
 			return "%.0f".printf (value * 100);
@@ -342,20 +334,13 @@ namespace Tailor {
 
 		[GtkCallback]
 		private void start_flashing () {
-			if (flashing)
+			if (started)
 				return;
 
 			reset ();
 
-			flashing = true;
-			cancellable = new Cancellable ();
-
-			if (selected_image == null) {
-				flash (service.image_file, cancellable);
-				return;
-			}
-
-			download_and_flash ();
+			started = true;
+			flash ();
 		}
 
 		[GtkCallback]
@@ -396,10 +381,10 @@ namespace Tailor {
 		private void toggle_pause () {
 			paused = !paused;
 			if (paused) {
-				active_operation?.pause ();
+				operation?.pause ();
 				set_progress_css_class ("dimmed");
 			} else {
-				active_operation?.resume ();
+				operation?.resume ();
 				set_progress_css_class ("accent");
 			}
 		}

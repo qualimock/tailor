@@ -40,11 +40,7 @@ namespace Tailor {
 				on_object_added (obj);
 		}
 
-		public FlashOperation create_flash_operation (
-			UsbDevice device,
-			File image,
-			Cancellable cancellable
-		) throws Error {
+		public UDisks.Block get_device_block (UsbDevice device) throws Error {
 			var udisks_obj = client.get_object (device.object_path);
 			if (udisks_obj == null)
 				throw new IOError.NOT_FOUND ("Device not found: %s", device.object_path);
@@ -53,8 +49,11 @@ namespace Tailor {
 			if (block == null)
 				throw new IOError.NOT_FOUND ("No block interface for: %s", device.object_path);
 
-			var object_manager = client.get_object_manager ();
-			return new FlashOperation (block, object_manager, image, cancellable);
+			return block;
+		}
+
+		public DBusObjectManager get_object_manager () {
+			return client.get_object_manager ();
 		}
 
 		private void on_object_added (DBusObject object) {

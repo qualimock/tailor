@@ -105,6 +105,7 @@ template $TailorFlashPage : Adw.NavigationPage {
 
 						Button pause_button {
 							label: bind $get_paused_label (template.paused);
+							visible: bind template.flashing inverted;
 							clicked => $toggle_pause ();
 						}
 					}

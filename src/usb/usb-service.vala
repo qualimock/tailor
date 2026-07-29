@@ -54,12 +54,30 @@ namespace Tailor {
 			initialized ();
 		}
 
-		public FlashOperation create_flash_operation (
+		public FlashOperation create_flash_operation_with_file (
 			UsbDevice device,
-			File image,
+			File image_file,
 			Cancellable cancellable
 		) throws Error {
-			return provider.create_flash_operation (device, image, cancellable);
+			return new FlashOperation.with_file (
+				provider.get_device_block (device),
+				provider.get_object_manager (),
+				image_file,
+				cancellable
+			);
+		}
+
+		public FlashOperation create_flash_operation_with_download (
+			UsbDevice device,
+			OsImage image,
+			Cancellable cancellable
+		) throws Error {
+			return new FlashOperation.with_download (
+				provider.get_device_block (device),
+				provider.get_object_manager (),
+				image,
+				cancellable
+			);
 		}
 
 		private void on_device_added (UsbDevice device) {

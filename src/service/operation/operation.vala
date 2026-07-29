@@ -24,10 +24,11 @@ namespace Tailor {
 
 		public enum State {
 			PAUSED,
+			DOWNLOADING,
+			CHECKSUM,
 			PREPARING,
 			WRITING,
-			VERIFYING,
-			DOWNLOADING
+			VERIFYING
 		}
 
 		protected Cancellable cancellable;

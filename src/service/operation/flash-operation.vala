@@ -24,22 +24,57 @@ namespace Tailor {
 
 		private UDisks.Block block;
 		private DBusObjectManager object_manager;
-		private File image;
+		private OsImage? os_image = null;
+		private File? image_file = null;
+		private DownloadOperation? download_operation = null;
+		private bool downloading = false;
 
 		private Checksum source_checksum = new Checksum (ChecksumType.SHA256);
 
 		public signal void completed ();
+		public signal void downloaded (File file);
 
-		public FlashOperation (
+		public FlashOperation.with_file (
 			UDisks.Block block,
 			DBusObjectManager object_manager,
-			File image,
+			File image_file,
 			Cancellable cancellable
 		) {
 			this.block = block;
 			this.object_manager = object_manager;
-			this.image = image;
+			this.image_file = image_file;
 			this.cancellable = cancellable;
+		}
+
+		public FlashOperation.with_download (
+			UDisks.Block block,
+			DBusObjectManager object_manager,
+			OsImage os_image,
+			Cancellable cancellable
+		) {
+			this.block = block;
+			this.object_manager = object_manager;
+			this.os_image = os_image;
+			this.download_operation = new DownloadOperation (os_image, cancellable);
+			this.cancellable = cancellable;
+		}
+
+		public override void pause () {
+			if (downloading) {
+				download_operation.pause ();
+				state = State.PAUSED;
+			} else {
+				base.pause ();
+			}
+		}
+
+		public override void resume () {
+			if (downloading) {
+				state = State.DOWNLOADING;
+				download_operation.resume ();
+			} else {
+				base.resume ();
+			}
 		}
 
 		public override async void run_async () throws Error {
@@ -47,6 +82,11 @@ namespace Tailor {
 			UnixOutputStream? output = null;
 
 			try {
+				if (download_operation != null) {
+					yield download ();
+					yield verify_checksum ();
+				}
+
 				yield unmount ();
 
 				FileInfo info;
@@ -54,7 +94,6 @@ namespace Tailor {
 				output = yield get_output ();
 				total_bytes = (int64) info.get_size ();
 
-				state = State.WRITING;
 				yield stream (input, output);
 			} catch (Error e) {
 				if (output != null) yield output.close_async (Priority.DEFAULT, null);
@@ -101,15 +140,50 @@ namespace Tailor {
 			}
 		}
 
+		private async void download () throws Error {
+			state = State.DOWNLOADING;
+			downloading = true;
+
+			var progress_id = download_operation.progress.connect (
+				(written, total) => progress (written, total)
+			);
+			var failed_id = download_operation.failed.connect ((message) => failed (message));
+			download_operation.completed.connect ((file) => image_file = file);
+
+			try {
+				yield download_operation.run_async ();
+			} finally {
+				download_operation.disconnect (progress_id);
+				download_operation.disconnect (failed_id);
+				downloading = false;
+			}
+
+			if (image_file == null)
+				throw new IOError.FAILED ("Download failed");
+
+			downloaded (image_file);
+		}
+
+		private async void verify_checksum () throws Error {
+			if (os_image.checksum == null)
+				return;
+
+			state = State.CHECKSUM;
+
+			var verified = yield os_image.verify_checksum (image_file, cancellable);
+			if (!verified)
+				throw new IOError.FAILED (_("Checksum mismatch - the download can be corrupted"));
+		}
+
 		private async FileInputStream get_input (out FileInfo file_info) throws Error {
-			file_info = yield image.query_info_async (
+			file_info = yield image_file.query_info_async (
 				FileAttribute.STANDARD_SIZE,
 				FileQueryInfoFlags.NONE,
 				Priority.DEFAULT,
 				cancellable
 			);
 
-			return yield image.read_async (Priority.DEFAULT, cancellable);
+			return yield image_file.read_async (Priority.DEFAULT, cancellable);
 		}
 
 		private async UnixOutputStream get_output () throws Error {
@@ -127,6 +201,8 @@ namespace Tailor {
 		}
 
 		private async void stream (FileInputStream input, UnixOutputStream output) throws Error {
+			state = State.WRITING;
+
 			var buf = new uint8[1024 * 1024];
 			ssize_t n;
 
