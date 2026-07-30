@@ -10,7 +10,7 @@ on:
 jobs:
   test-build:
     name: Test Build
-    runs-on: alt-sisyphus
+    runs-on: als-huge
 
     steps:
       - name: Install dependencies
