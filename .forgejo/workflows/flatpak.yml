@@ -3,18 +3,35 @@ name: Flatpak
 on:
   workflow_dispatch:
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'COPYING'
   push:
     branches:
       - 'main'
+    paths-ignore:
+      - '**.md'
+      - 'COPYING'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   flatpak-build:
     name: Flatpak Build
     runs-on: als-huge
+    timeout-minutes: 60
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-flatpak-${{ hashFiles('.forgejo/workflows/flatpak.yml') }}
 
       - name: Install flatpak tools
         run: |
@@ -32,7 +49,29 @@ jobs:
             org.gnome.Platform//50 \
             org.gnome.Sdk//50
 
+      - name: Cache flatpak-builder state
+        uses: actions/cache@v4
+        with:
+          path: |
+            .flatpak-builder
+            ~/.cache/flatpak-builder
+          key: flatpak-builder-${{ hashFiles('build-aux/flatpak/org.altlinux.Tailor.json') }}
+          restore-keys: |
+            flatpak-builder-
+
       - name: Build
         run: |
           flatpak-builder --repo=repo --force-clean builddir \
             build-aux/flatpak/org.altlinux.Tailor.json
+
+      - name: Bundle flatpak
+        run: |
+          flatpak build-bundle repo org.altlinux.Tailor.flatpak \
+            org.altlinux.Tailor
+
+      - name: Upload flatpak bundle artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flatpak-bundle
+          path: org.altlinux.Tailor.flatpak
+          retention-days: 7

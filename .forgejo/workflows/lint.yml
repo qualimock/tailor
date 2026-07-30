@@ -2,23 +2,65 @@ name: Lint
 
 on:
   push:
+    paths-ignore:
+      - '**.md'
+      - 'COPYING'
   pull_request:
+    paths-ignore:
+      - '**.md'
+      - 'COPYING'
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
 
 jobs:
   lint-vala:
     name: Lint vala files
     runs-on: als-tiny
+    timeout-minutes: 10
     container:
       image: altlinux.space/actions/runner/containers:sisyphus
 
     steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-lint-vala-${{ hashFiles('.forgejo/workflows/lint.yml') }}
+
       - name: Install dependencies
         run: |
           apt-get update
           apt-get install -y vala-lint
 
+      - name: Lint files
+        run: vala-lint -d src --config vala-lint.conf
+
+  lint-blueprint:
+    name: Lint blueprint files
+    runs-on: als-tiny
+    timeout-minutes: 10
+    container:
+      image: altlinux.space/actions/runner/containers:sisyphus
+
+    steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-lint-blueprint-${{ hashFiles('.forgejo/workflows/lint.yml') }}
+
+      - name: Install dependencies
+        run: |
+          apt-get update
+          apt-get install -y blueprint-compiler
+
       - name: Lint files
-        run: vala-lint -d src --config vala-lint.conf
+        run: blueprint-compiler lint $(find data/ui -name '*.blp')
