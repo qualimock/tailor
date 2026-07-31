@@ -315,6 +315,17 @@ namespace Tailor {
 		private bool is_not_empty_string (string str) { return str.length > 0; }
 
 		[GtkCallback]
+		private string trash_subtitle (bool trash_active) {
+			if (trash_active)
+				return "";
+
+			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
+				?? Environment.get_home_dir ();
+
+			return _("Image will be downloaded in %s").printf (downloads_dir);
+		}
+
+		[GtkCallback]
 		private bool any (int count, ...) {
 			var args = va_list ();
 

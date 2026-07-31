@@ -250,6 +250,7 @@ template $TailorOsPage : Adw.NavigationPage {
 
 							Adw.SwitchRow trash_switch {
 								title: _("Trash download after writing");
+								subtitle: bind $trash_subtitle (trash_switch.active) as <string>;
 								selectable: false;
 							}
 						}
