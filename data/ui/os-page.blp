@@ -265,6 +265,10 @@ template $TailorOsPage : Adw.NavigationPage {
 				halign: center;
 				valign: end;
 
+				accessibility {
+					label: _("Create Bootlable USB");
+				}
+
 				sensitive: bind $logical_and (
 					$logical_and ($greater_than (template.n-devices, 0) as <bool>, template.available) as <bool>,
 					$logical_not (template.checking) as <bool>
