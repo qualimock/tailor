@@ -3,7 +3,7 @@
 	<id>org.altlinux.Tailor</id>
 
 	<name>Tailor</name>
-	<developer id="org.altlinux.Tailor">
+	<developer id="org.altlinux">
 		<name>Alexey Volkov</name>
 	</developer>
 	<summary>Create bootable drives</summary>
@@ -13,7 +13,9 @@
 
 	<description>
 		<p>
-			TODO: description
+			Tailor is an application for writing OS images to USB drives.
+			Pick an OS and edition from the built-in catalog (or supply your own ISO),
+			pick a target drive, and Tailor downloads, verifies, and flashes it.
 		</p>
 	</description>
 
@@ -33,14 +35,6 @@
 		<control>touch</control>
 	</recommends>
 
-	<screenshots>
-		<!-- TODO: screenshots -->
-		<screenshot type="default">
-			<image>todo</image>
-			<caption>todo</caption>
-		</screenshot>
-	</screenshots>
-
 	<branding>
 		<!-- TODO: branding -->
 		<color type="primary" scheme_preference="light">#ffb63f</color>
@@ -51,7 +45,7 @@
 
 	<url type="homepage">https://qualimock.space/projects/Tailor</url>
 	<url type="bugtracker">https://altlinux.space/qualimock/Tailor/issues</url>
-	<url type="translate">https://altlinux.space/qualimock/Tailor/-/tree/main/po</url>
+	<url type="translate">https://altlinux.space/qualimock/Tailor/branch/main/po</url>
 	<url type="help">https://altlinux.space/qualimock/Tailor/issues</url>
 	<url type="vcs-browser">https://altlinux.space/qualimock/Tailor</url>
 	<url type="contribute">https://altlinux.space/qualimock/Tailor</url>
