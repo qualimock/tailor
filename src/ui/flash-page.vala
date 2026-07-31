@@ -183,8 +183,12 @@ namespace Tailor {
 			operation.notify["state"].connect (on_operation_state_changed);
 
 			operation.run_async.begin ((obj, res) => {
-				try { operation.run_async.end (res); }
-				catch (Error e) {}
+				try {
+					operation.run_async.end (res);
+				} catch (IOError.CANCELLED e) {
+					if (!finished)
+						on_cancel ();
+				} catch (Error e) {}
 			});
 		}
 
