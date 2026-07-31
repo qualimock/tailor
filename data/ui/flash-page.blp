@@ -119,7 +119,11 @@ template $TailorFlashPage : Adw.NavigationPage {
 						Button {
 							styles [ "suggested-action" ]
 							label: _("Details");
-							visible: bind exit_button.visible inverted;
+							clicked => $show_error_details ();
+							visible: bind $logical_and (
+								$logical_not (template.success) as <bool>,
+								$logical_not (template.cancelled) as <bool>
+							) as <bool>;
 						}
 
 						Button {

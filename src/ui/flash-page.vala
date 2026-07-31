@@ -30,6 +30,7 @@ namespace Tailor {
 		private bool trash_after_flashing = false;
 		private StatusLine[] flash_steps;
 		private FlashOperation? operation = null;
+		private string? last_error_message = null;
 
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
@@ -48,6 +49,7 @@ namespace Tailor {
 		public bool flashing { get; private set; default = false; }
 		public bool success { get; private set; default = false; }
 		public bool finished { get; private set; default = false; }
+		public bool cancelled { get; private set; default = false; }
 		public bool paused { get; private set; default = false; }
 		public bool has_checksum { get; set; default = false; }
 
@@ -133,6 +135,7 @@ namespace Tailor {
 			flashing = false;
 			finished = false;
 			success = false;
+			cancelled = false;
 			paused = false;
 			has_checksum = false;
 
@@ -140,6 +143,7 @@ namespace Tailor {
 
 			cancellable = null;
 			operation = null;
+			last_error_message = null;
 
 			download_status.state = StatusState.PENDING;
 			checksum_status.state = StatusState.PENDING;
@@ -279,10 +283,12 @@ namespace Tailor {
 			terminate_current_flash_step (StatusState.FAILED);
 
 			set_progress_css_class ("error");
-			flash_result_label.label = _("An error occurred during writing process: %s").printf (message);
 
 			if (image_file != null)
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
+
+			last_error_message = message;
+			flash_result_label.label = _("An error occurred during writing process");
 
 			image_file = null;
 		}
@@ -290,6 +296,7 @@ namespace Tailor {
 		private void on_cancel () {
 			finished = true;
 			success = false;
+			cancelled = true;
 			started = false;
 			flashing = false;
 
@@ -330,6 +337,16 @@ namespace Tailor {
 		[GtkCallback]
 		private string get_paused_label (bool is_paused) {
 			return is_paused ? _("Resume") : _("Pause");
+		}
+
+		[GtkCallback]
+		private bool logical_and (bool a, bool b) {
+			return a && b;
+		}
+
+		[GtkCallback]
+		private bool logical_not (bool a) {
+			return !a;
 		}
 
 		[GtkCallback]
@@ -387,6 +404,26 @@ namespace Tailor {
 				operation?.resume ();
 				set_progress_css_class ("accent");
 			}
+		}
+
+		[GtkCallback]
+		private void show_error_details () {
+			var dialog = new Adw.AlertDialog (
+				_("Error Details"),
+				last_error_message
+			);
+
+			dialog.add_response ("close", _("Close"));
+			dialog.add_response ("copy", _("Copy"));
+
+			dialog.set_default_response ("close");
+			dialog.set_close_response ("close");
+
+			dialog.response["copy"].connect (() => {
+				get_clipboard ().set_text (last_error_message);
+			});
+
+			dialog.present (this);
 		}
 	}
 }
