@@ -66,7 +66,9 @@ namespace Tailor {
 				yield stream (input);
 
 				yield iostream.close_async (Priority.DEFAULT, null);
-				completed (tmp_file);
+
+				var dest = yield move_to_downloads (tmp_file);
+				completed (dest);
 			} catch (Error e) {
 				stop_stall_timer ();
 
@@ -99,6 +101,21 @@ namespace Tailor {
 				stall_timeout_id = 0;
 				stalled = false;
 			}
+		}
+
+		private async File move_to_downloads (File tmp_file) throws Error {
+			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
+				?? Environment.get_home_dir ();
+
+			var downloads_folder = File.new_for_path (downloads_dir);
+			if (!downloads_folder.query_exists (cancellable))
+				downloads_folder.make_directory_with_parents (cancellable);
+
+			var dest = downloads_folder.get_child (Path.get_basename (image.url));
+
+			yield tmp_file.move_async (dest, FileCopyFlags.OVERWRITE, Priority.DEFAULT, cancellable, null);
+
+			return dest;
 		}
 
 		private async File create_temp_file () throws Error {
