@@ -66,6 +66,18 @@ namespace Tailor {
 			}
 		}
 
+		protected string state_label (State state) {
+			switch (state) {
+			case State.DOWNLOADING: return _("Download");
+			case State.CHECKSUM: return _("Checksum verification");
+			case State.PREPARING: return _("Device preparation");
+			case State.WRITING: return _("Writing");
+			case State.VERIFYING: return _("Verification");
+			default:
+				return _("Flashing");
+			}
+		}
+
 		protected async void wait_for_resume () {
 			resume_func = wait_for_resume.callback;
 			yield;

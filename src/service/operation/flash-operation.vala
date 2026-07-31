@@ -100,7 +100,7 @@ namespace Tailor {
 				if (input != null) yield input.close_async (Priority.DEFAULT, null);
 
 				if (!(e is IOError.CANCELLED))
-					failed (e.message);
+					failed (_("%s: %s").printf (state_label (state), e.message));
 
 				throw e;
 			}
@@ -112,7 +112,7 @@ namespace Tailor {
 				yield verify ();
 			} catch (Error e) {
 				if (!(e is IOError.CANCELLED))
-					failed (e.message);
+					failed (_("%s: %s").printf (state_label (state), e.message));
 
 				return;
 			}
@@ -159,7 +159,7 @@ namespace Tailor {
 			}
 
 			if (image_file == null)
-				throw new IOError.FAILED ("Download failed");
+				throw new IOError.FAILED (_("Download did not produce a file"));
 
 			downloaded (image_file);
 		}
