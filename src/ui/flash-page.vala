@@ -33,6 +33,7 @@ namespace Tailor {
 		private string? last_error_message = null;
 		private uint pulse_timeout_id = 0;
 
+		[GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
 		[GtkChild] private unowned Gtk.ProgressBar progress_bar;
@@ -177,7 +178,13 @@ namespace Tailor {
 			}
 
 			operation.progress.connect (on_progress);
-			operation.downloaded.connect ((file) => image_file = file);
+			operation.downloaded.connect ((file, skipped) => {
+				image_file = file;
+				if (skipped) {
+					download_status.state = StatusState.SKIPPED;
+					toast_overlay.add_toast (new Adw.Toast (_("Image is already downloaded")));
+				}
+			});
 			operation.completed.connect (on_completed);
 			operation.failed.connect (on_failed);
 			operation.notify["state"].connect (on_operation_state_changed);
@@ -229,9 +236,11 @@ namespace Tailor {
 					continue;
 				}
 
-				step.state = reached
-					? StatusState.PENDING
-					: StatusState.FINISHED;
+				if (reached) {
+					step.state = StatusState.PENDING;
+				} else if (step.state != StatusState.SKIPPED) {
+					step.state = StatusState.FINISHED;
+				}
 			}
 		}
 

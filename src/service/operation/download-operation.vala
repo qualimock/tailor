@@ -35,6 +35,7 @@ namespace Tailor {
 		private Cancellable? current_attempt_cancellable = null;
 
 		public signal void completed (File temp_file);
+		public signal void skipped (File existing_file);
 
 		public DownloadOperation (OsImage image, Cancellable cancellable) {
 			this.image = image;
@@ -61,6 +62,12 @@ namespace Tailor {
 				throw new IOError.INVALID_ARGUMENT ("OS has no download URL");
 
 			state = State.DOWNLOADING;
+
+			var existing = yield check_existing ();
+			if (existing != null) {
+				skipped (existing);
+				return;
+			}
 
 			var tmp_file = yield create_temp_file ();
 
@@ -149,15 +156,31 @@ namespace Tailor {
 			}
 		}
 
-		private async File move_to_downloads (File tmp_file) throws Error {
+		private File get_dest_file () {
 			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
 				?? Environment.get_home_dir ();
 
-			var downloads_folder = File.new_for_path (downloads_dir);
-			if (!downloads_folder.query_exists (cancellable))
-				downloads_folder.make_directory_with_parents (cancellable);
+			return File.new_for_path (downloads_dir).get_child (Path.get_basename (image.url));
+		}
 
-			var dest = downloads_folder.get_child (Path.get_basename (image.url));
+		private async File? check_existing () throws Error {
+			var dest = get_dest_file ();
+
+			if (!dest.query_exists (cancellable))
+				return null;
+
+			if (image.checksum != null)
+				return (yield image.verify_checksum (dest, cancellable)) ? dest : null;
+
+			return dest;
+		}
+
+		private async File move_to_downloads (File tmp_file) throws Error {
+			var dest = get_dest_file ();
+
+			var downloads_folder = dest.get_parent ();
+			if (downloads_folder != null && !downloads_folder.query_exists (cancellable))
+				downloads_folder.make_directory_with_parents (cancellable);
 
 			yield tmp_file.move_async (dest, FileCopyFlags.OVERWRITE, Priority.DEFAULT, cancellable, null);
 

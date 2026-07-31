@@ -32,7 +32,7 @@ namespace Tailor {
 		private Checksum source_checksum = new Checksum (ChecksumType.SHA256);
 
 		public signal void completed ();
-		public signal void downloaded (File file);
+		public signal void downloaded (File file, bool skipped);
 
 		public FlashOperation.with_file (
 			UDisks.Block block,
@@ -147,24 +147,32 @@ namespace Tailor {
 			state = State.DOWNLOADING;
 			downloading = true;
 
+			var skipped = false;
+
 			var progress_id = download_operation.progress.connect (
 				(written, total) => progress (written, total)
 			);
 			var failed_id = download_operation.failed.connect ((message) => failed (message));
-			download_operation.completed.connect ((file) => image_file = file);
+			var completed_id = download_operation.completed.connect ((file) => image_file = file);
+			var skipped_id = download_operation.skipped.connect ((file) => {
+				image_file = file;
+				skipped = true;
+			});
 
 			try {
 				yield download_operation.run_async ();
 			} finally {
 				download_operation.disconnect (progress_id);
 				download_operation.disconnect (failed_id);
+				download_operation.disconnect (completed_id);
+				download_operation.disconnect (skipped_id);
 				downloading = false;
 			}
 
 			if (image_file == null)
 				throw new IOError.FAILED (_("Download did not produce a file"));
 
-			downloaded (image_file);
+			downloaded (image_file, skipped);
 		}
 
 		private async void verify_checksum () throws Error {
