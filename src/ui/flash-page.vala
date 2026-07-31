@@ -208,13 +208,30 @@ namespace Tailor {
 			}
 		}
 
-		private void terminate_current_flash_step (StatusState terminal) {
+		private StatusLine? terminate_current_flash_step (StatusState terminal) {
 			foreach (var step in flash_steps) {
 				if (step.state == StatusState.ACTIVE || step.state == StatusState.PAUSED) {
 					step.state = terminal;
-					return;
+					return step;
 				}
 			}
+
+			return null;
+		}
+
+		private string step_failure_label (StatusLine? step) {
+			if (step == download_status)
+				return _("Downloading the image failed");
+			if (step == checksum_status)
+				return _("Checksum verification failed");
+			if (step == prepare_status)
+				return _("Preparing the device failed");
+			if (step == write_status)
+				return _("Writing the image failed");
+			if (step == verify_status)
+				return _("Verifying the write failed");
+
+			return _("An error occurred during writing process");
 		}
 
 		private void on_operation_state_changed () {
@@ -281,12 +298,12 @@ namespace Tailor {
 			started = false;
 			flashing = false;
 
-			terminate_current_flash_step (StatusState.FAILED);
+			var failed_step = terminate_current_flash_step (StatusState.FAILED);
 
 			set_progress_css_class ("error");
 
 			last_error_message = message;
-			flash_result_label.label = _("An error occurred during writing process");
+			flash_result_label.label = step_failure_label (failed_step);
 
 			if (selected_image != null && image_file != null) {
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
