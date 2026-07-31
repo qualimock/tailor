@@ -27,12 +27,6 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache apt packages
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt/archives
-          key: apt-build-${{ hashFiles('.forgejo/workflows/build.yml') }}
-
       - name: Install dependencies
         run: |
           apt-get update
