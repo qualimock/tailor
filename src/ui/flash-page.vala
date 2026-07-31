@@ -383,8 +383,6 @@ namespace Tailor {
 			if (cancellable == null)
 				return;
 
-			toggle_pause ();
-
 			var dialog = new Adw.AlertDialog (
 				_("Cancel tailoring?"),
 				_("The device may be left in an incomplete state and fail to boot.")
@@ -408,6 +406,9 @@ namespace Tailor {
 					);
 				}
 			}
+
+			if (!paused)
+				toggle_pause ();
 
 			dialog.response["cancel"].connect (() => {
 				cancellable.cancel ();
