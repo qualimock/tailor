@@ -268,7 +268,8 @@ namespace Tailor {
 			if (trash_after_flashing && image_file != null)
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
 
-			image_file = null;
+			if (selected_image != null)
+				image_file = null;
 		}
 
 		private void on_failed (string message) {
@@ -284,13 +285,13 @@ namespace Tailor {
 
 			set_progress_css_class ("error");
 
-			if (image_file != null)
-				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-
 			last_error_message = message;
 			flash_result_label.label = _("An error occurred during writing process");
 
-			image_file = null;
+			if (selected_image != null && image_file != null) {
+				image_file.delete_async.begin (Priority.DEFAULT, null, null);
+				image_file = null;
+			}
 		}
 
 		private void on_cancel () {
@@ -305,10 +306,10 @@ namespace Tailor {
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
 
-			if (image_file != null)
+			if (trash_after_flashing && image_file != null) {
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			image_file = null;
+				image_file = null;
+			}
 		}
 
 		private void set_progress_css_class (string css_class) {
@@ -382,6 +383,13 @@ namespace Tailor {
 			    checksum_status.state == StatusState.ACTIVE) {
 				dialog.heading = _("Cancel download?");
 				dialog.body = _("The device won't be affected.");
+			} else {
+				if (selected_image != null && !trash_after_flashing) {
+					dialog.body = "%s\n%s".printf (
+						dialog.body,
+						_("Downloaded image will not be deleted.")
+					);
+				}
 			}
 
 			dialog.response["cancel"].connect (() => {
