@@ -22,6 +22,8 @@ namespace Tailor {
 
 	public class DownloadOperation : Operation {
 
+		private const int MAX_RETRIES = 3;
+
 		private OsImage image;
 		private Soup.Session session;
 		private FileIOStream? iostream = null;
@@ -30,6 +32,7 @@ namespace Tailor {
 		private uint stall_timeout_id = 0;
 
 		private bool stalled = false;
+		private Cancellable? current_attempt_cancellable = null;
 
 		public signal void completed (File temp_file);
 
@@ -49,7 +52,8 @@ namespace Tailor {
 
 		public override void resume () {
 			base.resume ();
-			start_stall_timer ();
+			if (current_attempt_cancellable != null)
+				start_stall_timer (current_attempt_cancellable);
 		}
 
 		public override async void run_async () throws Error {
@@ -61,9 +65,7 @@ namespace Tailor {
 			var tmp_file = yield create_temp_file ();
 
 			try {
-				var input = yield open_source ();
-
-				yield stream (input);
+				yield stream_with_retries ();
 
 				yield iostream.close_async (Priority.DEFAULT, null);
 
@@ -75,19 +77,63 @@ namespace Tailor {
 				yield iostream.close_async (Priority.DEFAULT, null);
 				tmp_file.delete_async.begin (Priority.DEFAULT, null, null);
 
-				if (!(e is IOError.CANCELLED) || stalled)
-					failed (stalled ? _("Connection lost") : e.message);
+				if (!(e is IOError.CANCELLED))
+					failed (e.message);
 
 				throw e;
 			}
 		}
 
-		private void start_stall_timer () {
+		private async void stream_with_retries () throws Error {
+			for (int attempt = 0; ; attempt++) {
+				var attempt_cancellable = new Cancellable ();
+				current_attempt_cancellable = attempt_cancellable;
+				var link_id = cancellable.connect (() => attempt_cancellable.cancel ());
+
+				try {
+					var input = yield open_source (attempt_cancellable);
+					yield stream (input, attempt_cancellable);
+					cancellable.disconnect (link_id);
+					return;
+				} catch (Error e) {
+					cancellable.disconnect (link_id);
+
+					if (cancellable.is_cancelled ())
+						throw e;
+
+					if (!stalled)
+						throw e;
+
+					stalled = false;
+
+					if (attempt + 1 >= MAX_RETRIES)
+						throw new IOError.FAILED (_("Connection lost"));
+
+					progress (0, 0);
+					yield sleep_async (5);
+				}
+			}
+		}
+
+		private async void sleep_async (uint seconds) throws Error {
+			var timeout_id = Timeout.add_seconds (seconds, sleep_async.callback);
+			var cancel_id = cancellable.connect (() => {
+				Source.remove (timeout_id);
+				Idle.add (sleep_async.callback);
+			});
+			yield;
+			cancellable.disconnect (cancel_id);
+
+			if (cancellable.is_cancelled ())
+				throw new IOError.CANCELLED ("Cancelled during retry wait");
+		}
+
+		private void start_stall_timer (Cancellable attempt_cancellable) {
 			stall_timeout_id = Timeout.add_seconds (10, () => {
 				if (bytes_written == last_bytes) {
 					stall_timeout_id = 0;
 					stalled = true;
-					cancellable.cancel ();
+					attempt_cancellable.cancel ();
 					return Source.REMOVE;
 				}
 				last_bytes = bytes_written;
@@ -127,26 +173,36 @@ namespace Tailor {
 			);
 		}
 
-		private async InputStream open_source () throws Error {
+		private async InputStream open_source (Cancellable attempt_cancellable) throws Error {
 			var msg = new Soup.Message ("GET", image.url);
 			msg.request_headers.append ("Accept", "*/*");
-			var input = yield session.send_async (msg, Priority.DEFAULT, cancellable);
 
-			if (msg.status_code != Soup.Status.OK)
-				throw new IOError.FAILED ("HTTP %u: %s".printf (msg.status_code, msg.reason_phrase));
+			if (bytes_written > 0)
+				msg.request_headers.append ("Range", @"bytes=$(bytes_written)-");
 
-			total_bytes = msg.response_headers.get_content_length ();
+			var input = yield session.send_async (msg, Priority.DEFAULT, attempt_cancellable);
+
+			if (bytes_written > 0) {
+				if (msg.status_code != Soup.Status.PARTIAL_CONTENT)
+					throw new IOError.FAILED ("Server doesn't support resume, HTTP %u".printf (msg.status_code));
+			} else {
+				if (msg.status_code != Soup.Status.OK)
+					throw new IOError.FAILED ("HTTP %u: %s".printf (msg.status_code, msg.reason_phrase));
+
+				total_bytes = msg.response_headers.get_content_length ();
+			}
+
 			return input;
 		}
 
-		private async void stream (InputStream input) throws Error {
+		private async void stream (InputStream input, Cancellable attempt_cancellable) throws Error {
 			var output = iostream.output_stream;
 			var buf = new uint8[1024 * 1024];
 			ssize_t n;
 
-			start_stall_timer ();
+			start_stall_timer (attempt_cancellable);
 
-			while ((n = yield input.read_async (buf, Priority.DEFAULT, cancellable)) > 0) {
+			while ((n = yield input.read_async (buf, Priority.DEFAULT, attempt_cancellable)) > 0) {
 				if (paused)
 					yield wait_for_resume ();
 
@@ -154,7 +210,7 @@ namespace Tailor {
 				yield output.write_all_async (
 					buf[0:n],
 					Priority.DEFAULT,
-					cancellable,
+					attempt_cancellable,
 					out written
 				);
 

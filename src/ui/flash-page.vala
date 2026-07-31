@@ -31,6 +31,7 @@ namespace Tailor {
 		private StatusLine[] flash_steps;
 		private FlashOperation? operation = null;
 		private string? last_error_message = null;
+		private uint pulse_timeout_id = 0;
 
 		[GtkChild] private unowned StatusPageWithBadge os_statuspage;
 
@@ -139,6 +140,7 @@ namespace Tailor {
 			paused = false;
 			has_checksum = false;
 
+			stop_pulse ();
 			progress_bar.fraction = 0;
 
 			cancellable = null;
@@ -187,10 +189,31 @@ namespace Tailor {
 		}
 
 		private void on_progress (int64 written, int64 total) {
-			if (total > 0)
+			if (total > 0) {
+				stop_pulse ();
 				progress_bar.fraction = (double) written / total;
-			else
+				progress_status.title = operation.title;
+			} else {
+				start_pulse ();
+			}
+		}
+
+		private void start_pulse () {
+			if (pulse_timeout_id != 0)
+				return;
+
+			progress_status.title = _("Trying to reconnect");
+			pulse_timeout_id = Timeout.add (100, () => {
 				progress_bar.pulse ();
+				return Source.CONTINUE;
+			});
+		}
+
+		private void stop_pulse () {
+			if (pulse_timeout_id != 0) {
+				Source.remove (pulse_timeout_id);
+				pulse_timeout_id = 0;
+			}
 		}
 
 		private void activate_flash_step (StatusLine target) {
@@ -277,6 +300,7 @@ namespace Tailor {
 			started = false;
 			flashing = false;
 
+			stop_pulse ();
 			terminate_current_flash_step (StatusState.FINISHED);
 
 			set_progress_css_class ("success");
@@ -298,6 +322,7 @@ namespace Tailor {
 			started = false;
 			flashing = false;
 
+			stop_pulse ();
 			var failed_step = terminate_current_flash_step (StatusState.FAILED);
 
 			set_progress_css_class ("error");
@@ -318,6 +343,7 @@ namespace Tailor {
 			started = false;
 			flashing = false;
 
+			stop_pulse ();
 			terminate_current_flash_step (StatusState.ABORTED);
 
 			set_progress_css_class ("warning");
