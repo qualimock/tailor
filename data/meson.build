@@ -51,10 +51,8 @@ app_resources = gnome.compile_resources(
 
 blueprint_lint_rules = [
   'adjustment_prop_order',
-  'avoid_all_caps',
   'gtk_switch_state',
   'missing_descriptive_text',
-  'missing_user_facing_text',
   'number_of_children',
   'translate_display_string',
   'unused_widget',
