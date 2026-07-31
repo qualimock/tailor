@@ -99,6 +99,9 @@ namespace Tailor {
 				if (output != null) yield output.close_async (Priority.DEFAULT, null);
 				if (input != null) yield input.close_async (Priority.DEFAULT, null);
 
+				if (is_auth_dismissed (e))
+					throw new IOError.CANCELLED (e.message);
+
 				if (!(e is IOError.CANCELLED))
 					failed (_("%s: %s").printf (state_label (state), e.message));
 
@@ -111,7 +114,7 @@ namespace Tailor {
 			try {
 				yield verify ();
 			} catch (Error e) {
-				if (!(e is IOError.CANCELLED))
+				if (!(e is IOError.CANCELLED) && !is_auth_dismissed (e))
 					failed (_("%s: %s").printf (state_label (state), e.message));
 
 				return;
@@ -276,6 +279,10 @@ namespace Tailor {
 
 			if (source_checksum.get_string () != device_checksum.get_string ())
 				throw new IOError.FAILED (_("Verification failed: written data does not match source"));
+		}
+
+		private static bool is_auth_dismissed (Error e) {
+			return e.message.contains ("NotAuthorizedDismissed");
 		}
 	}
 }
