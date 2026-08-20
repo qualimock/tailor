@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <component type="desktop-application">
-	<id>org.altlinux.Tailor</id>
+	<id>@APP_ID@</id>
 
 	<name>Tailor</name>
 	<developer id="org.altlinux">
@@ -41,7 +41,7 @@
 		<color type="primary" scheme_preference="dark">#c54400</color>
 	</branding>
 
-	<launchable type="desktop-id">org.altlinux.Tailor.desktop</launchable>
+	<launchable type="desktop-id">@APP_ID@.desktop</launchable>
 
 	<url type="homepage">https://qualimock.space/projects/Tailor</url>
 	<url type="bugtracker">https://altlinux.space/qualimock/Tailor/issues</url>

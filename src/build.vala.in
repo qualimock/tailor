@@ -1,5 +1,7 @@
 namespace Tailor {
 	private const string ID = "@ID@";
+	private const string BASE_ID = "@BASE_ID@";
+	private const string PROFILE = "@PROFILE@";
 	private const string VERSION = "@VERSION@";
 	private const string GETTEXT_PACKAGE = "@GETTEXT_PACKAGE@";
 	private const string LOCALEDIR = "@LOCALEDIR@";

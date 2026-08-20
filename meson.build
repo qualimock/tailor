@@ -2,10 +2,20 @@ project(
 	'Tailor',
 	['c', 'vala'],
 	version: '0.1.0',
-	meson_version: '>= 0.62',
+	meson_version: '>= 1.1',
 )
 
-id = 'org.altlinux.Tailor'
+base_id = 'org.altlinux.Tailor'
+profile = get_option('profile')
+
+if profile == 'development'
+	application_id = base_id + '.Devel'
+	name_suffix = ' (Development)'
+else
+	application_id = base_id
+	name_suffix = ''
+endif
+
 name = meson.project_name()
 version = meson.project_version()
 basename = name.to_lower()
@@ -19,7 +29,10 @@ gnome = import('gnome')
 i18n = import('i18n')
 
 config = configuration_data()
-config.set('ID', id)
+config.set('ID', application_id)
+config.set('BASE_ID', base_id)
+config.set('PROFILE', profile)
+config.set('NAME_SUFFIX', name_suffix)
 config.set('VERSION', version)
 config.set('GETTEXT_PACKAGE', basename)
 config.set('LOCALEDIR', get_option('prefix') / get_option('localedir'))

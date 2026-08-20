@@ -23,6 +23,6 @@
 		<file preprocess="xml-stripblanks">icons/scalable/actions/drawer-symbolic.svg</file>
 		<file preprocess="xml-stripblanks">icons/scalable/actions/sad-computer-symbolic.svg</file>
 
-		<file>org.altlinux.Tailor.metainfo.xml</file>
+		<file>@APP_ID@.metainfo.xml</file>
 	</gresource>
 </gresources>
