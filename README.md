@@ -1,3 +1,7 @@
+<p align="center">
+<img alt="branding" src="data/icons/org.altlinux.Tailor.svg" width="128" height="128">
+</p>
+
 <h1 align="center">
 Tailor
 </h1>
