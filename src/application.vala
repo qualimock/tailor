@@ -44,7 +44,7 @@ namespace Tailor {
 		public override void startup () {
 			base.startup ();
 
-			settings = new Settings (Tailor.ID);
+			settings = new Settings (Tailor.BASE_ID);
 
 			service_context = new ServiceContext (
 				osinfo_service,
@@ -70,7 +70,7 @@ namespace Tailor {
 		}
 
 		private void open_app_page () {
-			var launcher = new Gtk.UriLauncher ("appstream://org.altlinux.Tailor");
+			var launcher = new Gtk.UriLauncher ("appstream://" + Tailor.ID);
 
 			launcher.launch.begin (null, null, (obj, res) => {
 				try {
@@ -85,7 +85,7 @@ namespace Tailor {
 			if (main_window == null)
 				return;
 
-			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/org.altlinux.Tailor.metainfo.xml", VERSION) {
+			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/%s.metainfo.xml".printf (Tailor.ID), VERSION) {
 				copyright = "© 2026 ALT Linux Team",
 				developers = {
 					"Alexey \"qualimock\" Volkov <qualimock@altlinux.org>",
