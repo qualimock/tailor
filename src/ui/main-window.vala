@@ -37,6 +37,9 @@ namespace Tailor {
 		}
 
 		construct {
+			if (Tailor.PROFILE == "development")
+				add_css_class ("devel");
+
 			service.osinfo.loaded.connect (download_page.populate);
 			service.osinfo.load_failed.connect (download_page.show_error);
 		}
