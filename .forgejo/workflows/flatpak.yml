@@ -18,21 +18,10 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  flatpak-build:
-    name: Flatpak Build (${{ matrix.profile }})
+  flatpak-build-devel:
+    name: Flatpak Build (devel)
     runs-on: als-huge
     timeout-minutes: 60
-
-    strategy:
-      matrix:
-        profile: [stable, devel]
-        include:
-          - profile: stable
-            manifest: build-aux/flatpak/org.altlinux.Tailor.json
-            app_id: org.altlinux.Tailor
-          - profile: devel
-            manifest: build-aux/flatpak/org.altlinux.Tailor.Devel.json
-            app_id: org.altlinux.Tailor.Devel
 
     steps:
       - name: Checkout repository
@@ -66,23 +55,82 @@ jobs:
           path: |
             .flatpak-builder
             ~/.cache/flatpak-builder
-          key: flatpak-builder-${{ matrix.profile }}-${{ hashFiles(matrix.manifest) }}
+          key: flatpak-builder-devel-${{ hashFiles('build-aux/flatpak/org.altlinux.Tailor.Devel.json') }}
           restore-keys: |
-            flatpak-builder-${{ matrix.profile }}-
+            flatpak-builder-devel-
 
       - name: Build
         run: |
           flatpak-builder --repo=repo --force-clean builddir \
-            ${{ matrix.manifest }}
+            build-aux/flatpak/org.altlinux.Tailor.Devel.json
 
       - name: Bundle flatpak
         run: |
-          flatpak build-bundle repo ${{ matrix.app_id }}.flatpak \
-            ${{ matrix.app_id }}
+          flatpak build-bundle repo org.altlinux.Tailor.Devel.flatpak \
+            org.altlinux.Tailor.Devel
 
       - name: Upload flatpak bundle artifact
         uses: actions/upload-artifact@v3
         with:
-          name: flatpak-bundle-${{ matrix.profile }}
-          path: ${{ matrix.app_id }}.flatpak
+          name: flatpak-bundle-devel
+          path: org.altlinux.Tailor.Devel.flatpak
+          retention-days: 7
+
+  flatpak-build-stable:
+    name: Flatpak Build (stable)
+    runs-on: als-huge
+    timeout-minutes: 60
+    if: ${{ github.event_name != 'pull_request' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Cache apt packages
+        uses: actions/cache@v4
+        with:
+          path: /var/cache/apt/archives
+          key: apt-flatpak-${{ hashFiles('.forgejo/workflows/flatpak.yml') }}
+
+      - name: Install flatpak tools
+        run: |
+          apt-get update
+          apt-get install -y flatpak flatpak-builder
+
+      - name: Add Flathub remote
+        run: |
+          flatpak remote-add --if-not-exists flathub \
+            https://dl.flathub.org/repo/flathub.flatpakrepo
+
+      - name: Install runtime and SDK
+        run: |
+          flatpak install -y flathub \
+            org.gnome.Platform//50 \
+            org.gnome.Sdk//50
+
+      - name: Cache flatpak-builder state
+        uses: actions/cache@v4
+        with:
+          path: |
+            .flatpak-builder
+            ~/.cache/flatpak-builder
+          key: flatpak-builder-stable-${{ hashFiles('build-aux/flatpak/org.altlinux.Tailor.json') }}
+          restore-keys: |
+            flatpak-builder-stable-
+
+      - name: Build
+        run: |
+          flatpak-builder --repo=repo --force-clean builddir \
+            build-aux/flatpak/org.altlinux.Tailor.json
+
+      - name: Bundle flatpak
+        run: |
+          flatpak build-bundle repo org.altlinux.Tailor.flatpak \
+            org.altlinux.Tailor
+
+      - name: Upload flatpak bundle artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: flatpak-bundle-stable
+          path: org.altlinux.Tailor.flatpak
           retention-days: 7
