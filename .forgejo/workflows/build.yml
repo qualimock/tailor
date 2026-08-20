@@ -19,9 +19,13 @@ concurrency:
 
 jobs:
   test-build:
-    name: Test Build
+    name: Test Build (${{ matrix.profile }})
     runs-on: als-huge
     timeout-minutes: 30
+
+    strategy:
+      matrix:
+        profile: [default, development]
 
     steps:
       - name: Checkout repository
@@ -39,7 +43,7 @@ jobs:
           gettext-tools
 
       - name: Setup
-        run: meson setup _build -Dprefix=/usr
+        run: meson setup _build -Dprefix=/usr -Dprofile=${{ matrix.profile }}
 
       - name: Build
         run: ninja install -C _build

@@ -19,9 +19,20 @@ concurrency:
 
 jobs:
   flatpak-build:
-    name: Flatpak Build
+    name: Flatpak Build (${{ matrix.profile }})
     runs-on: als-huge
     timeout-minutes: 60
+
+    strategy:
+      matrix:
+        profile: [stable, devel]
+        include:
+          - profile: stable
+            manifest: build-aux/flatpak/org.altlinux.Tailor.json
+            app_id: org.altlinux.Tailor
+          - profile: devel
+            manifest: build-aux/flatpak/org.altlinux.Tailor.Devel.json
+            app_id: org.altlinux.Tailor.Devel
 
     steps:
       - name: Checkout repository
@@ -55,23 +66,23 @@ jobs:
           path: |
             .flatpak-builder
             ~/.cache/flatpak-builder
-          key: flatpak-builder-${{ hashFiles('build-aux/flatpak/org.altlinux.Tailor.json') }}
+          key: flatpak-builder-${{ matrix.profile }}-${{ hashFiles(matrix.manifest) }}
           restore-keys: |
-            flatpak-builder-
+            flatpak-builder-${{ matrix.profile }}-
 
       - name: Build
         run: |
           flatpak-builder --repo=repo --force-clean builddir \
-            build-aux/flatpak/org.altlinux.Tailor.json
+            ${{ matrix.manifest }}
 
       - name: Bundle flatpak
         run: |
-          flatpak build-bundle repo org.altlinux.Tailor.flatpak \
-            org.altlinux.Tailor
+          flatpak build-bundle repo ${{ matrix.app_id }}.flatpak \
+            ${{ matrix.app_id }}
 
       - name: Upload flatpak bundle artifact
         uses: actions/upload-artifact@v3
         with:
-          name: flatpak-bundle
-          path: org.altlinux.Tailor.flatpak
+          name: flatpak-bundle-${{ matrix.profile }}
+          path: ${{ matrix.app_id }}.flatpak
           retention-days: 7
