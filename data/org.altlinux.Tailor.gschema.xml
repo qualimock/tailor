@@ -2,12 +2,12 @@
 <schemalist gettext-domain="tailor">
 	<schema id="org.altlinux.Tailor" path="/org/altlinux/Tailor/">
 		<key name="primary-os" type="s">
-			<default>'alt'</default>
+			<default>''</default>
 			<summary>Primary distribution</summary>
 			<description>Distribution to show as primary. See available distributions in osinfo-db.</description>
 		</key>
 		<key name="primary-os-title" type="s">
-			<default l10n="messages">'ALT OS Family'</default>
+			<default l10n="messages">''</default>
 			<summary>Primary distribution title</summary>
 			<description>Title above primary distribution list.</description>
 		</key>
