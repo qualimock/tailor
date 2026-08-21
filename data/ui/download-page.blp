@@ -141,6 +141,7 @@ template $TailorDownloadPage : Adw.NavigationPage {
 									Label {
 										styles [ "title-4" ]
 										halign: start;
+										visible: bind primary_os_box.visible;
 
 										label: _("Other operating systems");
 									}
