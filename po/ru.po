@@ -3,47 +3,55 @@
 # This file is distributed under the same license as the tailor package.
 # Alexey Volkov <qualimock@altlinux.org>, 2026.
 #
-#: data/ui/download-page.blp:27
 msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-05-15 12:48+0300\n"
-"PO-Revision-Date: 2026-05-15 12:58+0300\n"
+"POT-Creation-Date: 2026-08-24 13:14+0300\n"
+"PO-Revision-Date: 2026-08-24 13:18+0300\n"
 "Last-Translator: Alexey Volkov <qualimock@altlinux.org>\n"
 "Language-Team: Russian\n"
 "Language: ru\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n"
-"%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "X-Generator: Gtranslator 50.0\n"
 
 #. Translators: app name should be translated
-#: data/org.altlinux.Tailor.desktop.in:4
-#: data/org.altlinux.Tailor.metainfo.xml.in:5 data/ui/main-window.blp:7
-#: src/main.vala:28
+#: data/org.altlinux.Tailor.desktop.in.in:3
+msgid "Tailor@NAME_SUFFIX@"
+msgstr "Портной@NAME_SUFFIX@"
+
+#: data/org.altlinux.Tailor.desktop.in.in:4
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:9
+msgid "Create bootable drives"
+msgstr "Создавайте загрузочные носители"
+
+#. Translators: keep number of ';'
+#: data/org.altlinux.Tailor.desktop.in.in:6
+msgid "tailor;tale;teilor;usb;flash;writer;bootable;drive;iso;img;disk;image;"
+msgstr "портной;юсб;прошивка;прошить;флешка;образ;диск;"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:5 data/ui/home-page.blp:5
+#: data/ui/main-window.blp:7 src/main.vala:28
 msgid "Tailor"
 msgstr "Портной"
 
-#: data/org.altlinux.Tailor.desktop.in:5
-#: data/org.altlinux.Tailor.metainfo.xml.in:9
-msgid "Create bootable drives"
-msgstr ""
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:7
+msgid "Alexey Volkov"
+msgstr "Алексей Волков"
 
-#. Translators: keep number of ';'
-#: data/org.altlinux.Tailor.desktop.in:7
-msgid "tailor;tale;teilor;usb;flash;writer;bootable;drive;iso;img;disk;image;"
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:15
+msgid ""
+"Tailor is an application for writing OS images to USB drives. Pick an OS and "
+"edition from the built-in catalog (or supply your own ISO), pick a target "
+"drive, and Tailor downloads, verifies, and flashes it."
 msgstr ""
-
-#: data/org.altlinux.Tailor.metainfo.xml.in:15
-msgid "TODO: description"
-msgstr ""
-
-#: data/org.altlinux.Tailor.metainfo.xml.in:40
-msgid "todo"
-msgstr ""
+"Портной это приложение для записи образов ОС на USB носители. Выберите ОС и "
+"редакцию из каталога (или используйте свой ISO образ), выберите целевое "
+"устройство, и Портной загрузит, подтвердит и запишет образ."
 
 #: data/ui/device-card.blp:23
 msgid "Drive icon"
@@ -69,11 +77,11 @@ msgstr "Подробнее в “Дисках”"
 msgid "Restore"
 msgstr "Восстановить"
 
-#: data/ui/devices-page.blp:24
+#: data/ui/devices-page.blp:25
 msgid "No Drives Found"
 msgstr "Устройства не найдены"
 
-#: data/ui/devices-page.blp:25
+#: data/ui/devices-page.blp:26
 msgid "Insert a drive to begin."
 msgstr "Для начала вставьте устройство."
 
@@ -81,87 +89,493 @@ msgstr "Для начала вставьте устройство."
 msgid "Download Image"
 msgstr "Скачать образ"
 
-#: data/ui/download-page.blp:43
-msgid "Loading"
-msgstr "Загрузка"
-
-#: data/ui/download-page.blp:44
-msgid "Loading OS database…"
-msgstr "Загрузка базы данных ОС…"
-
-#: data/ui/download-page.blp:52
-msgid "Loading Failed"
-msgstr "Загрузка не удалась"
-
-#: data/ui/download-page.blp:53
-msgid "OS database failed to load"
-msgstr "База данных ОС не загрузилась"
-
-#: data/ui/download-page.blp:72
-msgid "Search"
-msgstr "Поиск"
-
-#: data/ui/download-page.blp:84
-msgid "No results"
-msgstr "Нет результатов"
-
-#: data/ui/download-page.blp:85
-msgid "Try to search for something else"
-msgstr "Попробуйте поискать что-нибудь еще"
-
-#: data/ui/download-page.blp:113
-msgid "Primary OS"
-msgstr "Основная ОС"
-
-#: data/ui/download-page.blp:130
-msgid "Other operating systems"
-msgstr "Другие операционные системы"
-
-#: data/ui/home-page.blp:5
-msgid "Home page"
-msgstr "Домашняя страница"
-
-#: data/ui/home-page.blp:19
+#: data/ui/download-page.blp:27 data/ui/home-page.blp:32
+#: data/ui/image-page.blp:20 data/ui/os-page.blp:30
 msgid "About"
 msgstr "О программе"
 
-#: data/ui/home-page.blp:28
+#: data/ui/download-page.blp:44
+msgid "Loading"
+msgstr "Загрузка"
+
+#: data/ui/download-page.blp:45
+msgid "Loading OS database…"
+msgstr "Загрузка базы данных ОС…"
+
+#: data/ui/download-page.blp:53
+msgid "Loading Failed"
+msgstr "Загрузка не удалась"
+
+#: data/ui/download-page.blp:54
+msgid "OS database failed to load"
+msgstr "База данных ОС не загрузилась"
+
+#: data/ui/download-page.blp:77
+msgid "Search"
+msgstr "Поиск"
+
+#: data/ui/download-page.blp:95
+msgid "No results"
+msgstr "Нет результатов"
+
+#: data/ui/download-page.blp:96
+msgid "Try to search for something else"
+msgstr "Попробуйте поискать что-нибудь еще"
+
+#: data/ui/download-page.blp:127
+msgid "Primary OS"
+msgstr "Основная ОС"
+
+#: data/ui/download-page.blp:146
+msgid "Other operating systems"
+msgstr "Другие операционные системы"
+
+#: data/ui/flash-page.blp:5 data/ui/home-page.blp:41
 msgid "Write"
 msgstr "Запись"
 
-#: data/ui/home-page.blp:36
+#: data/ui/flash-page.blp:47
+msgid "Installing"
+msgstr "Установка"
+
+#: data/ui/flash-page.blp:72 src/ui/flash-page.vala:281
+msgid "Verifying checksum"
+msgstr "Проверка контрольной суммы"
+
+#: data/ui/flash-page.blp:78 src/ui/flash-page.vala:286
+msgid "Preparing device"
+msgstr "Подготовка устройства"
+
+#: data/ui/flash-page.blp:84
+msgid "Writing image to device"
+msgstr "Запись образа на устройство"
+
+#: data/ui/flash-page.blp:90 src/ui/flash-page.vala:297
+msgid "Verifying installation"
+msgstr "Верификация установки"
+
+#: data/ui/flash-page.blp:103 src/ui/image-page.vala:109
+#: src/ui/os-page.vala:377
+msgid "Cancel"
+msgstr "Отменить"
+
+#: data/ui/flash-page.blp:122
+msgid "Details"
+msgstr "Детали"
+
+#: data/ui/flash-page.blp:131
+msgid "Retry"
+msgstr "Повторить"
+
+#: data/ui/flash-page.blp:137
+msgid "Go Back"
+msgstr "Назад"
+
+#: data/ui/home-page.blp:48
 msgid "Devices"
 msgstr "Устройства"
 
-#: data/ui/write-page.blp:6
+#: data/ui/image-page.blp:6 data/ui/os-page.blp:71
+msgid "Image"
+msgstr "Образ"
+
+#: data/ui/image-page.blp:40 src/ui/flash-page.vala:83
+msgid "Local file"
+msgstr "Локальный файл"
+
+#: data/ui/image-page.blp:51 data/ui/os-page.blp:208
+msgid "Media"
+msgstr "Медиа"
+
+#: data/ui/image-page.blp:58 data/ui/os-page.blp:215
+msgid "CAUTION: All data will be deleted. Check the media for important data."
+msgstr "ВНИМАНИЕ: Все данные будут удалены. Проверьте носитель на важные данные."
+
+#: data/ui/image-page.blp:67 data/ui/os-page.blp:224
+msgid "Target device"
+msgstr "Целевое устройство"
+
+#: data/ui/image-page.blp:84 data/ui/os-page.blp:298
+msgid "Create Bootable USB"
+msgstr "Создать загрузочный USB"
+
+#: data/ui/os-page.blp:6
+msgid "OS Info"
+msgstr "Информация ОС"
+
+#: data/ui/os-page.blp:42
+msgid "Checksum not available - download integrity cannot be verified"
+msgstr "Контрольная сумма недоступна - целостность загрузки не может быть проверена"
+
+#: data/ui/os-page.blp:60
+msgid "OS logo"
+msgstr "Логотип ОС"
+
+#: data/ui/os-page.blp:79
+msgid "Edition"
+msgstr "Редакция"
+
+#: data/ui/os-page.blp:91
+msgid "Version"
+msgstr "Версия"
+
+#: data/ui/os-page.blp:103
+msgid "Architecture"
+msgstr "Архитектура"
+
+#: data/ui/os-page.blp:119
+msgid "More About Image"
+msgstr "Больше об образе"
+
+#: data/ui/os-page.blp:120
+msgid "Additional image information"
+msgstr "Дополнительная информация образа"
+
+#: data/ui/os-page.blp:130
+msgid "Size"
+msgstr "Размер"
+
+#: data/ui/os-page.blp:139
+msgid "Release Date"
+msgstr "Дата выпуска"
+
+#: data/ui/os-page.blp:148
+msgid "Media Type"
+msgstr "Тип медиа"
+
+#: data/ui/os-page.blp:157
+msgid "Codename"
+msgstr "Кодовое имя"
+
+#: data/ui/os-page.blp:167
+msgid "System Requirements"
+msgstr "Системные требования"
+
+#: data/ui/os-page.blp:171
+msgid "Not Available"
+msgstr "Недоступно"
+
+#: data/ui/os-page.blp:174
+msgid "CPU"
+msgstr "Процессор"
+
+#: data/ui/os-page.blp:182
+msgid "RAM"
+msgstr "Оперативная память"
+
+#: data/ui/os-page.blp:190
+msgid "Free Disk Space"
+msgstr "Свободное место на диске"
+
+#: data/ui/os-page.blp:244
+msgid "Optional"
+msgstr "Дополнительно"
+
+#: data/ui/os-page.blp:252
+msgid "Trash download after writing"
+msgstr "Удалить загрузку после записи"
+
+#: data/ui/os-page.blp:270
+msgid "Create Bootlable USB"
+msgstr "Создать загрузочный USB"
+
+#: data/ui/os-page.blp:292
+msgid "Fetching checksum…"
+msgstr "Загрузка контрольной суммы…"
+
+#: data/ui/os-page.blp:293
+msgid "Checking OS…"
+msgstr "Проверка ОС…"
+
+#: data/ui/os-page.blp:299
+msgid "OS not Available"
+msgstr "ОС недоступна"
+
+#: data/ui/progress-line.blp:6 src/ui/flash-page.vala:158
+msgid "Starting"
+msgstr "Начало"
+
+#: data/ui/write-page.blp:27
 msgid "Welcome to Tailor!"
 msgstr "Добро пожаловать в Портного!"
 
-#: data/ui/write-page.blp:7
+#: data/ui/write-page.blp:28
 msgid "Select image source to start."
 msgstr "Для начала выберите источник образа."
 
-#: data/ui/write-page.blp:22 data/ui/write-page.blp:45
+#: data/ui/write-page.blp:40 data/ui/write-page.blp:43
 msgid "Install From File"
 msgstr "Установить из файла"
 
-#: data/ui/write-page.blp:53
+#: data/ui/write-page.blp:41
 msgid "Load an .iso image from your device"
 msgstr "Загрузите .iso образ с вашего устройства"
 
-#: data/ui/write-page.blp:61 data/ui/write-page.blp:86
+#: data/ui/write-page.blp:49 data/ui/write-page.blp:51
 msgid "Download and Write"
 msgstr "Скачать и записать"
 
-#: data/ui/write-page.blp:94
+#: data/ui/write-page.blp:50
 msgid "Download the required OS image directly in the application"
 msgstr "Скачайте необходимый образ ОС прямо в приложении"
 
-#: src/application.vala:82
-msgid "translator-credits"
-msgstr ""
+#: src/application.vala:91
+msgid "Alexey “qualimock” Volkov"
+msgstr "Алексей «qualimock» Волков"
 
-#: src/repository/usb-repository.vala:164
+#: src/application.vala:94
+msgid "Viktoria “gingercat” Zubacheva"
+msgstr "Виктория «gingercat» Зубачева"
+
+#: src/application.vala:96
+msgid "translator-credits"
+msgstr "Алексей «qualimock» Волков <qualimock@altlinux.org>"
+
+#: src/osinfo/os-mapper.vala:42 src/ui/image-page.vala:81
+msgid "Unknown"
+msgstr "Неизвестно"
+
+#: src/osinfo/os-mapper.vala:93
+msgid "Live + Installer"
+msgstr "Живая система + Установщик"
+
+#: src/osinfo/os-mapper.vala:96
+msgid "Live"
+msgstr "Живая система"
+
+#: src/osinfo/os-mapper.vala:99
+msgid "Installer"
+msgstr "Установщик"
+
+#: src/service/operation/download-operation.vala:117
+msgid "Connection lost"
+msgstr "Соединение потеряно"
+
+#: src/service/operation/flash-operation.vala:106
+#: src/service/operation/flash-operation.vala:118
+#, c-format
+msgid "%s: %s"
+msgstr "%s: %s"
+
+#: src/service/operation/flash-operation.vala:173
+msgid "Download did not produce a file"
+msgstr "Загрузка не произвела файл"
+
+#: src/service/operation/flash-operation.vala:186
+msgid "Checksum mismatch - the download can be corrupted"
+msgstr "Контрольные суммы не совпадают - загрузка может быть повреждена"
+
+#: src/service/operation/flash-operation.vala:289
+msgid "Verification failed: written data does not match source"
+msgstr "Верификация не удалась: записанные данные не совпадают с источником"
+
+#: src/service/operation/operation.vala:71
+msgid "Download"
+msgstr "Загрузка"
+
+#: src/service/operation/operation.vala:72
+msgid "Checksum verification"
+msgstr "Проверка контрольной суммы"
+
+#: src/service/operation/operation.vala:73
+msgid "Device preparation"
+msgstr "Подготовка устройства"
+
+#: src/service/operation/operation.vala:74
+msgid "Writing"
+msgstr "Запись"
+
+#: src/service/operation/operation.vala:75
+msgid "Verification"
+msgstr "Верификация"
+
+#: src/service/operation/operation.vala:77
+msgid "Flashing"
+msgstr "Запись"
+
+#: src/ui/flash-page.vala:116
+#, c-format
+msgid "Downloading image %s"
+msgstr "Загрузка образа %s"
+
+#: src/ui/flash-page.vala:185
+msgid "Image is already downloaded"
+msgstr "Образ уже загружен"
+
+#: src/ui/flash-page.vala:216
+msgid "Trying to reconnect"
+msgstr "Попытка переподключения"
+
+#: src/ui/flash-page.vala:260
+msgid "Downloading the image failed"
+msgstr "Не удалось загрузить образ"
+
+#: src/ui/flash-page.vala:262
+msgid "Checksum verification failed"
+msgstr "Не удалось проверить контрольную сумму"
+
+#: src/ui/flash-page.vala:264
+msgid "Preparing the device failed"
+msgstr "Не удалось подготовить устройство"
+
+#: src/ui/flash-page.vala:266
+msgid "Writing the image failed"
+msgstr "Не удалось записать образ"
+
+#: src/ui/flash-page.vala:268
+msgid "Verifying the write failed"
+msgstr "Не удалось верифицировать запись"
+
+#: src/ui/flash-page.vala:270
+msgid "An error occurred during writing process"
+msgstr "Произошла ошибка записи"
+
+#: src/ui/flash-page.vala:276
+msgid "Downloading"
+msgstr "Загрузка"
+
+#: src/ui/flash-page.vala:291
+msgid "Writing image"
+msgstr "Запись образа"
+
+#: src/ui/flash-page.vala:302 src/ui/status-line.vala:52
+msgid "Paused"
+msgstr "Пауза"
+
+#: src/ui/flash-page.vala:320
+msgid "The image was written successfully"
+msgstr "Образ записан успешно"
+
+#: src/ui/flash-page.vala:363
+msgid "Writing was canceled"
+msgstr "Запись отменена"
+
+#: src/ui/flash-page.vala:396
+msgid "Resume"
+msgstr "Продолжить"
+
+#: src/ui/flash-page.vala:396
+msgid "Pause"
+msgstr "Пауза"
+
+#: src/ui/flash-page.vala:426
+msgid "Cancel tailoring?"
+msgstr "Отменить прошивку?"
+
+#: src/ui/flash-page.vala:427
+msgid "The device may be left in an incomplete state and fail to boot."
+msgstr "Устройство может остаться в незавершенном состоянии и не загрузиться."
+
+#: src/ui/flash-page.vala:429
+msgid "Continue"
+msgstr "Продолжить"
+
+#: src/ui/flash-page.vala:430
+msgid "Cancel Anyway"
+msgstr "Все равно отменить"
+
+#: src/ui/flash-page.vala:438
+msgid "Cancel download?"
+msgstr "Отменить загрузку?"
+
+#: src/ui/flash-page.vala:439
+msgid "The device won't be affected."
+msgstr "Устройство не будет затронуто."
+
+#: src/ui/flash-page.vala:444
+msgid "Downloaded image will not be deleted."
+msgstr "Загруженный образ не будет удален."
+
+#: src/ui/flash-page.vala:477
+msgid "Error Details"
+msgstr "Детали ошибки"
+
+#: src/ui/flash-page.vala:481
+msgid "Close"
+msgstr "Закрыть"
+
+#: src/ui/flash-page.vala:482
+msgid "Copy"
+msgstr "Скопировать"
+
+#: src/ui/image-page.vala:106 src/ui/os-page.vala:374
+msgid "Tailor the Image?"
+msgstr "Прошить образ?"
+
+#: src/ui/image-page.vala:107 src/ui/os-page.vala:375
+msgid "All device data will be erased!"
+msgstr "Все данные устройства будут удалены!"
+
+#: src/ui/image-page.vala:110 src/ui/os-page.vala:378
+msgid "Proceed"
+msgstr "Приступить"
+
+#: src/ui/os-page.vala:245 src/ui/os-page.vala:249 src/ui/os-page.vala:253
+msgid "Not available"
+msgstr "Недоступно"
+
+#: src/ui/os-page.vala:288
+#, c-format
+msgid "%.0f MHz"
+msgstr "%.0f МГц"
+
+#: src/ui/os-page.vala:290
+#, c-format
+msgid "%.1f GHz"
+msgstr "%.1f ГГц"
+
+#: src/ui/os-page.vala:295
+#, c-format
+msgid "%.0f MiB"
+msgstr "%.0f МиБ"
+
+#: src/ui/os-page.vala:297
+#, c-format
+msgid "%.1f GiB"
+msgstr "%.1f ГиБ"
+
+#: src/ui/os-page.vala:325
+#, c-format
+msgid "Image will be downloaded in %s"
+msgstr "Образ будет загружен в %s"
+
+#: src/ui/status-line.vala:47
+msgid "Pending"
+msgstr "Ожидает"
+
+#: src/ui/status-line.vala:48
+msgid "In progress"
+msgstr "В процессе"
+
+#: src/ui/status-line.vala:49
+msgid "Finished"
+msgstr "Завершена"
+
+#: src/ui/status-line.vala:50
+msgid "Failed"
+msgstr "Провалена"
+
+#: src/ui/status-line.vala:51
+msgid "Aborted"
+msgstr "Отменена"
+
+#: src/ui/status-line.vala:53
+msgid "Skipped"
+msgstr "Пропущена"
+
+#: src/ui/write-page.vala:35
+msgid "ISO Images"
+msgstr "ISO образы"
+
+#: src/ui/write-page.vala:41
+msgid "All Files"
+msgstr "Все файлы"
+
+#: src/ui/write-page.vala:49
+msgid "Select Image"
+msgstr "Выберите образ"
+
+#: src/usb/usb-mapper.vala:147
 #, c-format
 msgid "%u partition"
 msgid_plural "%u partitions"
@@ -169,21 +583,6 @@ msgstr[0] "%u раздел"
 msgstr[1] "%u раздела"
 msgstr[2] "%u разделов"
 
-#: src/repository/usb-repository.vala:169
+#: src/usb/usb-mapper.vala:152
 msgid "No filesystem"
 msgstr "Без файловой системы"
-
-#: src/ui/write-page.vala:29
-msgid "ISO Images"
-msgstr "ISO образы"
-
-#: src/ui/write-page.vala:35
-msgid "All Files"
-msgstr "Все файлы"
-
-#: src/ui/write-page.vala:43
-msgid "Select Image"
-msgstr "Выберите образ"
-
-#~ msgid "Alexey Volkov"
-#~ msgstr "Алексей Волков"

@@ -88,10 +88,10 @@ namespace Tailor {
 			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/%s.metainfo.xml".printf (Tailor.ID), VERSION) {
 				copyright = "© 2026 ALT Linux Team",
 				developers = {
-					"Alexey \"qualimock\" Volkov <qualimock@altlinux.org>",
+					_("Alexey “qualimock” Volkov") + " <qualimock@altlinux.org>",
 				},
 				artists = {
-					"Viktoria \"gingercat\" Zubacheva",
+					_("Viktoria “gingercat” Zubacheva"),
 				},
 				translator_credits = _("translator-credits")
 			};
