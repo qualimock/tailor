@@ -16,9 +16,12 @@ src/osinfo/os-mapper.vala
 src/service/operation/download-operation.vala
 src/service/operation/flash-operation.vala
 src/service/operation/operation.vala
+src/service/operation/restore-operation.vala
+src/ui/device-card.vala
 src/ui/flash-page.vala
 src/ui/image-page.vala
 src/ui/os-page.vala
 src/ui/status-line.vala
+src/ui/ui-service.vala
 src/ui/write-page.vala
 src/usb/usb-mapper.vala
