@@ -116,6 +116,7 @@ namespace Tailor {
 			old.size = device.size;
 			old.size_display = device.size_display;
 			old.filesystem = device.filesystem;
+			old.has_image = device.has_image;
 
 			device_updated (old);
 		}

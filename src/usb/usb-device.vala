@@ -28,6 +28,7 @@ namespace Tailor {
 		public string filesystem { get; set; }
 		public uint64 size { get; set; }
 		public string size_display { get; set; }
+		public bool has_image { get; set; }
 
 		public UsbDevice (string object_path) {
 			Object (object_path: object_path);

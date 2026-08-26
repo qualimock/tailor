@@ -98,10 +98,13 @@ namespace Tailor {
 			if (restoring)
 				return;
 
-			var dialog = new Adw.AlertDialog (
-				_("Restore device?"),
-				_("All data on %s will be erased!").printf (device.name)
-			);
+			string dialog_body = device.has_image
+				? _("This will erase the image on %s.").printf (device.name)
+				: _("%s contains a regular filesystem. "
+				  + "Make sure this is the right device and "
+				  + "back up any important data before continuing.").printf (device.name);
+
+			var dialog = new Adw.AlertDialog (_("Restore device?"), dialog_body);
 			dialog.add_response ("cancel", _("Cancel"));
 			dialog.add_response ("proceed", _("Proceed"));
 

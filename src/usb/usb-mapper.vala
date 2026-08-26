@@ -60,6 +60,7 @@ namespace Tailor {
 			);
 
 			dto.filesystem = get_filesystem_label (block, stats.partition_count);
+			dto.has_image = get_has_image (block);
 
 			var total_space = client.get_size_for_display (drive.size, false, false);
 			var used_space = stats.used_bytes != 0
@@ -166,6 +167,10 @@ namespace Tailor {
 				return @"$(used_space)/$(total_space)";
 
 			return @"$(used_parts[0])/$(total_space)";
+		}
+
+		private static bool get_has_image (UDisks.Block block) {
+			return block.id_type == "iso9660" || block.id_type == "udf";
 		}
 	}
 }
