@@ -9,6 +9,7 @@ app_sources = files(
 
 	'service' / 'operation' / 'operation.vala',
 	'service' / 'operation' / 'device-operation.vala',
+	'service' / 'operation' / 'restore-operation.vala',
 	'service' / 'operation' / 'flash-operation.vala',
 	'service' / 'operation' / 'download-operation.vala',
 

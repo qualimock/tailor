@@ -80,6 +80,17 @@ namespace Tailor {
 			);
 		}
 
+		public RestoreOperation create_restore_operation (
+			UsbDevice device,
+			Cancellable cancellable
+		) throws Error {
+			return new RestoreOperation (
+				provider.get_device_block (device),
+				provider.get_object_manager (),
+				cancellable
+			);
+		}
+
 		private void on_device_added (UsbDevice device) {
 			devices.add (device);
 			device_added (device);
