@@ -24,122 +24,120 @@ template $TailorFlashPage : Adw.NavigationPage {
 			[top]
 			Adw.HeaderBar {}
 
-			content: Adw.ToastOverlay toast_overlay {
-				child: Adw.Clamp {
-					valign: center;
-					margin-top: 24;
-					margin-bottom: 24;
-					margin-start: 12;
-					margin-end: 24;
-					maximum-size: 600;
+			content: Adw.Clamp {
+				valign: center;
+				margin-top: 24;
+				margin-bottom: 24;
+				margin-start: 12;
+				margin-end: 24;
+				maximum-size: 600;
 
-					child: Box {
+				child: Box {
+					orientation: vertical;
+					spacing: 24;
+
+					$TailorStatusPageWithBadge os_statuspage {}
+
+					Box progress_box {
 						orientation: vertical;
-						spacing: 24;
+						spacing: 12;
 
-						$TailorStatusPageWithBadge os_statuspage {}
-
-						Box progress_box {
-							orientation: vertical;
-							spacing: 12;
-
-							ProgressBar progress_bar {
-								text: _("Installing");
-								ellipsize: start;
-								fraction: 0;
-							}
-
-							Label flash_result_label {
-								visible: bind template.finished;
-								wrap: true;
-							}
-
-							$TailorProgressLine progress_status {
-								progress: bind $fraction_to_string (progress_bar.fraction) as <string>;
-								visible: bind flash_result_label.visible inverted;
-							}
-
-							Separator {}
-
-							$TailorStatusLine download_status {
-								styles [ "dimmed" ]
-							}
-
-							$TailorStatusLine checksum_status {
-								styles [ "dimmed" ]
-								visible: bind template.has-checksum;
-
-								title: _("Verifying checksum");
-							}
-
-							$TailorStatusLine prepare_status {
-								styles [ "dimmed" ]
-
-								title: _("Preparing device");
-							}
-
-							$TailorStatusLine write_status {
-								styles [ "dimmed" ]
-
-								title: _("Writing image to device");
-							}
-
-							$TailorStatusLine verify_status {
-								styles [ "dimmed" ]
-
-								title: _("Verifying installation");
-							}
+						ProgressBar progress_bar {
+							text: _("Installing");
+							ellipsize: start;
+							fraction: 0;
 						}
 
-						Box {
-							homogeneous: true;
-							margin-top: 12;
-							spacing: 12;
-							visible: bind template.finished inverted;
-
-							Button {
-								styles [ "destructive-action" ]
-
-								label: _("Cancel");
-								clicked => $cancel_flashing ();
-							}
-
-							Button pause_button {
-								label: bind $get_paused_label (template.paused);
-								visible: bind template.flashing inverted;
-								clicked => $toggle_pause ();
-							}
-						}
-
-						Box {
-							homogeneous: true;
-							margin-top: 12;
-							spacing: 12;
+						Label flash_result_label {
 							visible: bind template.finished;
-
-							Button {
-								styles [ "suggested-action" ]
-								label: _("Details");
-								clicked => $show_error_details ();
-								visible: bind $logical_and (
-									$logical_not (template.success) as <bool>,
-									$logical_not (template.cancelled) as <bool>
-								) as <bool>;
-							}
-
-							Button {
-								label: _("Retry");
-								clicked => $start_flashing ();
-								visible: bind exit_button.visible inverted;
-							}
-
-							Button exit_button {
-								label: _("Go Back");
-								action-name: "navigation.pop";
-								visible: bind template.success;
-							}
+							wrap: true;
 						}
-					};
+
+						$TailorProgressLine progress_status {
+							progress: bind $fraction_to_string (progress_bar.fraction) as <string>;
+							visible: bind flash_result_label.visible inverted;
+						}
+
+						Separator {}
+
+						$TailorStatusLine download_status {
+							styles [ "dimmed" ]
+						}
+
+						$TailorStatusLine checksum_status {
+							styles [ "dimmed" ]
+							visible: bind template.has-checksum;
+
+							title: _("Verifying checksum");
+						}
+
+						$TailorStatusLine prepare_status {
+							styles [ "dimmed" ]
+
+							title: _("Preparing device");
+						}
+
+						$TailorStatusLine write_status {
+							styles [ "dimmed" ]
+
+							title: _("Writing image to device");
+						}
+
+						$TailorStatusLine verify_status {
+							styles [ "dimmed" ]
+
+							title: _("Verifying installation");
+						}
+					}
+
+					Box {
+						homogeneous: true;
+						margin-top: 12;
+						spacing: 12;
+						visible: bind template.finished inverted;
+
+						Button {
+							styles [ "destructive-action" ]
+
+							label: _("Cancel");
+							clicked => $cancel_flashing ();
+						}
+
+						Button pause_button {
+							label: bind $get_paused_label (template.paused);
+							visible: bind template.flashing inverted;
+							clicked => $toggle_pause ();
+						}
+					}
+
+					Box {
+						homogeneous: true;
+						margin-top: 12;
+						spacing: 12;
+						visible: bind template.finished;
+
+						Button {
+							styles [ "suggested-action" ]
+							label: _("Details");
+							clicked => $show_error_details ();
+							visible: bind $logical_and (
+								$logical_not (template.success) as <bool>,
+								$logical_not (template.cancelled) as <bool>
+							) as <bool>;
+						}
+
+						Button {
+							label: _("Retry");
+							clicked => $start_flashing ();
+							visible: bind exit_button.visible inverted;
+						}
+
+						Button exit_button {
+							label: _("Go Back");
+							action-name: "navigation.pop";
+							visible: bind template.success;
+						}
+					}
 				};
 			};
 		};

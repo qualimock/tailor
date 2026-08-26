@@ -8,11 +8,13 @@ template $TailorMainWindow: Adw.ApplicationWindow {
 
 	deletable: bind flash_page.started inverted;
 
-	content: Adw.NavigationView {
-		$TailorHomePage home_page { service: bind template.service; }
-		$TailorDownloadPage download_page { service: bind template.service; }
-		$TailorImagePage image_page { service: bind template.service; }
-		$TailorOsPage os_page { service: bind template.service; }
-		$TailorFlashPage flash_page { service: bind template.service; }
+	content: Adw.ToastOverlay toast_overlay {
+		child: Adw.NavigationView {
+			$TailorHomePage home_page { service: bind template.service; }
+			$TailorDownloadPage download_page { service: bind template.service; }
+			$TailorImagePage image_page { service: bind template.service; }
+			$TailorOsPage os_page { service: bind template.service; }
+			$TailorFlashPage flash_page { service: bind template.service; }
+		};
 	};
 }
