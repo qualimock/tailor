@@ -8,8 +8,9 @@ app_sources = files(
 	'service' / 'checksum-fetcher.vala',
 
 	'service' / 'operation' / 'operation.vala',
-	'service' / 'operation' / 'download-operation.vala',
+	'service' / 'operation' / 'device-operation.vala',
 	'service' / 'operation' / 'flash-operation.vala',
+	'service' / 'operation' / 'download-operation.vala',
 
 	'ui' / 'ui-service.vala',
 	'ui' / 'main-window.vala',

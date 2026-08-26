@@ -20,10 +20,8 @@
 
 namespace Tailor {
 
-	public class FlashOperation : Operation {
+	public class FlashOperation : DeviceOperation {
 
-		private UDisks.Block block;
-		private DBusObjectManager object_manager;
 		private OsImage? os_image = null;
 		private File? image_file = null;
 		private DownloadOperation? download_operation = null;
@@ -40,10 +38,9 @@ namespace Tailor {
 			File image_file,
 			Cancellable cancellable
 		) {
-			this.block = block;
-			this.object_manager = object_manager;
+			init_device (block, object_manager, cancellable);
+
 			this.image_file = image_file;
-			this.cancellable = cancellable;
 		}
 
 		public FlashOperation.with_download (
@@ -52,11 +49,10 @@ namespace Tailor {
 			OsImage os_image,
 			Cancellable cancellable
 		) {
-			this.block = block;
-			this.object_manager = object_manager;
+			init_device (block, object_manager, cancellable);
+
 			this.os_image = os_image;
 			this.download_operation = new DownloadOperation (os_image, cancellable);
-			this.cancellable = cancellable;
 		}
 
 		public override void pause () {
@@ -121,26 +117,6 @@ namespace Tailor {
 			}
 
 			completed ();
-		}
-
-		private async void unmount () throws Error {
-			state = State.PREPARING;
-
-			foreach (var obj in object_manager.get_objects ()) {
-				var udisks_obj = obj as UDisks.Object;
-				if (udisks_obj == null)
-					continue;
-
-				var blk = udisks_obj.block;
-				if (blk == null || blk.drive != block.drive)
-					continue;
-
-				var filesystem = udisks_obj.filesystem;
-				if (filesystem == null || filesystem.mount_points.length == 0)
-					continue;
-
-				yield filesystem.call_unmount (new Variant ("a{sv}", null), cancellable);
-			}
 		}
 
 		private async void download () throws Error {
@@ -287,10 +263,6 @@ namespace Tailor {
 
 			if (source_checksum.get_string () != device_checksum.get_string ())
 				throw new IOError.FAILED (_("Verification failed: written data does not match source"));
-		}
-
-		private static bool is_auth_dismissed (Error e) {
-			return e.message.contains ("NotAuthorizedDismissed");
 		}
 	}
 }
