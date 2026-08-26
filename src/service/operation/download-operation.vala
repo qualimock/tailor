@@ -1,6 +1,6 @@
-/* DownloadOperation.vala
+/* download-operation.vala
  *
- * Copyright 2026 Алексей Волков <$email>
+ * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
