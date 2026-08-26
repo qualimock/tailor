@@ -23,46 +23,12 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/device-card.ui")]
 	public class DeviceCard : Gtk.Box {
 
-		[GtkChild] private unowned Gtk.Label name_label;
-		[GtkChild] private unowned Gtk.Label filesystem_label;
-		[GtkChild] private unowned Gtk.Label size_label;
-		[GtkChild] private unowned Gtk.Label address_label;
+		RestoreOperation operation;
+		Cancellable cancellable;
 
-		private string _device_name;
-		public string device_name {
-			get { return _device_name; }
-			set {
-				_device_name = value;
-				name_label.label = value;
-			}
-		}
-
-		private string _size;
-		public string size {
-			get { return _size; }
-			set {
-				_size = value;
-				size_label.label = value;
-			}
-		}
-
-		private string _address;
-		public string address {
-			get { return _address; }
-			set {
-				_address = value;
-				address_label.label = value;
-			}
-		}
-
-		private string _filesystem;
-		public string filesystem {
-			get { return _filesystem; }
-			set {
-				_filesystem = value;
-				filesystem_label.label = value;
-			}
-		}
+		public bool restoring { get; set; default = false; }
+		public UsbDevice device { get; set; }
+		public ServiceContext service { get; set; }
 
 		private async void open_in_disks () {
 			try {
@@ -79,14 +45,14 @@ namespace Tailor {
 		private async void open_in_disks_native () throws Error {
 			try {
 				new Subprocess.newv ({
-						"gnome-disks", "--block-device", address
+						"gnome-disks", "--block-device", device.device_file
 					},
 					SubprocessFlags.NONE
 				);
 			} catch (Error e) {
 				new Subprocess.newv ({
 						"flatpak", "run",
-						"org.gnome.DiskUtility", "--block-device", address
+						"org.gnome.DiskUtility", "--block-device", device.device_file
 					},
 					SubprocessFlags.NONE
 				);
@@ -106,20 +72,99 @@ namespace Tailor {
 			if (probe.get_exit_status () == 0) {
 				cmd = {
 					"flatpak-spawn", "--host",
-					"gnome-disks", "--block-device", address
+					"gnome-disks", "--block-device", device.device_file
 				};
 			} else {
 				cmd = {
 					"flatpak-spawn", "--host",
-					"flatpak", "run", "org.gnome.DiskUtility", "--block-device", address
+					"flatpak", "run", "org.gnome.DiskUtility", "--block-device", device.device_file
 				};
 			}
 			new Subprocess.newv (cmd, SubprocessFlags.NONE);
 		}
 
 		[GtkCallback]
+		private string string_if (bool cond, string if_true, string if_false) {
+			return cond ? if_true : if_false;
+		}
+
+		[GtkCallback]
 		private void on_more_in_disks_clicked () {
 			open_in_disks.begin ();
+		}
+
+		[GtkCallback]
+		private void on_restore_clicked () {
+			if (restoring)
+				return;
+
+			var dialog = new Adw.AlertDialog (
+				_("Restore device?"),
+				_("All data on %s will be erased!").printf (device.name)
+			);
+			dialog.add_response ("cancel", _("Cancel"));
+			dialog.add_response ("proceed", _("Proceed"));
+
+			dialog.set_default_response ("cancel");
+			dialog.set_close_response ("cancel");
+			dialog.set_response_appearance ("proceed", Adw.ResponseAppearance.DESTRUCTIVE);
+
+			dialog.response["proceed"].connect (() => {
+				restoring = true;
+				cancellable = new Cancellable ();
+
+				try {
+					operation = service.usb.create_restore_operation (device, cancellable);
+				} catch (Error e) {
+					var message = e.message;
+					restoring = false;
+
+					var toast = new Adw.Toast (_("Failed to restore device"));
+					toast.button_label = _("Details");
+					toast.button_clicked.connect (() => {
+						service.ui.show_details (this, _("Error Details"), message);
+					});
+
+					service.ui.toast_requested (toast);
+					return;
+				}
+
+				operation.completed.connect (() => {
+					restoring = false;
+					service.ui.toast_requested (new Adw.Toast (_("Device restored")));
+				});
+
+				operation.failed.connect ((message) => {
+					restoring = false;
+
+					var toast = new Adw.Toast (_("Failed to restore device"));
+					toast.button_label = _("Details");
+					toast.button_clicked.connect (() => {
+						service.ui.show_details (this, _("Error Details"), message);
+					});
+
+					service.ui.toast_requested (toast);
+				});
+
+				operation.run_async.begin ((obj, res) => {
+					try {
+						operation.run_async.end (res);
+					} catch (Error e) {
+						var message = e.message;
+						restoring = false;
+
+						var toast = new Adw.Toast (_("Failed to restore device"));
+						toast.button_label = _("Details");
+						toast.button_clicked.connect (() => {
+							service.ui.show_details (this, _("Error Details"), message);
+						});
+
+						service.ui.toast_requested (toast);
+					}
+				});
+			});
+
+			dialog.present (this);
 		}
 	}
 }
