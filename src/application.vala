@@ -32,6 +32,7 @@ namespace Tailor {
 
 		private OsinfoService osinfo_service = new OsinfoService ();
 		private UsbService usb_service = new UsbService ();
+		private UiService ui_service = new UiService ();
 
 		public Settings settings { get; private set; }
 		private ServiceContext service_context { get; private set; }
@@ -48,7 +49,8 @@ namespace Tailor {
 
 			service_context = new ServiceContext (
 				osinfo_service,
-				usb_service
+				usb_service,
+				ui_service
 			);
 
 			add_action_entries (APP_ENTRIES, this);

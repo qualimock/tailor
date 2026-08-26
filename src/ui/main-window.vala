@@ -23,6 +23,7 @@ namespace Tailor {
 	[GtkTemplate (ui = "/org/altlinux/Tailor/main-window.ui")]
 	public class MainWindow : Adw.ApplicationWindow {
 
+		[GtkChild] private unowned Adw.ToastOverlay toast_overlay;
 		[GtkChild] private unowned DownloadPage download_page;
 
 		public ServiceContext service { get; construct; }
@@ -42,6 +43,7 @@ namespace Tailor {
 
 			service.osinfo.loaded.connect (download_page.populate);
 			service.osinfo.load_failed.connect (download_page.show_error);
+			service.ui.toast_requested.connect (toast => toast_overlay.add_toast (toast));
 		}
 
 		public MainWindow (Tailor.Application app, ServiceContext service) {

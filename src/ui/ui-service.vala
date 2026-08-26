@@ -1,4 +1,4 @@
-/* service-context.vala
+/* ui-service.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
@@ -20,25 +20,23 @@
 
 namespace Tailor {
 
-	public class ServiceContext : Object {
+	public class UiService : Object {
+		public signal void toast_requested (Adw.Toast toast);
 
-		public OsinfoService osinfo { get; construct; }
-		public UsbService usb { get; construct; }
-		public UiService ui { get; construct; }
-		public string host_arch { get; construct; }
-		public File image_file { get; set; }
+		public void show_details (Gtk.Widget parent, string title, string message) {
+			var dialog = new Adw.AlertDialog (title, message);
 
-		public ServiceContext (
-			OsinfoService osinfo_service,
-			UsbService usb_service,
-			UiService ui_service
-		) {
-			Object (
-				osinfo: osinfo_service,
-				usb: usb_service,
-				ui: ui_service,
-				host_arch: Posix.utsname ().machine
-			);
+			dialog.add_response ("close", _("Close"));
+			dialog.add_response ("copy", _("Copy"));
+
+			dialog.set_default_response ("close");
+			dialog.set_close_response ("close");
+
+			dialog.response["copy"].connect (() => {
+				parent.get_clipboard ().set_text (message);
+			});
+
+			dialog.present (parent);
 		}
 	}
 }

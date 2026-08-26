@@ -181,9 +181,7 @@ namespace Tailor {
 				image_file = file;
 				if (skipped) {
 					download_status.state = StatusState.SKIPPED;
-
-					((Adw.ToastOverlay) get_ancestor (typeof (Adw.ToastOverlay)))
-						.add_toast (new Adw.Toast (_("Image is already downloaded")));
+					service.ui.toast_requested (new Adw.Toast (_("Image is already downloaded")));
 				}
 			});
 			operation.completed.connect (on_completed);
@@ -474,22 +472,7 @@ namespace Tailor {
 
 		[GtkCallback]
 		private void show_error_details () {
-			var dialog = new Adw.AlertDialog (
-				_("Error Details"),
-				last_error_message
-			);
-
-			dialog.add_response ("close", _("Close"));
-			dialog.add_response ("copy", _("Copy"));
-
-			dialog.set_default_response ("close");
-			dialog.set_close_response ("close");
-
-			dialog.response["copy"].connect (() => {
-				get_clipboard ().set_text (last_error_message);
-			});
-
-			dialog.present (this);
+			service.ui.show_details (this, _("Error Details"), last_error_message);
 		}
 	}
 }
