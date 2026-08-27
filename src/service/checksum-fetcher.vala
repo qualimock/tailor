@@ -38,11 +38,15 @@ namespace Tailor {
 			var filename = iso_url.substring (iso_url.last_index_of ("/") + 1);
 			var candidates = ChecksumResolver.candidates_for (iso_url);
 
-			foreach (var url in candidates) {
-				var result = yield try_candidate (session, url, filename, cancellable);
+			try {
+				foreach (var url in candidates) {
+					var result = yield try_candidate (session, url, filename, cancellable);
 
-				if (result != null)
-					return result;
+					if (result != null)
+						return result;
+				}
+			} catch (Error e) {
+				return null;
 			}
 
 			return null;
@@ -53,7 +57,7 @@ namespace Tailor {
 			string url,
 			string filename,
 			Cancellable? cancellable
-		) {
+		) throws Error {
 			try {
 				var msg = new Soup.Message ("GET", url);
 				var input = yield session.send_async (msg, Priority.DEFAULT, cancellable);
@@ -65,6 +69,8 @@ namespace Tailor {
 				var content = (string) bytes.get_data ();
 
 				return parse (content, filename);
+			} catch (IOError.CANCELLED e) {
+				throw e;
 			} catch {
 				return null;
 			}

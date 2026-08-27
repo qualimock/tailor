@@ -8,7 +8,7 @@ template $TailorImagePage : Adw.NavigationPage {
 	notify::service => $on_service_load ();
 
 	has-devices: bind $greater_than ((devices_dropdown.model as <SingleSelection>).n-items, 0) as <bool>;
-	selected-device: bind devices_dropdown.model as <SingleSelection>;
+	selection-device: bind devices_dropdown.model as <SingleSelection>;
 
 	child: Adw.ToolbarView {
 		[top]

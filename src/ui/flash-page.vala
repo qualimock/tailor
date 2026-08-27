@@ -27,7 +27,7 @@ namespace Tailor {
 		private OsImage? selected_image = null;
 		private File? image_file;
 		private Cancellable cancellable;
-		private bool trash_after_flashing = false;
+		private bool delete_after_flashing = false;
 		private StatusLine[] flash_steps;
 		private FlashOperation? operation = null;
 		private string? last_error_message = null;
@@ -91,12 +91,12 @@ namespace Tailor {
 			OsVersion? version,
 			OsImage image,
 			UsbDevice selected_device,
-			bool trash_download
+			bool delete_download
 		) {
 			reset ();
 
 			device = selected_device;
-			trash_after_flashing = trash_download;
+			delete_after_flashing = delete_download;
 			selected_image = image;
 
 			build_flash_steps ();
@@ -324,11 +324,7 @@ namespace Tailor {
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
 
-			if (trash_after_flashing && image_file != null)
-				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			if (selected_image != null)
-				image_file = null;
+			cleanup_downloaded_image ();
 		}
 
 		private void on_failed (string message) {
@@ -349,10 +345,7 @@ namespace Tailor {
 			last_error_message = message;
 			flash_result_label.label = step_failure_label (failed_step);
 
-			if (selected_image != null && image_file != null) {
-				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-				image_file = null;
-			}
+			cleanup_downloaded_image ();
 		}
 
 		private void on_cancel () {
@@ -369,10 +362,15 @@ namespace Tailor {
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
 
-			if (trash_after_flashing && image_file != null) {
+			cleanup_downloaded_image ();
+		}
+
+		private void cleanup_downloaded_image () {
+			if (delete_after_flashing && image_file != null)
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
+
+			if (selected_image != null)
 				image_file = null;
-			}
 		}
 
 		private void set_progress_css_class (string css_class) {
@@ -445,7 +443,7 @@ namespace Tailor {
 				dialog.heading = _("Cancel download?");
 				dialog.body = _("The device won't be affected.");
 			} else {
-				if (selected_image != null && !trash_after_flashing) {
+				if (selected_image != null && !delete_after_flashing) {
 					dialog.body = "%s\n%s".printf (
 						dialog.body,
 						_("Downloaded image will not be deleted.")
@@ -453,7 +451,9 @@ namespace Tailor {
 				}
 			}
 
-			if (!paused)
+			var was_paused = paused;
+
+			if (!was_paused)
 				toggle_pause ();
 
 			dialog.response["cancel"].connect (() => {
@@ -461,7 +461,11 @@ namespace Tailor {
 				on_cancel ();
 			});
 
-			dialog.response["continue"].connect (toggle_pause);
+			dialog.response["continue"].connect (() => {
+				if (was_paused)
+					return;
+				toggle_pause ();
+			});
 
 			dialog.present (this);
 		}

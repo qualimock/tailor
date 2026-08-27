@@ -279,7 +279,7 @@ msgid "Optional"
 msgstr "Дополнительно"
 
 #: data/ui/os-page.blp:252
-msgid "Trash download after writing"
+msgid "Delete download after writing"
 msgstr "Удалить загрузку после записи"
 
 #: data/ui/os-page.blp:270

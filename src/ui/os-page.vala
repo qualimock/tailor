@@ -33,7 +33,7 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
-		[GtkChild] private unowned Adw.SwitchRow trash_switch;
+		[GtkChild] private unowned Adw.SwitchRow delete_switch;
 
 		[GtkChild] private unowned Gtk.Label cpu_label;
 		[GtkChild] private unowned Gtk.Label ram_label;
@@ -59,7 +59,7 @@ namespace Tailor {
 		public OsEdition? selected_edition { get; set; }
 		public OsVersion? selected_version { get; set; }
 		public OsImage? selected_image { get; set; }
-		public Gtk.SingleSelection? selected_device { get; set; }
+		public Gtk.SingleSelection? selection_device { get; set; }
 
 		public bool checking { get; set; default = true; }
 		public bool available { get; set; default = false; }
@@ -270,6 +270,9 @@ namespace Tailor {
 			image.check_downloadable.begin ((_, res) => {
 				available = image.check_downloadable.end (res);
 
+				if (image != selected_image)
+					return;
+
 				if (!available) {
 					checking = false;
 					return;
@@ -277,6 +280,10 @@ namespace Tailor {
 
 				image.fetch_checksum.begin (null, (_, res) => {
 					image.fetch_checksum.end (res);
+
+					if (image != selected_image)
+						return;
+
 					has_checksum = image.checksum != null;
 					checking = false;
 				});
@@ -315,8 +322,8 @@ namespace Tailor {
 		private bool is_not_empty_string (string str) { return str.length > 0; }
 
 		[GtkCallback]
-		private string trash_subtitle (bool trash_active) {
-			if (trash_active)
+		private string delete_subtitle (bool delete_active) {
+			if (delete_active)
 				return "";
 
 			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
@@ -367,7 +374,7 @@ namespace Tailor {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (FlashPage) view.find_page ("flash-page");
 
-			if (selected_device == null)
+			if (selection_device == null)
 				return;
 
 			var dialog = new Adw.AlertDialog (
@@ -385,8 +392,8 @@ namespace Tailor {
 				page.configure_from_os (
 					current_family,
 					selected_edition, selected_version, selected_image,
-					(UsbDevice) selected_device.selected_item,
-					trash_switch.active
+					(UsbDevice) selection_device.selected_item,
+					delete_switch.active
 				);
 
 				view.push (page);
