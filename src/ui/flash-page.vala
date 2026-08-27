@@ -318,11 +318,7 @@ namespace Tailor {
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
 
-			if (trash_after_flashing && image_file != null)
-				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-
-			if (selected_image != null)
-				image_file = null;
+			cleanup_downloaded_image ();
 		}
 
 		private void on_failed (string message) {
@@ -342,10 +338,7 @@ namespace Tailor {
 			last_error_message = message;
 			flash_result_label.label = step_failure_label (failed_step);
 
-			if (selected_image != null && image_file != null) {
-				image_file.delete_async.begin (Priority.DEFAULT, null, null);
-				image_file = null;
-			}
+			cleanup_downloaded_image ();
 		}
 
 		private void on_cancel () {
@@ -361,10 +354,15 @@ namespace Tailor {
 			set_progress_css_class ("warning");
 			flash_result_label.label = _("Writing was canceled");
 
-			if (trash_after_flashing && image_file != null) {
+			cleanup_downloaded_image ();
+		}
+
+		private void cleanup_downloaded_image () {
+			if (trash_after_flashing && image_file != null)
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
+
+			if (selected_image != null)
 				image_file = null;
-			}
 		}
 
 		private void set_progress_css_class (string css_class) {
