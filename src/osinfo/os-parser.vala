@@ -79,7 +79,7 @@ namespace Tailor {
 						return id;
 				}
 			} catch (RegexError e) {
-				// TODO: Empty catch
+				warning ("Regex error: %s", e.message);
 			}
 
 			return short_id;
@@ -259,7 +259,7 @@ namespace Tailor {
 					return text.substring (0, start) + text.substring (end);
 				}
 			} catch (RegexError e) {
-				// TODO: Empty catch
+				warning ("Regex error: %s", e.message);
 			}
 
 			return text;
