@@ -46,7 +46,7 @@ namespace Tailor {
 		}
 
 		public bool has_devices { get; set; default = false; }
-		public Gtk.SingleSelection? selected_device { get; set; }
+		public Gtk.SingleSelection? selection_device { get; set; }
 
 		construct {
 			devices_dropdown.model = new Gtk.SingleSelection (device_store);
@@ -99,7 +99,7 @@ namespace Tailor {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (FlashPage) view.find_page ("flash-page");
 
-			if (selected_device == null)
+			if (selection_device == null)
 				return;
 
 			var dialog = new Adw.AlertDialog (
@@ -116,7 +116,7 @@ namespace Tailor {
 			dialog.response["proceed"].connect (() => {
 				page.configure_from_image (
 					service.image_file,
-					(UsbDevice) selected_device.selected_item
+					(UsbDevice) selection_device.selected_item
 				);
 
 				view.push (page);
