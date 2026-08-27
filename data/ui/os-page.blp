@@ -248,9 +248,9 @@ template $TailorOsPage : Adw.NavigationPage {
 						ListBox {
 							styles [ "boxed-list" ]
 
-							Adw.SwitchRow trash_switch {
-								title: _("Trash download after writing");
-								subtitle: bind $trash_subtitle (trash_switch.active) as <string>;
+							Adw.SwitchRow delete_switch {
+								title: _("Delete download after writing");
+								subtitle: bind $delete_subtitle (delete_switch.active) as <string>;
 								selectable: false;
 							}
 						}

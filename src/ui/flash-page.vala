@@ -27,7 +27,7 @@ namespace Tailor {
 		private OsImage? selected_image = null;
 		private File? image_file;
 		private Cancellable cancellable;
-		private bool trash_after_flashing = false;
+		private bool delete_after_flashing = false;
 		private StatusLine[] flash_steps;
 		private FlashOperation? operation = null;
 		private string? last_error_message = null;
@@ -90,12 +90,12 @@ namespace Tailor {
 			OsVersion? version,
 			OsImage image,
 			UsbDevice selected_device,
-			bool trash_download
+			bool delete_download
 		) {
 			reset ();
 
 			device = selected_device;
-			trash_after_flashing = trash_download;
+			delete_after_flashing = delete_download;
 			selected_image = image;
 
 			build_flash_steps ();
@@ -358,7 +358,7 @@ namespace Tailor {
 		}
 
 		private void cleanup_downloaded_image () {
-			if (trash_after_flashing && image_file != null)
+			if (delete_after_flashing && image_file != null)
 				image_file.delete_async.begin (Priority.DEFAULT, null, null);
 
 			if (selected_image != null)
@@ -435,7 +435,7 @@ namespace Tailor {
 				dialog.heading = _("Cancel download?");
 				dialog.body = _("The device won't be affected.");
 			} else {
-				if (selected_image != null && !trash_after_flashing) {
+				if (selected_image != null && !delete_after_flashing) {
 					dialog.body = "%s\n%s".printf (
 						dialog.body,
 						_("Downloaded image will not be deleted.")

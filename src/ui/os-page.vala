@@ -33,7 +33,7 @@ namespace Tailor {
 		[GtkChild] private unowned Gtk.DropDown arch_dropdown;
 		[GtkChild] private unowned Gtk.DropDown devices_dropdown;
 
-		[GtkChild] private unowned Adw.SwitchRow trash_switch;
+		[GtkChild] private unowned Adw.SwitchRow delete_switch;
 
 		[GtkChild] private unowned Gtk.Label cpu_label;
 		[GtkChild] private unowned Gtk.Label ram_label;
@@ -322,8 +322,8 @@ namespace Tailor {
 		private bool is_not_empty_string (string str) { return str.length > 0; }
 
 		[GtkCallback]
-		private string trash_subtitle (bool trash_active) {
-			if (trash_active)
+		private string delete_subtitle (bool delete_active) {
+			if (delete_active)
 				return "";
 
 			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
@@ -393,7 +393,7 @@ namespace Tailor {
 					current_family,
 					selected_edition, selected_version, selected_image,
 					(UsbDevice) selected_device.selected_item,
-					trash_switch.active
+					delete_switch.active
 				);
 
 				view.push (page);
