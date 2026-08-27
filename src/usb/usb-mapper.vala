@@ -61,13 +61,7 @@ namespace Tailor {
 
 			dto.filesystem = get_filesystem_label (block, stats.partition_count);
 			dto.has_image = get_has_image (block);
-
-			var total_space = client.get_size_for_display (drive.size, false, false);
-			var used_space = stats.used_bytes != 0
-				? client.get_size_for_display (stats.used_bytes, false, false)
-				: null;
-
-			dto.size_display = get_drive_display_size (total_space, used_space);
+			dto.size_display = get_drive_display_size (stats.used_bytes, drive.size);
 
 			return dto;
 		}
@@ -153,20 +147,14 @@ namespace Tailor {
 				: _("No filesystem");
 		}
 
-		private static string get_drive_display_size (string total_space, string? used_space) {
-			if (used_space == null)
-				return total_space;
+		private static string get_drive_display_size (uint64 used_bytes, uint64 total_bytes) {
+			if (used_bytes == 0)
+				return format_size (total_bytes);
 
-			var used_parts = used_space.split (" ");
-			var total_parts = total_space.split (" ");
-
-			if (used_parts.length < 2 || total_parts.length < 2)
-				return @"$(used_space)/$(total_space)";
-
-			if (used_parts[1] != total_parts[1])
-				return @"$(used_space)/$(total_space)";
-
-			return @"$(used_parts[0])/$(total_space)";
+			return "%s/%s".printf (
+				format_size (used_bytes),
+				format_size (total_bytes)
+			);
 		}
 
 		private static bool get_has_image (UDisks.Block block) {
