@@ -270,6 +270,9 @@ namespace Tailor {
 			image.check_downloadable.begin ((_, res) => {
 				available = image.check_downloadable.end (res);
 
+				if (image != selected_image)
+					return;
+
 				if (!available) {
 					checking = false;
 					return;
@@ -277,6 +280,10 @@ namespace Tailor {
 
 				image.fetch_checksum.begin (null, (_, res) => {
 					image.fetch_checksum.end (res);
+
+					if (image != selected_image)
+						return;
+
 					has_checksum = image.checksum != null;
 					checking = false;
 				});
