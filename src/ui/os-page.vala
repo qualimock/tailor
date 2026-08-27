@@ -59,7 +59,7 @@ namespace Tailor {
 		public OsEdition? selected_edition { get; set; }
 		public OsVersion? selected_version { get; set; }
 		public OsImage? selected_image { get; set; }
-		public Gtk.SingleSelection? selected_device { get; set; }
+		public Gtk.SingleSelection? selection_device { get; set; }
 
 		public bool checking { get; set; default = true; }
 		public bool available { get; set; default = false; }
@@ -374,7 +374,7 @@ namespace Tailor {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (FlashPage) view.find_page ("flash-page");
 
-			if (selected_device == null)
+			if (selection_device == null)
 				return;
 
 			var dialog = new Adw.AlertDialog (
@@ -392,7 +392,7 @@ namespace Tailor {
 				page.configure_from_os (
 					current_family,
 					selected_edition, selected_version, selected_image,
-					(UsbDevice) selected_device.selected_item,
+					(UsbDevice) selection_device.selected_item,
 					trash_switch.active
 				);
 
