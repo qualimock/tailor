@@ -445,7 +445,9 @@ namespace Tailor {
 				}
 			}
 
-			if (!paused)
+			var was_paused = paused;
+
+			if (!was_paused)
 				toggle_pause ();
 
 			dialog.response["cancel"].connect (() => {
@@ -453,7 +455,11 @@ namespace Tailor {
 				on_cancel ();
 			});
 
-			dialog.response["continue"].connect (toggle_pause);
+			dialog.response["continue"].connect (() => {
+				if (was_paused)
+					return;
+				toggle_pause ();
+			});
 
 			dialog.present (this);
 		}
