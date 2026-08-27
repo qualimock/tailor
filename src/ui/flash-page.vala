@@ -48,6 +48,7 @@ namespace Tailor {
 		public ServiceContext service { get; construct set; }
 		public bool started { get; private set; default = false; }
 		public bool flashing { get; private set; default = false; }
+		public bool verifying { get; private set; default = false; }
 		public bool success { get; private set; default = false; }
 		public bool finished { get; private set; default = false; }
 		public bool cancelled { get; private set; default = false; }
@@ -134,6 +135,7 @@ namespace Tailor {
 		private void reset () {
 			started = false;
 			flashing = false;
+			verifying = false;
 			finished = false;
 			success = false;
 			cancelled = false;
@@ -295,6 +297,7 @@ namespace Tailor {
 			case Operation.State.VERIFYING:
 				operation.title = _("Verifying installation");
 				activate_flash_step (verify_status);
+				verifying = true;
 				break;
 
 			case Operation.State.PAUSED:
@@ -311,9 +314,12 @@ namespace Tailor {
 			success = true;
 			started = false;
 			flashing = false;
+			verifying = false;
 
 			stop_pulse ();
 			terminate_current_flash_step (StatusState.FINISHED);
+
+			progress_bar.fraction = 1;
 
 			set_progress_css_class ("success");
 			flash_result_label.label = _("The image was written successfully");
@@ -329,6 +335,7 @@ namespace Tailor {
 			success = false;
 			started = false;
 			flashing = false;
+			verifying = false;
 
 			stop_pulse ();
 			var failed_step = terminate_current_flash_step (StatusState.FAILED);
@@ -347,6 +354,7 @@ namespace Tailor {
 			cancelled = true;
 			started = false;
 			flashing = false;
+			verifying = false;
 
 			stop_pulse ();
 			terminate_current_flash_step (StatusState.ABORTED);
@@ -477,6 +485,12 @@ namespace Tailor {
 		[GtkCallback]
 		private void show_error_details () {
 			service.ui.show_details (this, _("Error Details"), last_error_message);
+		}
+
+		[GtkCallback]
+		private void skip_verify_step () {
+			operation?.skip_verification ();
+			terminate_current_flash_step (StatusState.SKIPPED);
 		}
 	}
 }

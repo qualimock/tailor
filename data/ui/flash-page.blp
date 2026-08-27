@@ -108,6 +108,12 @@ template $TailorFlashPage : Adw.NavigationPage {
 							visible: bind template.flashing inverted;
 							clicked => $toggle_pause ();
 						}
+
+						Button skip_verify_button {
+							label: _("Skip");
+							visible: bind template.verifying;
+							clicked => $skip_verify_step ();
+						}
 					}
 
 					Box {
