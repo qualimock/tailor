@@ -69,10 +69,10 @@ jobs:
       - name: Test
         run: meson test -C _build
 
-  flatpak-stable:
-    name: Flatpak Build (stable)
+  release:
+    name: Create release
     runs-on: als-huge
-    timeout-minutes: 60
+    timeout-minutes: 10
     needs: [lint-vala, test-build]
     if: ${{ startsWith(github.ref, 'refs/tags/') }}
 
@@ -80,54 +80,36 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Cache apt packages
-        uses: actions/cache@v4
-        with:
-          path: /var/cache/apt/archives
-          key: apt-flatpak-${{ hashFiles('.forgejo/workflows/ci.yml') }}
-
-      - name: Install flatpak tools
+      - name: Install archive tools
         run: |
           apt-get update
-          apt-get install -y flatpak flatpak-builder
+          apt-get install -y zstd bzip2
 
-      - name: Add Flathub remote
+      - name: Archive source
         run: |
-          flatpak remote-add --if-not-exists flathub \
-            https://dl.flathub.org/repo/flathub.flatpakrepo
+          mkdir -p release-assets
+          prefix="tailor-${{ steps.version.outputs.value }}"
+          git archive --format=tar.gz --prefix="$prefix/" \
+            -o "release-assets/$prefix.tar.gz" "$GITHUB_REF_NAME"
+          git archive --format=zip --prefix="$prefix/" \
+            -o "release-assets/$prefix.zip" "$GITHUB_REF_NAME"
+          git archive --format=tar --prefix="$prefix/" "$GITHUB_REF_NAME" \
+            | zstd -o "release-assets/$prefix.tar.zst"
+          git archive --format=tar --prefix="$prefix/" "$GITHUB_REF_NAME" \
+            | bzip2 -c > "release-assets/$prefix.tar.bz2"
 
-      - name: Install runtime and SDK
-        run: |
-          flatpak install -y flathub \
-            org.gnome.Platform//50 \
-            org.gnome.Sdk//50
-
-      - name: Cache flatpak-builder state
-        uses: actions/cache@v4
+      - name: Attach release assets
+        uses: actions/forgejo-release@v2
         with:
-          path: |
-            .flatpak-builder
-            ~/.cache/flatpak-builder
-          key: flatpak-builder-stable-${{ hashFiles('build-aux/flatpak/org.altlinux.Tailor.json') }}
-          restore-keys: |
-            flatpak-builder-stable-
-
-      - name: Build
-        run: |
-          flatpak-builder --repo=repo --force-clean builddir \
-            build-aux/flatpak/org.altlinux.Tailor.json
-
-      - name: Bundle flatpak
-        run: |
-          flatpak build-bundle repo org.altlinux.Tailor.flatpak \
-            org.altlinux.Tailor
-
-      - name: Upload flatpak bundle artifact
-        uses: actions/upload-artifact@v3
-        with:
-          name: flatpak-bundle-stable
-          path: org.altlinux.Tailor.flatpak
-          retention-days: 7
+          direction: upload
+          release-notes-file: RELEASE_NOTES.md
+          url: ${{ github.server_url }}
+          repo: ${{ github.repository }}
+          release-dir: release-assets
+          token: ${{ secrets.RELEASE_TOKEN }}
+          sha: ${{ github.sha }}
+          tag: ${{ github.ref_name }}
+          override: true
 
   flatpak-devel:
     name: Flatpak Build (devel, nightly)
