@@ -1,4 +1,4 @@
-/* primary-os-row.vala
+/* download-page-row.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
