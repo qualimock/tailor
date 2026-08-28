@@ -1,1 +1,3 @@
-First release of Tailor!
+- Caching downloads - OS images are cached instead of direct downloading into user's download directory
+- Flatpak - removed `xdg-download` permission due to downloads caching
+- UI - Clamp and center OsPage
