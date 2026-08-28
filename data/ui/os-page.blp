@@ -267,7 +267,11 @@ template $TailorOsPage : Adw.NavigationPage {
 
 							Adw.SwitchRow delete_switch {
 								title: _("Delete download after writing");
-								subtitle: bind $delete_subtitle (delete_switch.active) as <string>;
+								subtitle: bind $string_or_fallback (
+									delete_switch.active,
+									"",
+									_("Downloaded image will be kept in app cache")
+								) as <string>;
 								selectable: false;
 							}
 						}

@@ -28,6 +28,7 @@ namespace Tailor {
 		private File? image_file;
 		private Cancellable cancellable;
 		private bool delete_after_flashing = false;
+		private File? pending_save_destination = null;
 		private StatusLine[] flash_steps;
 		private FlashOperation? operation = null;
 		private string? last_error_message = null;
@@ -148,6 +149,7 @@ namespace Tailor {
 			cancellable = null;
 			operation = null;
 			last_error_message = null;
+			pending_save_destination = null;
 
 			download_status.state = StatusState.PENDING;
 			checksum_status.state = StatusState.PENDING;
@@ -172,6 +174,9 @@ namespace Tailor {
 					operation = service.usb.create_flash_operation_with_download (
 						device, selected_image, cancellable
 					);
+
+					if (!delete_after_flashing)
+						offer_save_downloaded_image ();
 				}
 			} catch (Error e) {
 				on_failed (e.message);
@@ -181,6 +186,8 @@ namespace Tailor {
 			operation.progress.connect (on_progress);
 			operation.downloaded.connect ((file, skipped) => {
 				image_file = file;
+				flush_pending_save ();
+
 				if (skipped) {
 					download_status.state = StatusState.SKIPPED;
 					service.ui.toast_requested (new Adw.Toast (_("Image is already downloaded")));
@@ -325,6 +332,42 @@ namespace Tailor {
 			flash_result_label.label = _("The image was written successfully");
 
 			cleanup_downloaded_image ();
+		}
+
+		private void offer_save_downloaded_image () {
+			var toast = new Adw.Toast (_("Downloaded image will be kept in app cache"));
+
+			toast.button_label = _("Save As…");
+			toast.button_clicked.connect (() => {
+				var dialog = new Gtk.FileDialog ();
+				dialog.title = _("Save Image");
+				dialog.initial_name = DownloadOperation.cache_path_for (selected_image).get_basename ();
+
+				dialog.save.begin ((Gtk.Window) this.get_root (), null, (obj, res) => {
+					try {
+						pending_save_destination = dialog.save.end (res);
+						flush_pending_save ();
+					} catch (Error e) {
+						if (e.code != Gtk.DialogError.DISMISSED)
+							critical ("Failed to save image: %s", e.message);
+					}
+				});
+			});
+
+			service.ui.toast_requested (toast);
+		}
+
+		private void flush_pending_save () {
+			if (pending_save_destination == null || image_file == null)
+				return;
+
+			try {
+				image_file.copy (pending_save_destination, FileCopyFlags.OVERWRITE);
+			} catch (Error e) {
+				critical ("Failed to save image: %s", e.message);
+			}
+
+			pending_save_destination = null;
 		}
 
 		private void on_failed (string message) {

@@ -76,7 +76,7 @@ namespace Tailor {
 
 				yield iostream.close_async (Priority.DEFAULT, null);
 
-				var dest = yield move_to_downloads (tmp_file);
+				var dest = yield move_to_cache (tmp_file);
 				completed (dest);
 			} catch (Error e) {
 				stop_stall_timer ();
@@ -89,6 +89,14 @@ namespace Tailor {
 
 				throw e;
 			}
+		}
+
+		public static File cache_path_for (OsImage image) {
+			var cache_dir = Path.build_filename (
+				Environment.get_user_cache_dir (), "tailor", "images"
+			);
+
+			return File.new_for_path (cache_dir).get_child (Path.get_basename (image.url));
 		}
 
 		private async void stream_with_retries () throws Error {
@@ -157,10 +165,7 @@ namespace Tailor {
 		}
 
 		private File get_dest_file () {
-			var downloads_dir = Environment.get_user_special_dir (UserDirectory.DOWNLOAD)
-				?? Environment.get_home_dir ();
-
-			return File.new_for_path (downloads_dir).get_child (Path.get_basename (image.url));
+			return cache_path_for (image);
 		}
 
 		private async File? check_existing () throws Error {
@@ -175,12 +180,12 @@ namespace Tailor {
 			return dest;
 		}
 
-		private async File move_to_downloads (File tmp_file) throws Error {
+		private async File move_to_cache (File tmp_file) throws Error {
 			var dest = get_dest_file ();
 
-			var downloads_folder = dest.get_parent ();
-			if (downloads_folder != null && !downloads_folder.query_exists (cancellable))
-				downloads_folder.make_directory_with_parents (cancellable);
+			var cache_dir = dest.get_parent ();
+			if (cache_dir != null && !cache_dir.query_exists (cancellable))
+				cache_dir.make_directory_with_parents (cancellable);
 
 			yield tmp_file.move_async (dest, FileCopyFlags.OVERWRITE, Priority.DEFAULT, cancellable, null);
 
