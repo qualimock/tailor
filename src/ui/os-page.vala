@@ -24,7 +24,6 @@ namespace Tailor {
 	public class OsPage : Adw.NavigationPage {
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
-		private OsFamily current_family;
 
 		private bool repopulating = false;
 
@@ -56,10 +55,12 @@ namespace Tailor {
 		public bool has_requirements { get; private set; default = false; }
 		public bool has_checksum { get; set; default = false; }
 
+		public OsFamily current_family { get; private set; }
 		public OsEdition? selected_edition { get; set; }
 		public OsVersion? selected_version { get; set; }
 		public OsImage? selected_image { get; set; }
 		public Gtk.SingleSelection? selection_device { get; set; }
+		public string logo_icon_name { get; private set; default = ""; }
 
 		public bool checking { get; set; default = true; }
 		public bool available { get; set; default = false; }
@@ -105,8 +106,6 @@ namespace Tailor {
 
 		public void configure (OsFamily family, OsEdition? preferred_edition) {
 			current_family = family;
-			title = family.name;
-
 			populate_editions (preferred_edition?.id);
 		}
 

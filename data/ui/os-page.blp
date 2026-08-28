@@ -3,7 +3,12 @@ using Adw 1;
 using Gio 2.0;
 
 template $TailorOsPage : Adw.NavigationPage {
-	title: _("OS Info");
+	title: bind $string_or_fallback (
+		os_logo.visible,
+		template.current-family as <$TailorOsFamily>.name,
+		template.current-family as <$TailorOsFamily>.vendor
+	);
+
 	tag: "os-page";
 
 	selected-edition: bind edition_dropdown.selected-item as <$OsEdition>;
@@ -55,9 +60,21 @@ template $TailorOsPage : Adw.NavigationPage {
 
 					Image os_logo {
 						pixel-size: 128;
-						icon-name: "image-missing-symbolic";
+						icon-name: bind template.logo-icon-name;
+						visible: bind $is_not_empty_string (template.logo-icon-name) as <bool>;
+
 						accessibility {
 							label: _("OS logo");
+						}
+					}
+
+					Adw.Bin {
+						margin-top: 12;
+						visible: bind os_logo.visible inverted;
+
+						Label {
+							styles [ "title-1" ]
+							label: bind template.current-family as <$TailorOsFamily>.name;
 						}
 					}
 
