@@ -84,6 +84,7 @@ template $TailorDeviceCard: Box {
 
 			Button details_button {
 				label: _("More in “Disks”");
+				visible: bind template.disks-available;
 				clicked => $on_more_in_disks_clicked ();
 			}
 

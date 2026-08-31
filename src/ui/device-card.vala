@@ -27,60 +27,15 @@ namespace Tailor {
 		Cancellable cancellable;
 
 		public bool restoring { get; set; default = false; }
+		public bool disks_available { get; set; default = false; }
 		public UsbDevice device { get; set; }
 		public ServiceContext service { get; set; }
 
-		private async void open_in_disks () {
-			try {
-				if (FileUtils.test ("/.flatpak-info", FileTest.EXISTS)) {
-					yield open_in_disks_from_flatpak ();
-				} else {
-					yield open_in_disks_native ();
-				}
-			} catch (Error e) {
-				warning ("Failed to open gnome-disks: %s", e.message);
-			}
-		}
-
-		private async void open_in_disks_native () throws Error {
-			try {
-				new Subprocess.newv ({
-						"gnome-disks", "--block-device", device.device_file
-					},
-					SubprocessFlags.NONE
-				);
-			} catch (Error e) {
-				new Subprocess.newv ({
-						"flatpak", "run",
-						"org.gnome.DiskUtility", "--block-device", device.device_file
-					},
-					SubprocessFlags.NONE
-				);
-			}
-		}
-
-		private async void open_in_disks_from_flatpak () throws Error {
-			var probe = new Subprocess.newv ({
-					"flatpak-spawn", "--host",
-					"sh", "-c", "command -v gnome-disks"
-				},
-				SubprocessFlags.NONE
-			);
-			yield probe.wait_async (null);
-
-			string[] cmd;
-			if (probe.get_exit_status () == 0) {
-				cmd = {
-					"flatpak-spawn", "--host",
-					"gnome-disks", "--block-device", device.device_file
-				};
-			} else {
-				cmd = {
-					"flatpak-spawn", "--host",
-					"flatpak", "run", "org.gnome.DiskUtility", "--block-device", device.device_file
-				};
-			}
-			new Subprocess.newv (cmd, SubprocessFlags.NONE);
+		construct {
+			// "Open in Disks" only supported for native installs, launching
+			// GNOME Disks from inside the sandbox needs flatpak-spawn --host
+			disks_available = !FileUtils.test ("/.flatpak-info", FileTest.EXISTS)
+				&& Environment.find_program_in_path ("gnome-disks") != null;
 		}
 
 		[GtkCallback]
@@ -90,7 +45,13 @@ namespace Tailor {
 
 		[GtkCallback]
 		private void on_more_in_disks_clicked () {
-			open_in_disks.begin ();
+			try {
+				new Subprocess.newv ({
+					"gnome-disks", "--block-device", device.device_file
+				}, SubprocessFlags.NONE);
+			} catch (Error e) {
+				warning ("Failed to open GNOME Disks: %s", e.message);
+			}
 		}
 
 		[GtkCallback]
