@@ -1,4 +1,4 @@
-/* usb-provider.vala
+/* usb-provider-linux.vala
  *
  * Copyright 2026 Alexey Volkov <qualimock@altlinux.org>
  *
