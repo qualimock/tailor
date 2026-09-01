@@ -8,7 +8,6 @@ app_sources = files(
 	'service' / 'checksum-fetcher.vala',
 
 	'service' / 'operation' / 'device-handle.vala',
-	'service' / 'operation' / 'device-handle-linux.vala',
 
 	'service' / 'operation' / 'operation.vala',
 	'service' / 'operation' / 'restore-operation.vala',
@@ -41,9 +40,7 @@ app_sources = files(
 	'osinfo' / 'os-family.vala',
 
 	'usb' / 'usb-provider.vala',
-	'usb' / 'usb-provider-linux.vala',
 	'usb' / 'usb-service.vala',
-	'usb' / 'usb-mapper.vala',
 	'usb' / 'usb-device.vala',
 
 ) + configure_file(
@@ -52,21 +49,46 @@ app_sources = files(
 	configuration: config
 ) + app_resources
 
+if host_machine.system() == 'windows'
+	app_sources += files(
+		'usb' / 'usb-provider-windows.vala',
+		'service' / 'operation' / 'device-handle-windows.vala',
+	)
+	vala_platform_args = [
+		'--vapidir=' + meson.project_source_root() / 'vapi',
+		'--pkg=win32-storage',
+		'--define=WINDOWS',
+	]
+	platform_link_args = ['-lsetupapi']
+else
+	app_sources += files(
+		'usb' / 'usb-provider-linux.vala',
+		'usb' / 'usb-mapper.vala',
+		'service' / 'operation' / 'device-handle-linux.vala',
+	)
+	vala_platform_args = ['--pkg=posix']
+	platform_link_args = []
+endif
+
 app_dependencies = [
 	dependency('libadwaita-1'),
 	dependency('libosinfo-1.0'),
 	dependency('gee-0.8'),
 	dependency('gio-2.0'),
-	dependency('udisks2'),
 	dependency('libsoup-3.0'),
-	dependency('gio-unix-2.0'),
 ]
+
+if host_machine.system() != 'windows'
+	app_dependencies += dependency('udisks2')
+	app_dependencies += dependency('gio-unix-2.0')
+endif
 
 executable(
 	basename,
 	sources: app_sources,
 	dependencies: app_dependencies,
-	vala_args: ['--pkg=posix'],
+	vala_args: vala_platform_args,
+	link_args: platform_link_args,
 	install: true
 )
 
