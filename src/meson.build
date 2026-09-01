@@ -7,6 +7,9 @@ app_sources = files(
 	'service' / 'checksum-resolver.vala',
 	'service' / 'checksum-fetcher.vala',
 
+	'service' / 'operation' / 'device-handle.vala',
+	'service' / 'operation' / 'device-handle-linux.vala',
+
 	'service' / 'operation' / 'operation.vala',
 	'service' / 'operation' / 'device-operation.vala',
 	'service' / 'operation' / 'restore-operation.vala',
