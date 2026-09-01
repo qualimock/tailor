@@ -22,7 +22,7 @@ namespace Tailor {
 
 	public class UsbService {
 
-		private UsbProvider provider;
+		private IUsbProvider provider;
 
 		public Gee.ArrayList<UsbDevice> devices { get; private set; }
 
@@ -38,7 +38,7 @@ namespace Tailor {
 		}
 
 		public async void init_async () {
-			provider = new UsbProvider ();
+			provider = new UsbProviderLinux ();
 
 			provider.device_added.connect (on_device_added);
 			provider.device_removed.connect (on_device_removed);
@@ -60,8 +60,7 @@ namespace Tailor {
 			Cancellable cancellable
 		) throws Error {
 			return new FlashOperation.with_file (
-				provider.get_device_block (device),
-				provider.get_object_manager (),
+				provider.get_device_handle (device),
 				image_file,
 				cancellable
 			);
@@ -73,8 +72,7 @@ namespace Tailor {
 			Cancellable cancellable
 		) throws Error {
 			return new FlashOperation.with_download (
-				provider.get_device_block (device),
-				provider.get_object_manager (),
+				provider.get_device_handle (device),
 				image,
 				cancellable
 			);
@@ -85,8 +83,7 @@ namespace Tailor {
 			Cancellable cancellable
 		) throws Error {
 			return new RestoreOperation (
-				provider.get_device_block (device),
-				provider.get_object_manager (),
+				provider.get_device_handle (device),
 				cancellable
 			);
 		}
