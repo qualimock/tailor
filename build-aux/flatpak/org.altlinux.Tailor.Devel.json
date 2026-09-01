@@ -99,7 +99,6 @@
                 }
             ],
             "config-opts" : [
-                "--libdir=lib",
                 "-Dprofile=development"
             ]
         }
