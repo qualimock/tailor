@@ -20,7 +20,11 @@
 
 namespace Tailor {
 
-	public abstract class Operation : Object {
+	public interface IPauseGate : Object {
+		public abstract async void wait_for_resume ();
+	}
+
+	public abstract class Operation : Object, IPauseGate {
 
 		public enum State {
 			PAUSED,
@@ -78,7 +82,10 @@ namespace Tailor {
 			}
 		}
 
-		protected async void wait_for_resume () {
+		public async void wait_for_resume () {
+			if (!paused)
+				return;
+
 			resume_func = wait_for_resume.callback;
 			yield;
 		}

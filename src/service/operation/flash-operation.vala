@@ -20,7 +20,7 @@
 
 namespace Tailor {
 
-	public class FlashOperation : DeviceOperation {
+	public class FlashOperation : Operation {
 
 		private OsImage? os_image = null;
 		private File? image_file = null;
@@ -28,33 +28,30 @@ namespace Tailor {
 		private Cancellable? verify_cancellable;
 		private bool downloading = false;
 		private bool verify_skipped = false;
-
-		private Checksum source_checksum = new Checksum (ChecksumType.SHA256);
+		IDeviceHandle device_handle;
 
 		public signal void completed ();
 		public signal void downloaded (File file, bool skipped);
 
 		public FlashOperation.with_file (
-			UDisks.Block block,
-			DBusObjectManager object_manager,
+			IDeviceHandle device_handle,
 			File image_file,
 			Cancellable cancellable
 		) {
-			init_device (block, object_manager, cancellable);
-
+			this.device_handle = device_handle;
 			this.image_file = image_file;
+			this.cancellable = cancellable;
 		}
 
 		public FlashOperation.with_download (
-			UDisks.Block block,
-			DBusObjectManager object_manager,
+			IDeviceHandle device_handle,
 			OsImage os_image,
 			Cancellable cancellable
 		) {
-			init_device (block, object_manager, cancellable);
-
+			this.device_handle = device_handle;
 			this.os_image = os_image;
 			this.download_operation = new DownloadOperation (os_image, cancellable);
+			this.cancellable = cancellable;
 		}
 
 		public override void pause () {
@@ -77,7 +74,12 @@ namespace Tailor {
 
 		public override async void run_async () throws Error {
 			FileInputStream? input = null;
-			UnixOutputStream? output = null;
+			int64 total_bytes = 0;
+			Checksum? checksum = null;
+
+			var progress_id = device_handle.progress.connect (
+				(written, total) => progress (written, total)
+			);
 
 			try {
 				if (download_operation != null) {
@@ -85,19 +87,30 @@ namespace Tailor {
 					yield verify_checksum ();
 				}
 
-				yield unmount ();
+				var file_info = yield image_file.query_info_async (
+					FileAttribute.STANDARD_SIZE,
+					FileQueryInfoFlags.NONE,
+					Priority.DEFAULT,
+					cancellable
+				);
+				total_bytes = (int64) file_info.get_size ();
 
-				FileInfo info;
-				input = yield get_input (out info);
-				output = yield get_output ();
-				total_bytes = (int64) info.get_size ();
+				state = State.PREPARING;
+				yield device_handle.unmount (cancellable);
+				input = yield image_file.read_async (Priority.DEFAULT, cancellable);
 
-				yield stream (input, output);
+				state = State.WRITING;
+				checksum = yield device_handle.write (
+					input,
+					total_bytes,
+					this,
+					cancellable
+				);
 			} catch (Error e) {
-				if (output != null) yield output.close_async (Priority.DEFAULT, null);
-				if (input != null) yield input.close_async (Priority.DEFAULT, null);
+				if (input != null)
+					yield input.close_async (Priority.DEFAULT, null);
 
-				if (is_auth_dismissed (e))
+				if (device_handle.is_auth_dismissed (e))
 					throw new IOError.CANCELLED (e.message);
 
 				if (!(e is IOError.CANCELLED))
@@ -106,21 +119,27 @@ namespace Tailor {
 				throw e;
 			}
 
-			yield output.close_async (Priority.DEFAULT, null);
 			yield input.close_async (Priority.DEFAULT, null);
 
+			verify_cancellable = new Cancellable ();
+			var verify_link_id = cancellable.connect (() => verify_cancellable.cancel ());
+
+			state = State.VERIFYING;
 			try {
-				yield verify ();
+				yield device_handle.verify (checksum, total_bytes, verify_cancellable);
 			} catch (Error e) {
 				if (verify_skipped) {
 					completed ();
 					return;
 				}
 
-				if (!(e is IOError.CANCELLED) && !is_auth_dismissed (e))
+				if (!(e is IOError.CANCELLED) && !device_handle.is_auth_dismissed (e))
 					failed (_("%s: %s").printf (state_label (state), e.message));
 
 				return;
+			} finally {
+				cancellable.disconnect (verify_link_id);
+				device_handle.disconnect (progress_id);
 			}
 
 			completed ();
@@ -172,116 +191,6 @@ namespace Tailor {
 			var verified = yield os_image.verify_checksum (image_file, cancellable);
 			if (!verified)
 				throw new IOError.FAILED (_("Checksum mismatch - the download can be corrupted"));
-		}
-
-		private async FileInputStream get_input (out FileInfo file_info) throws Error {
-			file_info = yield image_file.query_info_async (
-				FileAttribute.STANDARD_SIZE,
-				FileQueryInfoFlags.NONE,
-				Priority.DEFAULT,
-				cancellable
-			);
-
-			return yield image_file.read_async (Priority.DEFAULT, cancellable);
-		}
-
-		private async UnixOutputStream get_output () throws Error {
-			UnixFDList fd_list;
-			Variant out_fd;
-			yield block.call_open_for_restore (
-				new Variant ("a{sv}", null),
-				null,
-				cancellable,
-				out out_fd,
-				out fd_list
-			);
-			var fd = fd_list.get (out_fd.get_handle ());
-			return new UnixOutputStream (fd, true);
-		}
-
-		private async void stream (FileInputStream input, UnixOutputStream output) throws Error {
-			state = State.WRITING;
-
-			var buf = new uint8[1024 * 1024];
-			ssize_t n;
-
-			while ((n = yield input.read_async (buf, Priority.DEFAULT, cancellable)) > 0) {
-				if (paused)
-					yield wait_for_resume ();
-
-				size_t written;
-
-				yield output.write_all_async (
-					buf[0:n],
-					Priority.DEFAULT,
-					cancellable,
-					out written
-				);
-
-				bytes_written += written;
-				source_checksum.update (buf[0:n], n);
-
-				progress (bytes_written, total_bytes);
-			}
-
-			yield output.flush_async (Priority.DEFAULT, cancellable);
-		}
-
-		private async void verify () throws Error {
-			state = State.VERIFYING;
-			verify_cancellable = new Cancellable ();
-			var verify_link_id = cancellable.connect (() => verify_cancellable.cancel ());
-
-			UnixFDList fd_list;
-			Variant out_fd;
-
-			try {
-				yield block.call_open_for_backup (
-					new Variant ("a{sv}", null),
-					null,
-					verify_cancellable,
-					out out_fd,
-					out fd_list
-				);
-
-				var fd = fd_list.get (out_fd.get_handle ());
-				var input = new UnixInputStream (fd, true);
-
-				var device_checksum = new Checksum (ChecksumType.SHA256);
-				var buf = new uint8[1024 * 1024];
-				int64 bytes_verified = 0;
-				Error? read_error = null;
-
-				ssize_t n;
-				while (bytes_verified < total_bytes) {
-					var remaining = total_bytes - bytes_verified;
-					var chunk_size = (size_t) int64.min (remaining, buf.length);
-
-					try {
-						n = yield input.read_async (buf[0:chunk_size], Priority.DEFAULT, verify_cancellable);
-					} catch (Error e) {
-						read_error = e;
-						break;
-					}
-
-					if (n == 0)
-						break;
-
-					device_checksum.update (buf[0:n], n);
-					bytes_verified += n;
-					progress (bytes_verified, total_bytes);
-				}
-
-				yield input.close_async (Priority.DEFAULT, verify_cancellable);
-
-				if (read_error != null)
-					throw read_error;
-
-				if (source_checksum.get_string () != device_checksum.get_string ())
-					throw new IOError.FAILED (_("Verification failed: written data does not match source"));
-			} finally {
-				cancellable.disconnect (verify_link_id);
-			}
 		}
 	}
 }

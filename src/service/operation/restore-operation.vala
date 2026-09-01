@@ -20,30 +20,32 @@
 
 namespace Tailor {
 
-	public class RestoreOperation : DeviceOperation {
+	public class RestoreOperation : Operation {
+
+		private IDeviceHandle device_handle;
 
 		public signal void completed ();
 
 		public RestoreOperation (
-			UDisks.Block block,
-			DBusObjectManager object_manager,
+			IDeviceHandle device_handle,
 			Cancellable cancellable
 		) {
-			init_device (block, object_manager, cancellable);
+			this.device_handle = device_handle;
+			this.cancellable = cancellable;
 		}
 
 		public override async void run_async () throws Error {
+			state = State.PREPARING;
 			try {
-				yield unmount ();
-				yield block.call_format ("vfat", new Variant ("a{sv}", null), cancellable);
-			} catch (Error e) {
-				if (is_auth_dismissed (e))
-					throw new IOError.CANCELLED (e.message);
+				yield device_handle.unmount (cancellable);
 
-				if (!(e is IOError.CANCELLED))
+				state = State.WRITING;
+				yield device_handle.format ("vfat", cancellable);
+			} catch (Error e) {
+				if (!(e is IOError.CANCELLED) && !device_handle.is_auth_dismissed (e))
 					failed (_("%s: %s").printf (state_label (state), e.message));
 
-				throw e;
+				return;
 			}
 
 			completed ();
