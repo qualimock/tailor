@@ -38,6 +38,7 @@ app_sources = files(
 	'osinfo' / 'os-edition.vala',
 	'osinfo' / 'os-family.vala',
 
+	'usb' / 'usb-provider.vala',
 	'usb' / 'usb-provider-linux.vala',
 	'usb' / 'usb-service.vala',
 	'usb' / 'usb-mapper.vala',
