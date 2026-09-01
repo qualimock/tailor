@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changed
+
+#### Large USB management refactor
+
+Now USB provider is connected to service as interface, allowing multiple provider implementations.
+
 ## [0.1.1] - 2026-08-28
 
 ### Changed
