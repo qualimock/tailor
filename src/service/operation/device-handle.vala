@@ -38,6 +38,7 @@ namespace Tailor {
 		public abstract async void verify (
 			Checksum expected,
 			int64 total_bytes,
+			IPauseGate pause_gate,
 			Cancellable cancellable
 		) throws Error;
 

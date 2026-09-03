@@ -126,7 +126,7 @@ namespace Tailor {
 
 			state = State.VERIFYING;
 			try {
-				yield device_handle.verify (checksum, total_bytes, verify_cancellable);
+				yield device_handle.verify (checksum, total_bytes, this, verify_cancellable);
 			} catch (Error e) {
 				if (verify_skipped) {
 					completed ();

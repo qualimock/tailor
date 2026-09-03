@@ -77,6 +77,7 @@ namespace Tailor {
 		public async void verify (
 			Checksum expected,
 			int64 total_bytes,
+			IPauseGate pause_gate,
 			Cancellable cancellable
 		) throws Error {
 			UnixFDList fd_list;
@@ -100,6 +101,8 @@ namespace Tailor {
 
 			ssize_t n;
 			while (bytes_verified < total_bytes) {
+				yield pause_gate.wait_for_resume ();
+
 				var remaining = total_bytes - bytes_verified;
 				var chunk_size = (size_t) int64.min (remaining, buf.length);
 
