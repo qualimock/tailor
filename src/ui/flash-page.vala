@@ -211,7 +211,8 @@ namespace Tailor {
 			if (total > 0) {
 				stop_pulse ();
 				progress_bar.fraction = (double) written / total;
-				progress_status.title = operation.title;
+				if (operation.state != Operation.State.PAUSED)
+					progress_status.title = operation.title;
 			} else {
 				start_pulse ();
 			}
