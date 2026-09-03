@@ -115,7 +115,6 @@ namespace Tailor {
 						operation.run_async.end (res);
 					} catch (Error e) {
 						var message = e.message;
-						restoring = false;
 
 						var toast = new Adw.Toast (_("Failed to restore device"));
 						toast.button_label = _("Details");
@@ -125,6 +124,8 @@ namespace Tailor {
 
 						service.ui.toast_requested (toast);
 					}
+
+					restoring = false;
 				});
 			});
 
