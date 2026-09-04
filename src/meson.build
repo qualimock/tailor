@@ -53,6 +53,7 @@ if host_machine.system() == 'windows'
 	app_sources += files(
 		'usb' / 'usb-provider-windows.vala',
 		'service' / 'operation' / 'device-handle-windows.vala',
+		'service' / 'operation' / 'flash-pipe-windows.vala',
 	)
 	vala_platform_args = [
 		'--vapidir=' + meson.project_source_root() / 'vapi',
