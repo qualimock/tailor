@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Dismissed restoration polkit dialog now sets 'Restoring...' to 'Restore' back
+- Flashing status now is not being overwritten while paused
+- Correct screenshots links in appstream file
+
 ### Changed
 
 #### Large USB management refactor
