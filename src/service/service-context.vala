@@ -37,8 +37,30 @@ namespace Tailor {
 				osinfo: osinfo_service,
 				usb: usb_service,
 				ui: ui_service,
-				host_arch: Posix.utsname ().machine
+				host_arch: resolve_host_arch ()
 			);
+		}
+
+		private static string resolve_host_arch () {
+#if WINDOWS
+			Win32.SystemInfo info;
+			Win32.get_native_system_info (out info);
+
+			switch (info.processor_architecture) {
+			case Win32.PROCESSOR_ARCHITECTURE_AMD64:
+				return "x86_64";
+			case Win32.PROCESSOR_ARCHITECTURE_ARM64:
+				return "aarch64";
+			case Win32.PROCESSOR_ARCHITECTURE_ARM:
+				return "armv7l";
+			case Win32.PROCESSOR_ARCHITECTURE_INTEL:
+				return "i686";
+			default:
+				return "unknown";
+			}
+#else
+			return Posix.utsname ().machine;
+#endif
 		}
 	}
 }

@@ -38,7 +38,11 @@ namespace Tailor {
 		}
 
 		public async void init_async () {
+#if WINDOWS
+			provider = new UsbProviderWindows ();
+#else
 			provider = new UsbProviderLinux ();
+#endif
 
 			provider.device_added.connect (on_device_added);
 			provider.device_removed.connect (on_device_removed);
