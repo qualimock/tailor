@@ -22,14 +22,45 @@ namespace Tailor {
 
 	public class UsbProviderWindows : Object, IUsbProvider {
 
+		private static UsbProviderWindows? active_instance;
+		private Gee.HashMap<string, UsbDevice> known_devices = new Gee.HashMap<string, UsbDevice> ();
+
 		public async void init_async () throws Error {
-			var known_devices = scan_devices ();
+			active_instance = this;
+
+			known_devices = scan_devices ();
 			foreach (var device in known_devices.values)
 				device_added (device);
+
+			try {
+				new Thread<void>.try ("usb-hotplug", hotplug_thread_main);
+			} catch (Error e) {
+				warning ("failed to start hotplug thread: %s", e.message);
+			}
 		}
 
 		public IDeviceHandle get_device_handle (UsbDevice device) throws Error {
 			return new DeviceHandleWindows (device.object_path);
+		}
+
+		private void rescan () {
+			var current = scan_devices ();
+
+			foreach (var entry in current.entries) {
+				if (known_devices.has_key (entry.key)) {
+					device_updated (entry.value);
+				} else {
+					device_added (entry.value);
+				}
+			}
+
+			foreach (var path in known_devices.keys) {
+				if (!current.has_key (path)) {
+					device_removed (path);
+				}
+			}
+
+			known_devices = current;
 		}
 
 		private Gee.HashMap<string, UsbDevice> scan_devices () {
@@ -69,6 +100,73 @@ namespace Tailor {
 			Win32.destroy_device_info_list (device_info_set);
 
 			return result;
+		}
+
+		private void hotplug_thread_main () {
+			var class_name = "TailorHotplugWindow";
+			var instance = Win32.get_module_handle (null);
+
+			Win32.WndClassEx wc = {};
+			wc.cb_size = (uint32) sizeof (Win32.WndClassEx);
+			wc.wnd_proc = wnd_proc_callback;
+			wc.instance = instance;
+			wc.class_name = class_name;
+
+			if (Win32.register_class_ex (&wc) == 0) {
+				warning ("hotplug: RegisterClassEx failed, GetLastError=%u", Win32.get_last_error ());
+				return;
+			}
+
+			var hwnd = Win32.create_window_ex (
+				0, class_name, null, 0,
+				0, 0, 0, 0,
+				Win32.hwnd_message,
+				null,
+				instance,
+				null
+			);
+
+			if (hwnd == null) {
+				warning ("hotplug: CreateWindowEx failed, GetLastError=%u", Win32.get_last_error ());
+				return;
+			}
+
+			Win32.DevBroadcastDeviceInterface filter = {};
+			filter.size = (uint32) sizeof (Win32.DevBroadcastDeviceInterface);
+			filter.device_type = Win32.DBT_DEVTYP_DEVICEINTERFACE;
+			filter.class_guid = Win32.guid_devinterface_disk;
+
+			var notify_handle = Win32.register_device_notification (
+				hwnd, &filter, Win32.DEVICE_NOTIFY_WINDOW_HANDLE
+			);
+
+			if (notify_handle == null) {
+				warning ("hotplug: RegisterDeviceNotification failed, GetLastError=%u", Win32.get_last_error ());
+				return;
+			}
+
+			Win32.Msg msg;
+
+			while (Win32.get_message (&msg, null, 0, 0) > 0) {
+				Win32.translate_message (&msg);
+				Win32.dispatch_message (&msg);
+			}
+		}
+
+		private static ssize_t wnd_proc_callback (void* hwnd, uint32 msg, size_t wparam, ssize_t lparam) {
+			if (msg == Win32.WM_DEVICECHANGE
+				&& (wparam == Win32.DBT_DEVICEARRIVAL || wparam == Win32.DBT_DEVICEREMOVECOMPLETE)) {
+				var instance = active_instance;
+
+				if (instance != null) {
+					Idle.add (() => {
+						instance.rescan ();
+						return Source.REMOVE;
+					});
+				}
+			}
+
+			return Win32.def_window_proc (hwnd, msg, wparam, lparam);
 		}
 
 		private UsbDevice? build_device (void* device_info_set, ref Win32.DeviceInterfaceData iface_data) {
