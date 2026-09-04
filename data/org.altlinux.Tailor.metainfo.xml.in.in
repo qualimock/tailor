@@ -57,23 +57,23 @@
 
 	<screenshots>
 		<screenshot type="default">
-			<image>https://altlinux.space/qualimock/Tailor/src/commit/cee267d64c8934afa7a153832f6e6deabc993ee0/data/screenshots/1-tailor.png</image>
+			<image>https://altlinux.space/qualimock/Tailor/raw/commit/a7dd769a8ecaa5203c7128f8f6a63ef997158f51/data/screenshots/1-tailor.png</image>
 			<caption>Tailor main page</caption>
 		</screenshot>
 		<screenshot>
-			<image>https://altlinux.space/qualimock/Tailor/src/commit/cee267d64c8934afa7a153832f6e6deabc993ee0/data/screenshots/2-os-catalog.png</image>
+			<image>https://altlinux.space/qualimock/Tailor/raw/commit/a7dd769a8ecaa5203c7128f8f6a63ef997158f51/data/screenshots/2-os-catalog.png</image>
 			<caption>OS catalog</caption>
 		</screenshot>
 		<screenshot>
-			<image>https://altlinux.space/qualimock/Tailor/src/commit/cee267d64c8934afa7a153832f6e6deabc993ee0/data/screenshots/3-os-page.png</image>
+			<image>https://altlinux.space/qualimock/Tailor/raw/commit/a7dd769a8ecaa5203c7128f8f6a63ef997158f51/data/screenshots/3-os-page.png</image>
 			<caption>OS page with detailed information</caption>
 		</screenshot>
 		<screenshot>
-			<image>https://altlinux.space/qualimock/Tailor/src/commit/cee267d64c8934afa7a153832f6e6deabc993ee0/data/screenshots/4-flashing.png</image>
+			<image>https://altlinux.space/qualimock/Tailor/raw/commit/a7dd769a8ecaa5203c7128f8f6a63ef997158f51/data/screenshots/4-flashing.png</image>
 			<caption>Flashing process</caption>
 		</screenshot>
 		<screenshot>
-			<image>https://altlinux.space/qualimock/Tailor/src/commit/cee267d64c8934afa7a153832f6e6deabc993ee0/data/screenshots/5-about.png</image>
+			<image>https://altlinux.space/qualimock/Tailor/raw/commit/a7dd769a8ecaa5203c7128f8f6a63ef997158f51/data/screenshots/5-about.png</image>
 			<caption>About dialog</caption>
 		</screenshot>
 	</screenshots>
