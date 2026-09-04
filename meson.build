@@ -42,6 +42,10 @@ subdir('data')
 subdir('src')
 subdir('po')
 
+if host_machine.system() == 'windows'
+	subdir('windows-flash-helper')
+endif
+
 gnome.post_install(
 	glib_compile_schemas: true,
 	gtk_update_icon_cache: host_machine.system() != 'windows',
