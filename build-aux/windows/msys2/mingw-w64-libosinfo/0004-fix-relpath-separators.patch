@@ -1,0 +1,13 @@
+diff --git a/osinfo/osinfo_loader.c b/osinfo/osinfo_loader.c
+index 0a9004a..45c6d6d 100644
+--- a/osinfo/osinfo_loader.c
++++ b/osinfo/osinfo_loader.c
+@@ -2179,6 +2179,8 @@ osinfo_loader_process_file_reg_xml(OsinfoLoader *loader,
+             relpath = g_file_get_path(file);
+             g_warning("File %s does not have expected prefix", relpath);
+         }
++        if (relpath)
++            g_strdelimit(relpath, "\\", '/');
+     }
+     uri = g_file_get_uri(file);
+     osinfo_loader_process_xml(loader,

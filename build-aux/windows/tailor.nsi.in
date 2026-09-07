@@ -1,0 +1,56 @@
+; tailor.nsi.in — NSIS installer script template for Tailor.
+; Placeholders (@VERSION@, @STAGE_DIR@, @OUT_FILE@, @ICON@) are filled in by
+; build-aux/windows/bundle-windows.sh, which also builds @STAGE_DIR@.
+
+!include "MUI2.nsh"
+
+!define APP_NAME "Tailor"
+!define APP_VERSION "@VERSION@"
+!define APP_PUBLISHER "ALT Linux Team"
+!define APP_EXE "tailor.exe"
+!define UNINSTALL_KEY "Software\Microsoft\Windows\CurrentVersion\Uninstall\${APP_NAME}"
+
+Name "${APP_NAME}"
+OutFile "@OUT_FILE@"
+InstallDir "$PROGRAMFILES64\${APP_NAME}"
+InstallDirRegKey HKLM "Software\${APP_NAME}" "InstallDir"
+RequestExecutionLevel admin
+Icon "@ICON@"
+UninstallIcon "@ICON@"
+
+!insertmacro MUI_PAGE_WELCOME
+!insertmacro MUI_PAGE_DIRECTORY
+!insertmacro MUI_PAGE_INSTFILES
+!insertmacro MUI_PAGE_FINISH
+!insertmacro MUI_UNPAGE_CONFIRM
+!insertmacro MUI_UNPAGE_INSTFILES
+!insertmacro MUI_LANGUAGE "English"
+
+Section "Install"
+	SetOutPath "$INSTDIR"
+	File /r "@STAGE_DIR@\*.*"
+
+	CreateDirectory "$SMPROGRAMS\${APP_NAME}"
+	CreateShortcut "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk" "$INSTDIR\bin\${APP_EXE}"
+	CreateShortcut "$DESKTOP\${APP_NAME}.lnk" "$INSTDIR\bin\${APP_EXE}"
+
+	WriteRegStr HKLM "Software\${APP_NAME}" "InstallDir" "$INSTDIR"
+	WriteUninstaller "$INSTDIR\uninstall.exe"
+
+	WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayName" "${APP_NAME}"
+	WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayIcon" "$INSTDIR\bin\${APP_EXE}"
+	WriteRegStr HKLM "${UNINSTALL_KEY}" "UninstallString" "$INSTDIR\uninstall.exe"
+	WriteRegStr HKLM "${UNINSTALL_KEY}" "DisplayVersion" "${APP_VERSION}"
+	WriteRegStr HKLM "${UNINSTALL_KEY}" "Publisher" "${APP_PUBLISHER}"
+	WriteRegDWORD HKLM "${UNINSTALL_KEY}" "NoModify" 1
+	WriteRegDWORD HKLM "${UNINSTALL_KEY}" "NoRepair" 1
+SectionEnd
+
+Section "Uninstall"
+	RMDir /r "$INSTDIR"
+	Delete "$SMPROGRAMS\${APP_NAME}\${APP_NAME}.lnk"
+	RMDir "$SMPROGRAMS\${APP_NAME}"
+	Delete "$DESKTOP\${APP_NAME}.lnk"
+	DeleteRegKey HKLM "Software\${APP_NAME}"
+	DeleteRegKey HKLM "${UNINSTALL_KEY}"
+SectionEnd

@@ -1,0 +1,311 @@
+diff --git a/meson.build b/meson.build
+index 4fb90b3..28b31ad 100644
+--- a/meson.build
++++ b/meson.build
+@@ -104,9 +104,13 @@ libosinfo_cflags += [
+ #  directories used
+ libosinfo_cflags += [
+     '-DPKG_DATA_DIR="@0@"'.format(libosinfo_pkgdatadir),
++    '-DPKG_DATA_DIR_REL="@0@"'.format(join_paths(get_option('datadir'), meson.project_name())),
+     '-DDATA_DIR="@0@"'.format(libosinfo_datadir),
++    '-DDATA_DIR_REL="@0@"'.format(get_option('datadir')),
+     '-DSYS_CONF_DIR="@0@"'.format(libosinfo_sysconfdir),
++    '-DSYS_CONF_DIR_REL="@0@"'.format(get_option('sysconfdir')),
+     '-DLOCALEDIR="@0@"'.format(libosinfo_localedir),
++    '-DLOCALEDIR_REL="@0@"'.format(get_option('localedir')),
+ ]
+ 
+ #  gettext package name
+diff --git a/osinfo/meson.build b/osinfo/meson.build
+index 72eda19..dc1c3a3 100644
+--- a/osinfo/meson.build
++++ b/osinfo/meson.build
+@@ -126,6 +126,7 @@ libosinfo_private_headers = [
+     'osinfo_install_script_private.h',
+     'osinfo_product_private.h',
+     'osinfo_media_private.h',
++    'osinfo_relocatable.h',
+     'osinfo_resources_private.h',
+     'osinfo_util_private.h',
+     'ignore-value.h',
+diff --git a/osinfo/osinfo_loader.c b/osinfo/osinfo_loader.c
+index 0775167..c27a6df 100644
+--- a/osinfo/osinfo_loader.c
++++ b/osinfo/osinfo_loader.c
+@@ -33,6 +33,7 @@
+ #include "ignore-value.h"
+ #include "osinfo_install_script_private.h"
+ #include "osinfo_device_driver_private.h"
++#include "osinfo_relocatable.h"
+ #include "osinfo_resources_private.h"
+ 
+ #ifndef USB_IDS
+@@ -94,8 +95,13 @@ static void
+ osinfo_loader_class_init(OsinfoLoaderClass *klass)
+ {
+     GObjectClass *g_klass = G_OBJECT_CLASS(klass);
++    g_autofree gchar *localedir = NULL;
+ 
+-    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
++    localedir = osinfo_relocatable_dir((gconstpointer)osinfo_loader_class_init,
++                                       LOCALEDIR,
++                                       LOCALEDIR_REL);
++
++    bindtextdomain(GETTEXT_PACKAGE, localedir);
+     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+ 
+     g_klass->finalize = osinfo_loader_finalize;
+@@ -2633,7 +2639,15 @@ void osinfo_loader_process_uri(OsinfoLoader *loader,
+ 
+ static GFile *osinfo_loader_get_pci_path(void)
+ {
+-    GFile *ids = g_file_new_for_path(PCI_IDS);
++    g_autofree gchar *pkgdatadir = NULL;
++    g_autofree gchar *path = NULL;
++    GFile *ids;
++
++    pkgdatadir = osinfo_relocatable_dir((gconstpointer)osinfo_loader_get_pci_path,
++                                        PKG_DATA_DIR,
++                                        PKG_DATA_DIR_REL);
++    path = g_build_filename(pkgdatadir, "pci.ids", NULL);
++    ids = g_file_new_for_path(path);
+     g_object_set_data(G_OBJECT(ids), "data-format",
+                       GINT_TO_POINTER(OSINFO_DATA_FORMAT_PCI_IDS));
+     return ids;
+@@ -2642,7 +2656,15 @@ static GFile *osinfo_loader_get_pci_path(void)
+ 
+ static GFile *osinfo_loader_get_usb_path(void)
+ {
+-    GFile *ids = g_file_new_for_path(USB_IDS);
++    g_autofree gchar *pkgdatadir = NULL;
++    g_autofree gchar *path = NULL;
++    GFile *ids;
++
++    pkgdatadir = osinfo_relocatable_dir((gconstpointer)osinfo_loader_get_usb_path,
++                                        PKG_DATA_DIR,
++                                        PKG_DATA_DIR_REL);
++    path = g_build_filename(pkgdatadir, "usb.ids", NULL);
++    ids = g_file_new_for_path(path);
+     g_object_set_data(G_OBJECT(ids), "data-format",
+                       GINT_TO_POINTER(OSINFO_DATA_FORMAT_USB_IDS));
+     return ids;
+@@ -2653,6 +2675,7 @@ static GFile *osinfo_loader_get_system_path(void)
+ {
+     GFile *file;
+     const gchar *path;
++    g_autofree gchar *relocated_path = NULL;
+ 
+     path = g_getenv("OSINFO_DATA_DIR");
+     if (path) {
+@@ -2672,7 +2695,10 @@ static GFile *osinfo_loader_get_system_path(void)
+     } else {
+         path = g_getenv("OSINFO_SYSTEM_DIR");
+         if (!path)
+-            path = DATA_DIR "/osinfo";
++            path = relocated_path = osinfo_relocatable_dir(
++                (gconstpointer)osinfo_loader_get_system_path,
++                DATA_DIR "/osinfo",
++                DATA_DIR_REL "/osinfo");
+ 
+         file = g_file_new_for_path(path);
+     }
+@@ -2685,12 +2711,23 @@ static GFile *osinfo_loader_get_local_path(void)
+ {
+     GFile *file;
+     const gchar *path = g_getenv("OSINFO_LOCAL_DIR");
++    g_autofree gchar *relocated_path = NULL;
++    g_autofree gchar *relocated_oldpath = NULL;
+ 
+     if (!path) {
+-        path = SYS_CONF_DIR "/osinfo";
++        path = relocated_path = osinfo_relocatable_dir(
++            (gconstpointer)osinfo_loader_get_local_path,
++            SYS_CONF_DIR "/osinfo",
++            SYS_CONF_DIR_REL "/osinfo");
+ 
+         if (!g_file_test(path, G_FILE_TEST_IS_DIR)) {
+-            const gchar *oldpath = SYS_CONF_DIR "/libosinfo/db";
++            const gchar *oldpath;
++
++            relocated_oldpath = osinfo_relocatable_dir(
++                (gconstpointer)osinfo_loader_get_local_path,
++                SYS_CONF_DIR "/libosinfo/db",
++                SYS_CONF_DIR_REL "/libosinfo/db");
++            oldpath = relocated_oldpath;
+             if (g_file_test(oldpath, G_FILE_TEST_IS_DIR)) {
+                 static gboolean warned = FALSE;
+ 
+diff --git a/tools/osinfo-detect.c b/tools/osinfo-detect.c
+index 3973f92..19aef63 100644
+--- a/tools/osinfo-detect.c
++++ b/tools/osinfo-detect.c
+@@ -22,6 +22,7 @@
+ #include <string.h>
+ #include <locale.h>
+ #include <glib/gi18n.h>
++#include "osinfo_relocatable.h"
+ 
+ #define FORMAT_STR_PLAIN "plain"
+ 
+@@ -218,10 +219,14 @@ gint main(gint argc, gchar **argv)
+     OsinfoDb *db = NULL;
+     gint ret = 0;
+     gchar *description;
++    g_autofree gchar *localedir = NULL;
+ 
+     setlocale(LC_ALL, "");
+     textdomain(GETTEXT_PACKAGE);
+-    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
++    localedir = osinfo_relocatable_dir((gconstpointer)main,
++                                       LOCALEDIR,
++                                       LOCALEDIR_REL);
++    bindtextdomain(GETTEXT_PACKAGE, localedir);
+     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+ 
+     context = g_option_context_new(_("- Detect if media is bootable " \
+diff --git a/tools/osinfo-install-script.c b/tools/osinfo-install-script.c
+index 3d40a05..8d1be95 100644
+--- a/tools/osinfo-install-script.c
++++ b/tools/osinfo-install-script.c
+@@ -21,6 +21,7 @@
+ #include <string.h>
+ #include <locale.h>
+ #include <glib/gi18n.h>
++#include "osinfo_relocatable.h"
+ 
+ static const gchar *profile = "jeos";
+ static const gchar *output_dir;
+@@ -458,10 +459,14 @@ gint main(gint argc, gchar **argv)
+     OsinfoOs *os = NULL;
+     OsinfoMedia *media = NULL;
+     gint ret = 0;
++    g_autofree gchar *localedir = NULL;
+ 
+     setlocale(LC_ALL, "");
+     textdomain(GETTEXT_PACKAGE);
+-    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
++    localedir = osinfo_relocatable_dir((gconstpointer)main,
++                                       LOCALEDIR,
++                                       LOCALEDIR_REL);
++    bindtextdomain(GETTEXT_PACKAGE, localedir);
+     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+ 
+     config = osinfo_install_config_new("https://libosinfo.org/config");
+diff --git a/tools/osinfo-query.c b/tools/osinfo-query.c
+index 4f85f54..016b496 100644
+--- a/tools/osinfo-query.c
++++ b/tools/osinfo-query.c
+@@ -26,6 +26,7 @@
+ #include <glib/gi18n.h>
+ 
+ #include <osinfo/osinfo.h>
++#include "osinfo_relocatable.h"
+ 
+ 
+ struct OsinfoLabel {
+@@ -398,10 +399,14 @@ gint main(gint argc, gchar **argv)
+           _("Display fields"), NULL },
+         { NULL, 0, 0, 0, NULL, NULL, NULL }
+     };
++    g_autofree gchar *localedir = NULL;
+ 
+     setlocale(LC_ALL, "");
+     textdomain(GETTEXT_PACKAGE);
+-    bindtextdomain(GETTEXT_PACKAGE, LOCALEDIR);
++    localedir = osinfo_relocatable_dir((gconstpointer)main,
++                                       LOCALEDIR,
++                                       LOCALEDIR_REL);
++    bindtextdomain(GETTEXT_PACKAGE, localedir);
+     bind_textdomain_codeset(GETTEXT_PACKAGE, "UTF-8");
+ 
+     context = g_option_context_new(_("- Query the OS info database"));
+diff --git a/osinfo/osinfo_relocatable.h b/osinfo/osinfo_relocatable.h
+new file mode 100644
+index 0000000..2f73252
+--- /dev/null
++++ b/osinfo/osinfo_relocatable.h
+@@ -0,0 +1,84 @@
++/*
++ * libosinfo: Helpers for relocatable runtime paths
++ *
++ * Copyright (C) 2026
++ *
++ * This library is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * This library is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with this library. If not, see
++ * <http://www.gnu.org/licenses/>.
++ */
++
++#pragma once
++
++#include <glib.h>
++
++#ifdef G_OS_WIN32
++# include <windows.h>
++#endif
++
++static inline gchar *
++osinfo_relocatable_dir(gconstpointer address,
++                       const gchar *fallback,
++                       const gchar *relative_dir)
++{
++#ifdef G_OS_WIN32
++    HMODULE module = NULL;
++    DWORD len = 0;
++    DWORD size = MAX_PATH;
++    wchar_t *module_path_utf16 = NULL;
++    gchar *module_path = NULL;
++    gchar *bindir = NULL;
++    gchar *prefix = NULL;
++    gchar *path = NULL;
++
++    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                            (LPCWSTR)address,
++                            &module)) {
++        return g_strdup(fallback);
++    }
++
++    for (;;) {
++        module_path_utf16 = g_new(wchar_t, size);
++        len = GetModuleFileNameW(module, module_path_utf16, size);
++        if (len == 0) {
++            g_free(module_path_utf16);
++            return g_strdup(fallback);
++        }
++        if (len < size)
++            break;
++
++        g_free(module_path_utf16);
++        module_path_utf16 = NULL;
++        size *= 2;
++    }
++
++    module_path = g_utf16_to_utf8((const gunichar2 *)module_path_utf16,
++                                  -1, NULL, NULL, NULL);
++    g_free(module_path_utf16);
++    if (!module_path)
++        return g_strdup(fallback);
++
++    bindir = g_path_get_dirname(module_path);
++    prefix = g_path_get_dirname(bindir);
++    path = g_build_filename(prefix, relative_dir, NULL);
++
++    g_free(prefix);
++    g_free(bindir);
++    g_free(module_path);
++
++    return path;
++#else
++    return g_strdup(fallback);
++#endif
++}

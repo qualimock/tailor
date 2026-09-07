@@ -1,0 +1,69 @@
+# Maintainer: <name> <email>
+
+_realname=osinfo-db-tools
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=1.12.0
+pkgrel=1
+pkgdesc="Tools for managing the osinfo database (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
+url="https://libosinfo.org/"
+msys2_repository_url="https://gitlab.com/libosinfo/osinfo-db-tools"
+msys2_references=(
+  "anitya: 10950"
+)
+license=('spdx:GPL-2.0-or-later')
+depends=(
+  "${MINGW_PACKAGE_PREFIX}-glib2"
+  "${MINGW_PACKAGE_PREFIX}-json-glib"
+  "${MINGW_PACKAGE_PREFIX}-libarchive"
+  "${MINGW_PACKAGE_PREFIX}-libsoup3"
+  "${MINGW_PACKAGE_PREFIX}-libxml2"
+)
+makedepends=(
+  "${MINGW_PACKAGE_PREFIX}-cc"
+  "${MINGW_PACKAGE_PREFIX}-meson"
+  "${MINGW_PACKAGE_PREFIX}-ninja"
+  "${MINGW_PACKAGE_PREFIX}-pkgconf"
+  "${MINGW_PACKAGE_PREFIX}-gettext-tools"
+)
+source=(
+  "https://gitlab.com/libosinfo/${_realname}/-/archive/v${pkgver}/${_realname}-v${pkgver}.tar.gz"
+  "0001-relocation.patch"
+)
+sha256sums=(
+  '5c2ef41e3395be7df090840d171996510c4c87ea8b40763ddf59ab9fb62e0be3'
+  '84cfbffdd161e099d1a9dd4aedb2931141f39a2d16ea326c3d90c4afd12b3c44'
+)
+
+prepare() {
+  cd "${srcdir}/${_realname}-v${pkgver}"
+  patch -p1 < "${srcdir}/0001-relocation.patch"
+}
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
+  "${MINGW_PREFIX}/bin/meson.exe" setup \
+    --prefix="${MINGW_PREFIX}" \
+    --wrap-mode=nodownload \
+    --buildtype=plain \
+    "../${_realname}-v${pkgver}"
+
+  "${MINGW_PREFIX}/bin/ninja.exe"
+}
+
+check() {
+  cd "${srcdir}/build-${MSYSTEM}"
+  # tests require osinfo-db installed — skip during packaging
+  # "${MINGW_PREFIX}/bin/ninja.exe" test || true
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+  DESTDIR="${pkgdir}" "${MINGW_PREFIX}/bin/ninja.exe" install
+
+  find "${pkgdir}" -name "*.la" -delete
+}

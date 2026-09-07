@@ -1,0 +1,102 @@
+From 43b9484a6891b4a84a303de42a01e5b1614cf038 Mon Sep 17 00:00:00 2001
+From: Alexey Volkov <qualimock@altlinux.org>
+Date: Tue, 5 May 2026 11:30:18 +0300
+Subject: [PATCH] meson: Enable GObject Introspection and Vala bindings on
+ Windows
+
+GObject Introspection (g-ir-scanner) now works correctly on Windows
+with recent MSYS2/MinGW-w64 toolchains. Remove the Windows exclusion
+that prevented generating GIR and VAPI files on this platform.
+
+Tested with MSYS2 MinGW64, GCC 16.1.0, gobject-introspection 1.86.
+
+Signed-off-by: Alexey Volkov <qualimock@altlinux.org>
+---
+ osinfo/meson.build | 70 ++++++++++++++++++++++------------------------
+ 1 file changed, 34 insertions(+), 36 deletions(-)
+
+diff --git a/osinfo/meson.build b/osinfo/meson.build
+index 1d8464e..72eda19 100644
+--- a/osinfo/meson.build
++++ b/osinfo/meson.build
+@@ -191,43 +191,41 @@ libosinfo_gir_sources = [
+     libosinfo_enum_types,
+ ]
+ 
+-if host_machine.system() != 'windows'
+-    if enable_introspection
+-        libosinfo_gir = gnome.generate_gir(
+-            libosinfo,
+-            sources: libosinfo_gir_sources,
+-            nsversion: '1.0',
+-            namespace: 'Libosinfo',
+-            export_packages: versioned_name,
+-            includes: [
+-                'GObject-2.0',
+-                'Gio-2.0',
+-                'libxml2-2.0',
+-            ],
+-            dependencies: libosinfo_dependencies,
+-            header: 'osinfo/osinfo.h',
+-            identifier_prefix: 'Osinfo',
+-            symbol_prefix: 'osinfo',
++if enable_introspection
++    libosinfo_gir = gnome.generate_gir(
++        libosinfo,
++        sources: libosinfo_gir_sources,
++        nsversion: '1.0',
++        namespace: 'Libosinfo',
++        export_packages: versioned_name,
++        includes: [
++            'GObject-2.0',
++            'Gio-2.0',
++            'libxml2-2.0',
++        ],
++        dependencies: libosinfo_dependencies,
++        header: 'osinfo/osinfo.h',
++        identifier_prefix: 'Osinfo',
++        symbol_prefix: 'osinfo',
++        install: true,
++        install_dir_gir: libosinfo_girdir,
++        install_dir_typelib: libosinfo_typelibdir,
++    )
++
++    libosinfo_gir_dep = declare_dependency(
++        sources: libosinfo_gir,
++    )
++
++    if enable_vapi
++        libosinfo_vapi = gnome.generate_vapi(
++            versioned_name,
+             install: true,
+-            install_dir_gir: libosinfo_girdir,
+-            install_dir_typelib: libosinfo_typelibdir,
+-        )
+-
+-        libosinfo_gir_dep = declare_dependency(
+-            sources: libosinfo_gir,
++            packages: [
++                'gobject-2.0',
++                'gio-2.0',
++                'libxml-2.0',
++            ],
++            sources: libosinfo_gir[0],
+         )
+-
+-        if enable_vapi
+-            libosinfo_vapi = gnome.generate_vapi(
+-                versioned_name,
+-                install: true,
+-                packages: [
+-                    'gobject-2.0',
+-                    'gio-2.0',
+-                    'libxml-2.0',
+-                ],
+-                sources: libosinfo_gir[0],
+-            )
+-        endif
+     endif
+ endif
+-- 
+2.50.1
+

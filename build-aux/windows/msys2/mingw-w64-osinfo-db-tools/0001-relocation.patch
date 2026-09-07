@@ -1,0 +1,164 @@
+diff --git a/meson.build b/meson.build
+index 425809d..e8df4f2 100644
+--- a/meson.build
++++ b/meson.build
+@@ -81,7 +81,9 @@ osinfo_db_tools_cflags += [
+ osinfo_db_tools_cflags += [
+     '-DPKGDATADIR="@0@"'.format(osinfo_db_tools_pkgdatadir),
+     '-DDATA_DIR="@0@"'.format(osinfo_db_tools_datadir),
++    '-DDATA_DIR_REL="@0@"'.format(get_option('datadir')),
+     '-DSYSCONFDIR="@0@"'.format(osinfo_db_tools_sysconfdir),
++    '-DSYSCONFDIR_REL="@0@"'.format(get_option('sysconfdir')),
+     '-DLOCALEDIR="@0@"'.format(osinfo_db_tools_localedir),
+ ]
+ 
+diff --git a/tools/osinfo-db-relocatable.h b/tools/osinfo-db-relocatable.h
+new file mode 100644
+index 0000000..9130a24
+--- /dev/null
++++ b/tools/osinfo-db-relocatable.h
+@@ -0,0 +1,82 @@
++/*
++ * osinfo-db-tools: Helpers for relocatable runtime paths
++ *
++ * Copyright (C) 2026
++ *
++ * This program is free software; you can redistribute it and/or modify
++ * it under the terms of the GNU General Public License as published by
++ * the Free Software Foundation; either version 2 of the License, or
++ * (at your option) any later version.
++ *
++ * This program is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
++ * GNU General Public License for more details.
++ *
++ * You should have received a copy of the GNU General Public License along
++ * with this program. If not, see <http://www.gnu.org/licenses/>
++ */
++
++#pragma once
++
++#include <glib.h>
++
++#ifdef G_OS_WIN32
++# include <windows.h>
++#endif
++
++static inline gchar *
++osinfo_db_relocatable_dir(gconstpointer address,
++                           const gchar *fallback,
++                           const gchar *relative_dir)
++{
++#ifdef G_OS_WIN32
++    HMODULE module = NULL;
++    DWORD len = 0;
++    DWORD size = MAX_PATH;
++    wchar_t *module_path_utf16 = NULL;
++    gchar *module_path = NULL;
++    gchar *bindir = NULL;
++    gchar *prefix = NULL;
++    gchar *path = NULL;
++
++    if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
++                            GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
++                            (LPCWSTR)address,
++                            &module)) {
++        return g_strdup(fallback);
++    }
++
++    for (;;) {
++        module_path_utf16 = g_new(wchar_t, size);
++        len = GetModuleFileNameW(module, module_path_utf16, size);
++        if (len == 0) {
++            g_free(module_path_utf16);
++            return g_strdup(fallback);
++        }
++        if (len < size)
++            break;
++        g_free(module_path_utf16);
++        module_path_utf16 = NULL;
++        size *= 2;
++    }
++
++    module_path = g_utf16_to_utf8((const gunichar2 *)module_path_utf16,
++                                  -1, NULL, NULL, NULL);
++    g_free(module_path_utf16);
++    if (!module_path)
++        return g_strdup(fallback);
++
++    bindir = g_path_get_dirname(module_path);
++    prefix = g_path_get_dirname(bindir);
++    path = g_build_filename(prefix, relative_dir, NULL);
++
++    g_free(prefix);
++    g_free(bindir);
++    g_free(module_path);
++
++    return path;
++#else
++    return g_strdup(fallback);
++#endif
++}
+diff --git a/tools/osinfo-db-util.c b/tools/osinfo-db-util.c
+index af754cd..4da4231 100644
+--- a/tools/osinfo-db-util.c
++++ b/tools/osinfo-db-util.c
+@@ -23,6 +23,7 @@
+ #include <glib/gi18n.h>
+ 
+ #include "osinfo-db-util.h"
++#include "osinfo-db-relocatable.h"
+ 
+ GQuark osinfo_db_error_quark(void)
+ {
+@@ -34,11 +35,20 @@ GFile *osinfo_db_get_system_path(const gchar *root)
+     GFile *file;
+     g_autofree gchar *dbdir = NULL;
+     const gchar *path = g_getenv("OSINFO_SYSTEM_DIR");
+-    if (!path)
+-        path = DATA_DIR "/osinfo";
+ 
+-    dbdir = g_build_filename(root, path, NULL);
+-    file = g_file_new_for_path(dbdir);
++    if (path) {
++        dbdir = g_build_filename(root, path, NULL);
++        file = g_file_new_for_path(dbdir);
++    } else if (root && *root) {
++        dbdir = g_build_filename(root, DATA_DIR_REL "/osinfo", NULL);
++        file = g_file_new_for_path(dbdir);
++    } else {
++        dbdir = osinfo_db_relocatable_dir(
++            (gconstpointer)osinfo_db_get_system_path,
++            DATA_DIR "/osinfo",
++            DATA_DIR_REL "/osinfo");
++        file = g_file_new_for_path(dbdir);
++    }
+     return file;
+ }
+ 
+@@ -48,11 +58,20 @@ GFile *osinfo_db_get_local_path(const gchar *root)
+     GFile *file;
+     g_autofree gchar *dbdir = NULL;
+     const gchar *path = g_getenv("OSINFO_LOCAL_DIR");
+-    if (!path)
+-        path = SYSCONFDIR "/osinfo";
+ 
+-    dbdir = g_build_filename(root, path, NULL);
+-    file = g_file_new_for_path(dbdir);
++    if (path) {
++        dbdir = g_build_filename(root, path, NULL);
++        file = g_file_new_for_path(dbdir);
++    } else if (root && *root) {
++        dbdir = g_build_filename(root, SYSCONFDIR_REL "/osinfo", NULL);
++        file = g_file_new_for_path(dbdir);
++    } else {
++        dbdir = osinfo_db_relocatable_dir(
++            (gconstpointer)osinfo_db_get_local_path,
++            SYSCONFDIR "/osinfo",
++            SYSCONFDIR_REL "/osinfo");
++        file = g_file_new_for_path(dbdir);
++    }
+     return file;
+ }
+ 
