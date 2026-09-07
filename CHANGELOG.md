@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.0.0] - 2026-09-07
+
 ### Fixed
 
 - Dismissed restoration polkit dialog now sets 'Restoring...' to 'Restore' back
@@ -19,6 +21,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 Now USB provider is connected to service as interface, allowing multiple provider implementations.
 
+#### Windows backend
+
+Now Tailor works on Windows!
+
+Look for installer in release assets.
+
 ## [0.1.1] - 2026-08-28
 
 ### Changed
@@ -30,6 +38,7 @@ Now USB provider is connected to service as interface, allowing multiple provide
 
 First release of Tailor!
 
-[Unreleased]: https://altlinux.space/qualimock/Tailor/compare/v0.1.1...HEAD
+[Unreleased]: https://altlinux.space/qualimock/Tailor/compare/v1.0.0...HEAD
+[1.0.0]: https://altlinux.space/qualimock/Tailor/compare/v0.1.1...v1.0.0
 [0.1.1]: https://altlinux.space/qualimock/Tailor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://altlinux.space/qualimock/Tailor/releases/tag/v0.1.0

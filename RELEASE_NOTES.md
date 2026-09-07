@@ -1,3 +1,5 @@
-- Caching downloads - OS images are cached instead of direct downloading into user's download directory
-- Flatpak - removed `xdg-download` permission due to downloads caching
-- UI - Clamp and center OsPage
+- Large USB management refactor - USB provider is now connected to service as an interface, allowing multiple provider implementations
+- Windows support - Tailor now runs on Windows, look for the installer in release assets
+- Fixed dismissed restoration polkit dialog not setting 'Restoring...' back to 'Restore'
+- Fixed flashing status being overwritten while paused
+- Fixed screenshots links in appstream file
