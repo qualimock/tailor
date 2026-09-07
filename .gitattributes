@@ -1,0 +1,2 @@
+build-aux/windows/msys2/**/PKGBUILD text eol=lf
+build-aux/windows/msys2/**/*.patch text eol=lf

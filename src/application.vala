@@ -38,8 +38,14 @@ namespace Tailor {
 		private ServiceContext service_context { get; private set; }
 
 		public Application () {
+#if WINDOWS
+			Object (application_id: Tailor.ID,
+			        resource_base_path: "/org/altlinux/Tailor",
+			        flags: ApplicationFlags.NON_UNIQUE);
+#else
 			Object (application_id: Tailor.ID,
 			        resource_base_path: "/org/altlinux/Tailor");
+#endif
 		}
 
 		public override void startup () {

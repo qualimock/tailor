@@ -1,0 +1,123 @@
+name: Windows
+
+on:
+  push:
+    tags:
+      - '*'
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: windows-latest
+    defaults:
+      run:
+        shell: msys2 {0}
+    env:
+      PYTHONUTF8: "1"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up MSYS2 (ucrt64)
+        uses: msys2/setup-msys2@v2
+        with:
+          msystem: UCRT64
+          update: true
+          install: >-
+            zip
+            git
+            base-devel
+            python
+            mingw-w64-ucrt-x86_64-gcc
+            mingw-w64-ucrt-x86_64-meson
+            mingw-w64-ucrt-x86_64-ninja
+            mingw-w64-ucrt-x86_64-pkgconf
+            mingw-w64-ucrt-x86_64-vala
+            mingw-w64-ucrt-x86_64-gtk4
+            mingw-w64-ucrt-x86_64-libadwaita
+            mingw-w64-ucrt-x86_64-json-glib
+            mingw-w64-ucrt-x86_64-libgee
+            mingw-w64-ucrt-x86_64-glib-networking
+            mingw-w64-ucrt-x86_64-openssl
+            mingw-w64-ucrt-x86_64-ca-certificates
+            mingw-w64-ucrt-x86_64-librsvg
+            mingw-w64-ucrt-x86_64-adwaita-icon-theme
+            mingw-w64-ucrt-x86_64-vulkan-loader
+
+      - name: Cache osinfo/blueprint-compiler packages
+        id: osinfo-cache
+        uses: actions/cache@v4
+        with:
+          path: build-aux/windows/msys2/dist
+          key: msys2-osinfo-stack-${{ hashFiles('build-aux/windows/msys2/**/PKGBUILD', 'build-aux/windows/msys2/**/*.patch') }}
+
+      - name: Build osinfo stack + blueprint-compiler
+        run: bash build-aux/windows/msys2/build-osinfo-stack.sh
+
+      - name: Build tailor
+        run: |
+          mkdir -p /usr/share/gettext/its
+          cp build-aux/its/its/metainfo.its build-aux/its/its/metainfo.loc /usr/share/gettext/its/
+          meson setup build --prefix=/ucrt64
+          ninja -C build install
+
+      - name: Test the binary starts
+        run: |
+          /ucrt64/bin/tailor.exe &
+          pid=$!
+          sleep 5
+          if ! kill -0 "$pid" 2>/dev/null; then
+            echo "tailor.exe exited within 5s of startup — see above for its output"
+            exit 1
+          fi
+          kill "$pid"
+
+      - name: Install NSIS
+        shell: pwsh
+        run: |
+          for ($i = 1; $i -le 3; $i++) {
+            choco install nsis -y --no-progress
+            if (Test-Path 'C:\Program Files (x86)\NSIS\makensis.exe') { exit 0 }
+            Write-Host "NSIS install attempt $i failed; retrying in 20s"
+            Start-Sleep -Seconds 20
+          }
+          throw 'NSIS install failed after 3 attempts'
+
+      - name: Build installer
+        env:
+          RELEASE_VERSION: ${{ github.ref_name }}
+        run: bash build-aux/windows/bundle-windows.sh
+
+      - name: Upload installer (GitHub artifact)
+        uses: actions/upload-artifact@v7
+        with:
+          name: tailor-windows-x86_64
+          path: Tailor-*-windows-x86_64-setup.exe
+          retention-days: 14
+
+      - name: Upload installer (Forgejo release asset)
+        shell: bash
+        env:
+          FORGEJO_TOKEN: ${{ secrets.FORGEJO_TOKEN }}
+        run: |
+          set -euo pipefail
+          if [ -z "${FORGEJO_TOKEN:-}" ]; then
+            echo "FORGEJO_TOKEN not set - skipping upload to Forgejo (GitHub artifact above still has the build)"
+            exit 0
+          fi
+
+          tag="${GITHUB_REF_NAME}"
+          file="$(ls Tailor-*-windows-x86_64-setup.exe)"
+          api="https://altlinux.space/api/v1/repos/qualimock/Tailor"
+
+          release_id="$(curl -sSf -H "Authorization: token ${FORGEJO_TOKEN}" \
+            "$api/releases/tags/$tag" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+
+          curl -sSf \
+            -H "Authorization: token ${FORGEJO_TOKEN}" \
+            -F "attachment=@${file}" \
+            "$api/releases/${release_id}/assets?name=$(basename "$file")"

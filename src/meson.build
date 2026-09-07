@@ -61,6 +61,23 @@ if host_machine.system() == 'windows'
 		'--define=WINDOWS',
 	]
 	platform_link_args = ['-lsetupapi']
+
+	windres = find_program('windres', required: true)
+	svg_to_ico = find_program(meson.project_source_root() / 'build-aux' / 'windows' / 'svg-to-ico.py')
+	tailor_ico = custom_target(
+		'tailor-ico',
+		input: meson.project_source_root() / 'data' / 'icons' / 'org.altlinux.Tailor.svg',
+		output: 'tailor.ico',
+		command: [svg_to_ico, '@INPUT@', '@OUTPUT@'],
+	)
+	tailor_rc = custom_target(
+		'tailor-rc',
+		input: 'tailor.rc',
+		output: 'tailor-rc.o',
+		depends: tailor_ico,
+		command: [windres, '-I', meson.current_build_dir(), '@INPUT@', '@OUTPUT@'],
+	)
+	app_sources += [tailor_rc]
 else
 	app_sources += files(
 		'usb' / 'usb-provider-linux.vala',
@@ -90,6 +107,7 @@ executable(
 	dependencies: app_dependencies,
 	vala_args: vala_platform_args,
 	link_args: platform_link_args,
+	win_subsystem: host_machine.system() == 'windows' ? 'windows' : 'console',
 	install: true
 )
 

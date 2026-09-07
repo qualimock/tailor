@@ -1,0 +1,52 @@
+# Maintainer: <name> <email>
+
+_realname=osinfo-db
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+_date=20251212
+pkgver=${_date}
+pkgrel=1
+pkgdesc="A database of OSes and hypervisors for virtualization provisioning (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
+url="https://libosinfo.org/"
+msys2_repository_url="https://gitlab.com/libosinfo/osinfo-db"
+msys2_references=(
+  "anitya: 10996"
+)
+license=('spdx:LGPL-2.0-or-later')
+depends=("${MINGW_PACKAGE_PREFIX}-osinfo-db-tools")
+makedepends=(
+  "python"
+  "gettext"
+)
+source=("https://gitlab.com/libosinfo/${_realname}/-/archive/v${_date}/${_realname}-v${_date}.tar.gz")
+sha256sums=('02219039eb922724d36a0d09fd1c351ae55a0b476d785c185d20a760d79d1940')
+noextract=("${_realname}-v${_date}.tar.gz")
+
+prepare() {
+  tar -xzf "${srcdir}/${_realname}-v${_date}.tar.gz" \
+    --exclude="${_realname}-v${_date}/tests" \
+    -C "${srcdir}"
+}
+
+build() {
+  cd "${srcdir}/${_realname}-v${_date}"
+  make
+}
+
+package() {
+  cd "${srcdir}/${_realname}-v${_date}"
+
+  # osinfo-db-import --root used to be broken on Windows: g_build_filename
+  # treated the absolute DATA_DIR path as absolute, silently ignoring --root.
+  # mingw-w64-osinfo-db-tools/0001-relocation.patch fixes this (DATA_DIR_REL
+  # join), but extracting the built archive directly is still simpler and
+  # avoids depending on osinfo-db-tools being installed with a matching
+  # patch level. Re-evaluate if osinfo-db-import --system/--root is needed.
+  local archive
+  archive=$(ls osinfo-db-*.tar.xz 2>/dev/null | head -1)
+
+  install -d "${pkgdir}${MINGW_PREFIX}/share/osinfo"
+  tar -xJf "${archive}" --strip-components=1 -C "${pkgdir}${MINGW_PREFIX}/share/osinfo"
+}

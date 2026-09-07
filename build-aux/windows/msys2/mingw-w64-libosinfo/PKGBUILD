@@ -1,0 +1,85 @@
+# Maintainer: <name> <email>
+
+_realname=libosinfo
+pkgbase=mingw-w64-${_realname}
+pkgname=("${MINGW_PACKAGE_PREFIX}-${_realname}")
+pkgver=1.12.0
+pkgrel=1
+pkgdesc="A library for managing OS information for virtualization (mingw-w64)"
+arch=('any')
+mingw_arch=('mingw32' 'mingw64' 'ucrt64' 'clang64' 'clang32' 'clangarm64')
+url="https://libosinfo.org/"
+msys2_repository_url="https://gitlab.com/libosinfo/libosinfo"
+msys2_references=(
+  "anitya: 8974"
+)
+license=('spdx:LGPL-2.1-or-later')
+depends=(
+  "${MINGW_PACKAGE_PREFIX}-glib2"
+  "${MINGW_PACKAGE_PREFIX}-libsoup3"
+  "${MINGW_PACKAGE_PREFIX}-libxml2"
+  "${MINGW_PACKAGE_PREFIX}-libxslt"
+)
+makedepends=(
+  "${MINGW_PACKAGE_PREFIX}-cc"
+  "${MINGW_PACKAGE_PREFIX}-meson"
+  "${MINGW_PACKAGE_PREFIX}-ninja"
+  "${MINGW_PACKAGE_PREFIX}-pkgconf"
+  "${MINGW_PACKAGE_PREFIX}-gettext-tools"
+  "${MINGW_PACKAGE_PREFIX}-gobject-introspection"
+  "${MINGW_PACKAGE_PREFIX}-vala"
+  "perl"
+)
+source=(
+  "https://gitlab.com/libosinfo/${_realname}/-/archive/v${pkgver}/${_realname}-v${pkgver}.tar.gz"
+  "0001-meson-Enable-GObject-Introspection-and-Vala-bindings.patch"
+  "0002-loader-don-t-use-libxml2-deprecated-APIs.patch"
+  "0003-relocation.patch"
+  "0004-fix-relpath-separators.patch"
+)
+sha256sums=(
+  '3c52fb542d65d1ec5a10f87126d7513c2bd115eaa2f87fb91b15ba588708fc7b'
+  '5f2c20466363cc444c920e6af5f931cef7a9e96f19c844d331129d867983b332'
+  '377d026134d8ae471fac25b192971205d896a1ebe8c0421e094e77827bd9fd33'
+  'd3e45801c69181ffc79fd30b98262e8fd4952f6bcc5340a0adf685726afa6710'
+  'c250558354da150b86b0e9cc63cd3ec7ed54f3f9f9675373736ce6d245c74eda'
+)
+
+prepare() {
+  cd "${srcdir}/${_realname}-v${pkgver}"
+  patch -p1 < "${srcdir}/0001-meson-Enable-GObject-Introspection-and-Vala-bindings.patch"
+  patch -p1 < "${srcdir}/0002-loader-don-t-use-libxml2-deprecated-APIs.patch"
+  patch -p1 < "${srcdir}/0003-relocation.patch"
+  patch -p1 < "${srcdir}/0004-fix-relpath-separators.patch"
+}
+
+build() {
+  mkdir -p "${srcdir}/build-${MSYSTEM}" && cd "${srcdir}/build-${MSYSTEM}"
+
+  MSYS2_ARG_CONV_EXCL="--prefix=" \
+  "${MINGW_PREFIX}/bin/meson.exe" setup \
+    --prefix="${MINGW_PREFIX}" \
+    --wrap-mode=nodownload \
+    --buildtype=plain \
+    -Denable-introspection=enabled \
+    -Denable-vala=auto \
+    -Denable-gtk-doc=false \
+    -Denable-tests=false \
+    -Dlibsoup-abi=3.0 \
+    "../${_realname}-v${pkgver}"
+
+  "${MINGW_PREFIX}/bin/ninja.exe"
+}
+
+check() {
+  cd "${srcdir}/build-${MSYSTEM}"
+  # tests require installed osinfo-db — skip during packaging
+  # "${MINGW_PREFIX}/bin/ninja.exe" test || true
+}
+
+package() {
+  cd "${srcdir}/build-${MSYSTEM}"
+  DESTDIR="${pkgdir}" "${MINGW_PREFIX}/bin/ninja.exe" install
+
+  find "${pkgdir}" -name "*.la" -delete
+}
