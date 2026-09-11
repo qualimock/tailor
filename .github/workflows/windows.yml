@@ -2,8 +2,10 @@ name: Windows
 
 on:
   push:
+    branches:
+      - 'main'
     tags:
-      - '*'
+      - 'v*'
   workflow_dispatch:
 
 concurrency:
@@ -87,9 +89,21 @@ jobs:
           }
           throw 'NSIS install failed after 3 attempts'
 
+      - name: Resolve release tag
+        id: release
+        shell: bash
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "tag=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+            echo "version=${{ github.ref_name }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "tag=nightly" >> "$GITHUB_OUTPUT"
+            echo "version=nightly" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Build installer
         env:
-          RELEASE_VERSION: ${{ github.ref_name }}
+          RELEASE_VERSION: ${{ steps.release.outputs.version }}
         run: bash build-aux/windows/bundle-windows.sh
 
       - name: Upload installer (GitHub artifact)
@@ -110,12 +124,23 @@ jobs:
             exit 0
           fi
 
-          tag="${GITHUB_REF_NAME}"
+          tag="${{ steps.release.outputs.tag }}"
           file="$(ls Tailor-*-windows-x86_64-setup.exe)"
           api="https://altlinux.space/api/v1/repos/qualimock/Tailor"
 
-          release_id="$(curl -sSf -H "Authorization: token ${FORGEJO_TOKEN}" \
-            "$api/releases/tags/$tag" | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+          release_id=""
+          for i in $(seq 1 10); do
+            release_id="$(curl -sSf -H "Authorization: token ${FORGEJO_TOKEN}" \
+              "$api/releases/tags/$tag" | python3 -c 'import json,sys; print(json.load(sys.stdin).get("id",""))' || true)"
+            [ -n "$release_id" ] && break
+            echo "Release '$tag' not found yet on Forgejo, retrying in 15s ($i/10)"
+            sleep 15
+          done
+
+          if [ -z "$release_id" ]; then
+            echo "Release '$tag' never appeared on Forgejo - skipping asset upload"
+            exit 0
+          fi
 
           curl -sSf \
             -H "Authorization: token ${FORGEJO_TOKEN}" \

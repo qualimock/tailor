@@ -5,7 +5,7 @@ on:
     branches:
       - 'main'
     tags:
-      - '*'
+      - 'v*'
     paths-ignore:
       - '**.md'
       - 'COPYING'
@@ -166,15 +166,35 @@ jobs:
 
       - name: Bundle flatpak
         run: |
-          flatpak build-bundle repo org.altlinux.Tailor.Devel.flatpak \
+          mkdir -p release-assets
+          flatpak build-bundle repo release-assets/org.altlinux.Tailor.Devel.flatpak \
             org.altlinux.Tailor.Devel
 
-      - name: Upload flatpak bundle artifact
-        uses: actions/upload-artifact@v3
+      - name: Publish nightly pre-release
+        uses: actions/forgejo-release@v2
         with:
-          name: flatpak-bundle-devel
-          path: org.altlinux.Tailor.Devel.flatpak
-          retention-days: 7
+          direction: upload
+          title: Tailor nightly
+          prerelease: true
+          url: ${{ github.server_url }}
+          repo: ${{ github.repository }}
+          release-dir: release-assets
+          release-notes: "Nightly build from ${{ github.sha }}"
+          token: ${{ secrets.RELEASE_TOKEN }}
+          sha: ${{ github.sha }}
+          tag: nightly
+          override: true
+
+      - name: Force prerelease flag (forgejo-release override PATCH bug)
+        run: |
+          release_id="$(curl -sSf -H "Authorization: token ${{ secrets.RELEASE_TOKEN }}" \
+            "${{ github.server_url }}/api/v1/repos/${{ github.repository }}/releases/tags/nightly" \
+            | python3 -c 'import json,sys; print(json.load(sys.stdin)["id"])')"
+          curl -sSf -X PATCH \
+            -H "Authorization: token ${{ secrets.RELEASE_TOKEN }}" \
+            -H "Content-Type: application/json" \
+            -d '{"prerelease": true}' \
+            "${{ github.server_url }}/api/v1/repos/${{ github.repository }}/releases/$release_id"
 
   flatpak-test:
     name: Flatpak Test Build (devel)
