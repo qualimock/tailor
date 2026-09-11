@@ -75,6 +75,25 @@ namespace Tailor {
 			return 0;
 		}
 
+		public async OsFamily? detect_os (string image_path) {
+			try {
+				var media = yield Osinfo.Media.create_from_location_async (
+					image_path,
+					Priority.DEFAULT,
+					new Cancellable ()
+				);
+				provider.identify_media (media);
+
+				if (media.os == null)
+					return null;
+
+				return build_family_for_media (media.os, media);
+			} catch (Error e) {
+				warning ("Couldn't detect an OS in present path: %s", image_path);
+				return null;
+			}
+		}
+
 		private void build_families (string primary_distro) {
 			families = new Gee.HashMap<string, OsFamily> ();
 			arches = new Gee.TreeSet<string> ();
@@ -120,6 +139,25 @@ namespace Tailor {
 
 				finalize_base_editions (family);
 			}
+		}
+
+		private OsFamily build_family_for_media (Osinfo.Os os, Osinfo.Media media) {
+			var family = OsMapper.family_from_osinfo (os, "");
+
+			var version_id = os.version ?? "unknown";
+			var version = OsMapper.version_from_osinfo (version_id, os);
+			family.versions.set (version_id, version);
+
+			var edition_id = OsParser.get_edition_id (os, media);
+			var edition = OsMapper.edition_from_osinfo (os, media);
+			version.editions.set (edition_id, edition);
+
+			edition.images.add (OsMapper.image_from_osinfo (os, media));
+
+			if (media.architecture != null)
+				arches.add (media.architecture);
+
+			return family;
 		}
 
 		private OsFamily? build_family (Osinfo.Os os, string primary_distro) {
@@ -214,8 +252,6 @@ namespace Tailor {
 					base_edition.name = family.name;
 			}
 		}
-
-		// TODO: add OS detection in .iso file
 
 		private bool is_at_eol (Osinfo.Os os) {
 			var eol = os.get_eol_date ();

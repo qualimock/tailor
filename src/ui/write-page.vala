@@ -56,8 +56,20 @@ namespace Tailor {
 				(obj, res) => {
 					try {
 						service.image_file = dialog.open.end (res);
-						var nav = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
-						nav.push_by_tag ("image-page");
+						var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
+
+						service.osinfo.detect_os.begin (service.image_file.get_path (), (detect_obj, detect_res) => {
+							var family = service.osinfo.detect_os.end (detect_res);
+							if (family == null) {
+								view.push ((ImagePage) view.find_page ("image-page"));
+								return;
+							}
+
+
+							var page = (OsPage) view.find_page ("os-page");
+							page.configure (family, null);
+							view.push (page);
+						});
 					} catch (Error e) {
 						if (e.code == Gtk.DialogError.DISMISSED)
 							return;

@@ -46,6 +46,10 @@ namespace Tailor {
 				throw thread_error;
 		}
 
+		public bool identify_media (Osinfo.Media media) {
+			return db.identify_media (media);
+		}
+
 		public Gee.ArrayList<Osinfo.Os> get_os_list () {
 			var list = new Gee.ArrayList<Osinfo.Os> ();
 
