@@ -12,11 +12,17 @@ Tailor
 > If you are interested in contributing code to this app (Thank you!),
 > please see the [style rules](./CONTRIBUTING.md).
 
+> [!NOTE]
+> If you are interested in contributing translations to Tailor (Thank you!),
+> please see the [Weblate project](https://translate.alt-gnome.ru/projects/tailor/).
+
 Tailor is an application for writing OS images to USB drives. Pick an OS and
 edition from the built-in catalog (or supply your own ISO), pick a target
 drive, and Tailor downloads, verifies, and flashes it.
 
 ### Installing
+
+<a href='https://flathub.org/apps/details/org.altlinux.Tailor'><img width='240' alt='Get it on Flathub' src='https://flathub.org/api/badge?svg&locale=en'/></a>
 
 Clone the repository and run these commands inside the project root:
 
@@ -31,6 +37,10 @@ Or build as a Flatpak:
 ```sh
 flatpak-builder build-dir build-aux/flatpak/org.altlinux.Tailor.json
 ```
+
+A Windows installer (`.exe`, built via MSYS2/NSIS) is published on every
+release and nightly build - see
+[Releases](https://altlinux.space/qualimock/Tailor/releases).
 
 You will need the following dependencies installed, along with a C
 compiler, `vala`, `meson`, and `ninja`:
@@ -47,6 +57,10 @@ compiler, `vala`, `meson`, and `ninja`:
 ### Contributing
 
 See [CONTRIBUTING.md](./CONTRIBUTING.md) for code style rules.
+
+### Changelog
+
+See [CHANGELOG.md](./CHANGELOG.md).
 
 ### License
 
