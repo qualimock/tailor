@@ -7,6 +7,17 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### New
+
+#### OS detection:
+
+Now Tailor can detect an operating system in your .iso file.
+
+Click 'Install from File' and select an image - if Tailor knows that OS, it will
+navigate you to OsPage to display OS information.
+
+Then create downloadable USB as before.
+
 ### Fixed
 
 - Unknown versions are no longer displayed, e.g. for rolling-release distros like Arch
