@@ -48,9 +48,11 @@ namespace Tailor {
 		}
 
 		public static OsEdition edition_from_osinfo (Osinfo.Os os, Osinfo.Media media) {
+			var id = OsParser.get_edition_id (os, media);
 			return new OsEdition (
-				OsParser.get_edition_id (os, media),
-				OsParser.get_edition_name (os, media)
+				id,
+				OsParser.get_edition_name (os, media),
+				id == OsParser.BASE_EDITION_ID
 			);
 		}
 

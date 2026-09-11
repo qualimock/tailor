@@ -26,9 +26,10 @@ namespace Tailor {
 
 		public string id { get; construct; }
 		public string name { get; set; }
+		public bool is_base { get; construct; }
 
-		public OsEdition (string id, string name) {
-			Object (id: id, name: name);
+		public OsEdition (string id, string name, bool is_base) {
+			Object (id: id, name: name, is_base: is_base);
 		}
 	}
 }
