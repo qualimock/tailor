@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Unknown versions are no longer displayed, e.g. for rolling-release distros like Arch
 - OSes with single edition like GNU Guix does not display that single edition
+- FlashPage title is now build from non-empty parts
 
 ## [1.0.0] - 2026-09-07
 

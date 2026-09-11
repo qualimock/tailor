@@ -102,13 +102,19 @@ namespace Tailor {
 
 			build_flash_steps ();
 
-			os_statuspage.title = "%s %s %s %s".printf (
-				family.name,
-				edition?.name ?? "",
-				version?.version ?? "",
-				version?.codename != null ? @"($(version.codename))" : ""
-			).strip ();
+			var title = new Gee.ArrayList<string> ();
+			title.add (family.name);
 
+			if (edition != null && edition.name != family.name)
+				title.add (edition.name);
+
+			if (version != null && version.has_number)
+				title.add (version.version);
+
+			if (version?.codename != null)
+				title.add (@"($(version.codename))");
+
+			os_statuspage.title = string.joinv (" ", title.to_array ());
 			os_statuspage.description = family.vendor;
 			os_statuspage.icon_name = ""; // TODO: add OS icons
 			os_statuspage.badge = image.arch;
