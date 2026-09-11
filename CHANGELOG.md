@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Fixed
+
+- Unknown versions are no longer displayed, e.g. for rolling-release distros like Arch
+
 ## [1.0.0] - 2026-09-07
 
 ### Fixed

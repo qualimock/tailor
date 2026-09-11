@@ -307,6 +307,9 @@ namespace Tailor {
 		private bool greater_than (uint a, uint b) { return a > b; }
 
 		[GtkCallback]
+		private bool equal (uint a, uint b) { return a == b; }
+
+		[GtkCallback]
 		private bool logical_and (bool a, bool b) { return a && b; }
 
 		[GtkCallback]

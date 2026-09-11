@@ -115,7 +115,16 @@ template $TailorOsPage : Adw.NavigationPage {
 									Adw.ActionRow {
 										title: _("Version");
 										selectable: false;
-										visible: bind $greater_than (template.n-versions, 0) as <bool>;
+
+										visible: bind $logical_and (
+											$greater_than (template.n-versions, 0) as <bool>,
+											$logical_not (
+												$logical_and (
+													$equal (template.n-versions, 1) as <bool>,
+													$logical_not (template.selected-version as <$TailorOsVersion>.has-number) as <bool>
+												) as <bool>
+											) as <bool>
+										);
 
 										[suffix]
 										DropDown version_dropdown {
