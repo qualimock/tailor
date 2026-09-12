@@ -12,6 +12,18 @@
         "--system-talk-name=org.freedesktop.UDisks2",
         "--device=all"
     ],
+    "cleanup": [
+        "/include",
+        "/lib/girepository-1.0",
+        "/lib/pkgconfig",
+        "/share/bash-completion",
+        "/share/gir-1.0",
+        "/share/man",
+        "/share/vala",
+        "/share/zsh",
+        "*.la",
+        "*.a"
+    ],
     "modules" : [
         {
             "name" : "udisks2",
@@ -102,8 +114,5 @@
                 "-Dprofile=development"
             ]
         }
-    ],
-    "build-options" : {
-        "env" : {        }
-    }
+    ]
 }
