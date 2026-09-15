@@ -142,6 +142,15 @@ jobs:
             exit 0
           fi
 
+          asset_name="$(basename "$file")"
+          existing_id="$(curl -sSf -H "Authorization: token ${FORGEJO_TOKEN}" \
+            "$api/releases/${release_id}/assets" \
+            | python3 -c "import json,sys; print(next((a['id'] for a in json.load(sys.stdin) if a['name']=='$asset_name'), ''))")"
+          if [ -n "$existing_id" ]; then
+            curl -sSf -X DELETE -H "Authorization: token ${FORGEJO_TOKEN}" \
+              "$api/releases/${release_id}/assets/${existing_id}"
+          fi
+
           curl -sSf \
             -H "Authorization: token ${FORGEJO_TOKEN}" \
             -F "attachment=@${file}" \
