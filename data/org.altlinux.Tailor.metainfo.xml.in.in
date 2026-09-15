@@ -78,6 +78,28 @@
 	</screenshots>
 
 	<releases>
+		<release version="1.1.0" date="2026-09-15">
+			<description>
+				<p>New - OS detection!</p>
+				<p>Now Tailor can detect an operating system in your .iso file.</p>
+				<p>Click &#x27;Install from File&#x27; and select an image - if Tailor knows that OS, it will navigate you to OsPage to display OS information.</p>
+				<p>Then create downloadable USB as before.</p>
+				<p>Changes:</p>
+				<ul>
+					<li>Tailor can now be translated conveniently! You can see translation progress in Weblate</li>
+					<li>Tailor got Nightly release</li>
+					<li>Set default window size to 600x680</li>
+					<li>New branding scheme in metainfo</li>
+					<li>Updated screenshots</li>
+				</ul>
+				<p>Fixes:</p>
+				<ul>
+					<li>Unknown versions are no longer displayed, e.g. for rolling-release distros like Arch</li>
+					<li>OSes with single edition like GNU Guix does not display that single edition</li>
+					<li>FlashPage title is now build from non-empty parts</li>
+				</ul>
+			</description>
+		</release>
 		<release version="1.0.0" date="2026-09-07" />
 		<release version="0.1.1" date="2026-08-28" />
 		<release version="0.1.0" date="2026-08-27" />

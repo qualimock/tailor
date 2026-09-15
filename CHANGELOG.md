@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.1.0] - 2026-09-15
+
 ### New - OS detection!
 
 Now Tailor can detect an operating system in your .iso file.
@@ -61,7 +63,8 @@ Look for installer in release assets.
 
 First release of Tailor!
 
-[Unreleased]: https://altlinux.space/qualimock/Tailor/compare/v1.0.0...HEAD
+[Unreleased]: https://altlinux.space/qualimock/Tailor/compare/v1.1.0...HEAD
+[1.1.0]: https://altlinux.space/qualimock/Tailor/compare/v1.0.0...v1.1.0
 [1.0.0]: https://altlinux.space/qualimock/Tailor/compare/v0.1.1...v1.0.0
 [0.1.1]: https://altlinux.space/qualimock/Tailor/compare/v0.1.0...v0.1.1
 [0.1.0]: https://altlinux.space/qualimock/Tailor/releases/tag/v0.1.0
