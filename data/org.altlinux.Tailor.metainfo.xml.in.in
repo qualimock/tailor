@@ -36,9 +36,8 @@
 	</recommends>
 
 	<branding>
-		<!-- TODO: branding -->
-		<color type="primary" scheme_preference="light">#ffb63f</color>
-		<color type="primary" scheme_preference="dark">#c54400</color>
+		<color type="primary" scheme_preference="light">#cdab8f</color>
+		<color type="primary" scheme_preference="dark">#4a2f1a</color>
 	</branding>
 
 	<launchable type="desktop-id">@APP_ID@.desktop</launchable>
