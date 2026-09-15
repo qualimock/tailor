@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 16:20+0300\n"
+"POT-Creation-Date: 2026-09-15 18:13+0300\n"
 "PO-Revision-Date: 2026-09-15 10:13+0000\n"
 "Last-Translator: Alexey Volkov <qualimock@alt-gnome.ru>\n"
 "Language-Team: Russian <https://translate.alt-gnome.ru/projects/tailor/"
@@ -54,23 +54,23 @@ msgstr ""
 "редакцию из каталога (или используйте свой ISO образ), выберите целевое "
 "устройство, и Портной загрузит, подтвердит и запишет образ."
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:61
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:60
 msgid "Tailor main page"
 msgstr "Главная страница Портного"
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:65
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:64
 msgid "OS catalog"
 msgstr "Каталог ОС"
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:69
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:68
 msgid "OS page with detailed information"
 msgstr "Страница ОС с детальной информацией"
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:73
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:72
 msgid "Flashing process"
 msgstr "Процесс записи"
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:77
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:76
 msgid "About dialog"
 msgstr "Диалог о программе"
 
@@ -222,7 +222,7 @@ msgstr ""
 msgid "Target device"
 msgstr "Целевое устройство"
 
-#: data/ui/image-page.blp:84 data/ui/os-page.blp:347
+#: data/ui/image-page.blp:84 data/ui/os-page.blp:319 data/ui/os-page.blp:347
 msgid "Create Bootable USB"
 msgstr "Создать загрузочный USB"
 
@@ -302,10 +302,6 @@ msgstr "Удалить загрузку после записи"
 #: data/ui/os-page.blp:299 src/ui/flash-page.vala:345
 msgid "Downloaded image will be kept in app cache"
 msgstr "Загруженный образ будет сохранен в кеше приложения"
-
-#: data/ui/os-page.blp:319
-msgid "Create Bootlable USB"
-msgstr "Создать загрузочный USB"
 
 #: data/ui/os-page.blp:341
 msgid "Fetching checksum…"
@@ -643,6 +639,9 @@ msgstr[2] "%u разделов"
 #: src/usb/usb-mapper.vala:147
 msgid "No filesystem"
 msgstr "Без файловой системы"
+
+#~ msgid "Create Bootlable USB"
+#~ msgstr "Создать загрузочный USB"
 
 #~ msgid "OS Info"
 #~ msgstr "Информация ОС"
