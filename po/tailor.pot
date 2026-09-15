@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-11 16:20+0300\n"
+"POT-Creation-Date: 2026-09-15 18:13+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -49,23 +49,23 @@ msgid ""
 "drive, and Tailor downloads, verifies, and flashes it."
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:61
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:60
 msgid "Tailor main page"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:65
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:64
 msgid "OS catalog"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:69
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:68
 msgid "OS page with detailed information"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:73
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:72
 msgid "Flashing process"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:77
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:76
 msgid "About dialog"
 msgstr ""
 
@@ -216,7 +216,7 @@ msgstr ""
 msgid "Target device"
 msgstr ""
 
-#: data/ui/image-page.blp:84 data/ui/os-page.blp:347
+#: data/ui/image-page.blp:84 data/ui/os-page.blp:319 data/ui/os-page.blp:347
 msgid "Create Bootable USB"
 msgstr ""
 
@@ -294,10 +294,6 @@ msgstr ""
 
 #: data/ui/os-page.blp:299 src/ui/flash-page.vala:345
 msgid "Downloaded image will be kept in app cache"
-msgstr ""
-
-#: data/ui/os-page.blp:319
-msgid "Create Bootlable USB"
 msgstr ""
 
 #: data/ui/os-page.blp:341
