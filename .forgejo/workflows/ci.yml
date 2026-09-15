@@ -9,10 +9,18 @@ on:
     paths-ignore:
       - '**.md'
       - 'COPYING'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
   pull_request:
     paths-ignore:
       - '**.md'
       - 'COPYING'
+      - '.editorconfig'
+      - '.gitattributes'
+      - '.gitignore'
+      - '.pre-commit-config.yaml'
   workflow_dispatch:
     inputs:
       release_version:
