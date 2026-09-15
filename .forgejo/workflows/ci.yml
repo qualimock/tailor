@@ -14,6 +14,12 @@ on:
       - '**.md'
       - 'COPYING'
   workflow_dispatch:
+    inputs:
+      release_version:
+        description: 'Version to release (e.g. 1.1.0) - leave empty for a plain CI run'
+        required: false
+        type: string
+        default: ''
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -102,12 +108,19 @@ jobs:
           git archive --format=tar --prefix="$prefix/" "$GITHUB_REF_NAME" \
             | bzip2 -c > "release-assets/$prefix.tar.bz2"
 
+      - name: Extract changelog section
+        run: |
+          awk -v ver="${{ steps.version.outputs.value }}" '
+            /^## \[/ { if (found) exit; if ($0 ~ "\\[" ver "\\]") found=1; next }
+            found { print }
+          ' CHANGELOG.md > /tmp/release-notes.md
+
       - name: Attach release assets
         uses: actions/forgejo-release@v2
         with:
           direction: upload
           title: Tailor ${{ steps.version.outputs.value }}
-          release-notes-file: RELEASE_NOTES.md
+          release-notes-file: /tmp/release-notes.md
           url: ${{ github.server_url }}
           repo: ${{ github.repository }}
           release-dir: release-assets
@@ -115,6 +128,29 @@ jobs:
           sha: ${{ github.sha }}
           tag: ${{ github.ref_name }}
           override: true
+
+  prepare-release:
+    name: Prepare release
+    runs-on: als-tiny
+    timeout-minutes: 5
+    if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.release_version != '' }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.RELEASE_TOKEN }}
+
+      - name: Sync CHANGELOG.md and metainfo
+        run: python3 build-aux/sync-changelog.py "${{ github.event.inputs.release_version }}"
+
+      - name: Commit release prep
+        run: |
+          git config user.name "forgejo-actions"
+          git config user.email "actions@noreply.altlinux.space"
+          git add CHANGELOG.md data/org.altlinux.Tailor.metainfo.xml.in.in meson.build
+          git commit -m "chore: release ${{ github.event.inputs.release_version }}"
+          git push origin HEAD:main
 
   flatpak-devel:
     name: Flatpak Build (devel, nightly)
