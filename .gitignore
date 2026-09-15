@@ -1,7 +1,6 @@
 build
 .project
 .buildconfig
-*.pot
 .flatpak-builder/
 flatpak-build/
 .idea/
