@@ -121,7 +121,7 @@ namespace Tailor {
 				progress (bytes_verified, total_bytes);
 			}
 
-			yield input.close_async (Priority.DEFAULT, cancellable);
+			yield input.close_async (Priority.DEFAULT, null);
 
 			if (read_error != null)
 				throw read_error;

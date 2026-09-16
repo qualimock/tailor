@@ -540,6 +540,7 @@ namespace Tailor {
 
 			dialog.response["cancel"].connect (() => {
 				cancellable.cancel ();
+				operation?.resume ();
 				on_cancel ();
 			});
 
