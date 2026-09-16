@@ -7,7 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
-### Hotfix:
+### New - primary OS translations:
+
+Now Tailor detects OS id in 'primary-os' field and put translatable primary OS title on DownloadPage.
+If id is not found, Tailor uses fallback 'OS images'.
+
+### Fixes:
 
 - Flashing an OS detected from a local ISO file now writes that file directly
 - Fixed device staying "busy" after cancelling a flash
