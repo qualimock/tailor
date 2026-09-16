@@ -78,6 +78,17 @@
 	</screenshots>
 
 	<releases>
+		<release version="1.1.1" date="2026-09-16">
+			<description>
+				<p>New - primary OS translations:</p>
+				<p>Now Tailor detects OS id in &#x27;primary-os&#x27; field and put translatable primary OS title on DownloadPage. If id is not found, Tailor uses fallback &#x27;OS images&#x27;.</p>
+				<p>Fixes:</p>
+				<ul>
+					<li>Flashing an OS detected from a local ISO file now writes that file directly</li>
+					<li>Fixed device staying &quot;busy&quot; after cancelling a flash</li>
+				</ul>
+			</description>
+		</release>
 		<release version="1.1.0" date="2026-09-15">
 			<description>
 				<p>New - OS detection!</p>
