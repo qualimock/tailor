@@ -48,6 +48,7 @@ namespace Tailor {
 
 		public ServiceContext service { get; construct set; }
 		public bool started { get; private set; default = false; }
+		public bool downloading { get; private set; default = false; }
 		public bool flashing { get; private set; default = false; }
 		public bool verifying { get; private set; default = false; }
 		public bool success { get; private set; default = false; }
@@ -67,6 +68,7 @@ namespace Tailor {
 			this.device = device;
 			selected_image = null;
 			image_file = image;
+			downloading = false;
 
 			build_flash_steps ();
 
@@ -83,7 +85,6 @@ namespace Tailor {
 			os_statuspage.title = "%s".printf (image.get_basename ());
 			os_statuspage.description = _("Local file");
 			os_statuspage.icon_name = "media-optical-symbolic";
-			download_status.visible = false;
 		}
 
 		public void configure_from_os (
@@ -120,8 +121,8 @@ namespace Tailor {
 			os_statuspage.badge = image.arch;
 			os_statuspage.badge_visible = true;
 
+			downloading = true;
 			download_status.title = _("Downloading image %s").printf (Path.get_basename (image.url));
-			download_status.visible = true;
 		}
 
 		private void build_flash_steps () {

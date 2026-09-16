@@ -62,6 +62,7 @@ template $TailorFlashPage : Adw.NavigationPage {
 
 						$TailorStatusLine download_status {
 							styles [ "dimmed" ]
+							visible: bind template.downloading;
 						}
 
 						$TailorStatusLine checksum_status {
