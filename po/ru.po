@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-15 18:13+0300\n"
+"POT-Creation-Date: 2026-09-16 17:43+0300\n"
 "PO-Revision-Date: 2026-09-15 10:13+0000\n"
 "Last-Translator: Alexey Volkov <qualimock@alt-gnome.ru>\n"
 "Language-Team: Russian <https://translate.alt-gnome.ru/projects/tailor/"
@@ -73,6 +73,93 @@ msgstr "Процесс записи"
 #: data/org.altlinux.Tailor.metainfo.xml.in.in:76
 msgid "About dialog"
 msgstr "Диалог о программе"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:83
+msgid "Hotfix:"
+msgstr "Хотфикс:"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:85
+msgid ""
+"Flashing an OS detected from a local ISO file now writes that file directly"
+msgstr ""
+"Запись ОС, обнаруженной в локальном ISO файла теперь записывает именно этот "
+"файл"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:86
+msgid "Fixed device staying \"busy\" after cancelling a flash"
+msgstr ""
+"Исправлена ошибка, из-за которой устройство оставалось \"busy\" после отмены "
+"записи."
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:92
+msgid "New - OS detection!"
+msgstr "Новое - Обнаружение ОС!"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:93
+msgid "Now Tailor can detect an operating system in your .iso file."
+msgstr ""
+"Теперь Портной умеет обнаруживать операционные системы в ваших .iso файлах."
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:94
+msgid ""
+"Click 'Install from File' and select an image - if Tailor knows that OS, it "
+"will navigate you to OsPage to display OS information."
+msgstr ""
+"Нажмите 'Установить из файла' и выберите образ - если Портной знает эту ОС, "
+"он покажет вам страницу ОС с подробной информацией."
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:95
+msgid "Then create downloadable USB as before."
+msgstr "Затем создавайте загрузочные USB как прежде."
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:96
+msgid "Changes:"
+msgstr "Изменения:"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:98
+msgid ""
+"Tailor can now be translated conveniently! You can see translation progress "
+"in Weblate"
+msgstr ""
+"Теперь Портной можно удобно переводить! Вы можете наблюдать прогресс "
+"перевода на Weblate"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:99
+msgid "Tailor got Nightly release"
+msgstr "Портной получил Nightly релизы"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:100
+msgid "Set default window size to 600x680"
+msgstr "Размер окна по-умолчанию установлен на 600x680"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:101
+msgid "New branding scheme in metainfo"
+msgstr "Новая схема брендинга в metainfo"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:102
+msgid "Updated screenshots"
+msgstr "Обновлены скриншоты"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:104
+msgid "Fixes:"
+msgstr "Исправления:"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:106
+msgid ""
+"Unknown versions are no longer displayed, e.g. for rolling-release distros "
+"like Arch"
+msgstr "Неизвестные версии больше не показываются, например как у Arch"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:107
+msgid ""
+"OSes with single edition like GNU Guix does not display that single edition"
+msgstr ""
+"ОС с единственной редакцией (например GNU Guix) теперь не показывают эту "
+"редакцию"
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:108
+msgid "FlashPage title is now build from non-empty parts"
+msgstr "Заголовок FlashPage теперь строится из непустых частей"
 
 #: data/ui/device-card.blp:24
 msgid "Drive icon"
@@ -159,41 +246,41 @@ msgstr "Запись"
 msgid "Installing"
 msgstr "Установка"
 
-#: data/ui/flash-page.blp:71 src/ui/flash-page.vala:296
+#: data/ui/flash-page.blp:72 src/ui/flash-page.vala:328
 msgid "Verifying checksum"
 msgstr "Проверка контрольной суммы"
 
-#: data/ui/flash-page.blp:77 src/ui/flash-page.vala:301
+#: data/ui/flash-page.blp:78 src/ui/flash-page.vala:333
 msgid "Preparing device"
 msgstr "Подготовка устройства"
 
-#: data/ui/flash-page.blp:83
+#: data/ui/flash-page.blp:84
 msgid "Writing image to device"
 msgstr "Запись образа на устройство"
 
-#: data/ui/flash-page.blp:89 src/ui/flash-page.vala:312
+#: data/ui/flash-page.blp:90 src/ui/flash-page.vala:344
 msgid "Verifying installation"
 msgstr "Верификация установки"
 
-#: data/ui/flash-page.blp:102 src/ui/device-card.vala:69
-#: src/ui/image-page.vala:109 src/ui/os-page.vala:375
+#: data/ui/flash-page.blp:103 src/ui/device-card.vala:69
+#: src/ui/image-page.vala:109 src/ui/os-page.vala:377
 msgid "Cancel"
 msgstr "Отменить"
 
-#: data/ui/flash-page.blp:113
+#: data/ui/flash-page.blp:114
 msgid "Skip"
 msgstr "Пропустить"
 
-#: data/ui/flash-page.blp:127 src/ui/device-card.vala:87
+#: data/ui/flash-page.blp:128 src/ui/device-card.vala:87
 #: src/ui/device-card.vala:105 src/ui/device-card.vala:120
 msgid "Details"
 msgstr "Детали"
 
-#: data/ui/flash-page.blp:136
+#: data/ui/flash-page.blp:137
 msgid "Retry"
 msgstr "Повторить"
 
-#: data/ui/flash-page.blp:142
+#: data/ui/flash-page.blp:143
 msgid "Go Back"
 msgstr "Назад"
 
@@ -205,7 +292,7 @@ msgstr "Устройства"
 msgid "Image"
 msgstr "Образ"
 
-#: data/ui/image-page.blp:40 src/ui/flash-page.vala:84
+#: data/ui/image-page.blp:40 src/ui/flash-page.vala:77
 msgid "Local file"
 msgstr "Локальный файл"
 
@@ -299,7 +386,7 @@ msgstr "Дополнительно"
 msgid "Delete download after writing"
 msgstr "Удалить загрузку после записи"
 
-#: data/ui/os-page.blp:299 src/ui/flash-page.vala:345
+#: data/ui/os-page.blp:299 src/ui/flash-page.vala:377
 msgid "Downloaded image will be kept in app cache"
 msgstr "Загруженный образ будет сохранен в кеше приложения"
 
@@ -315,7 +402,7 @@ msgstr "Проверка ОС…"
 msgid "OS not Available"
 msgstr "ОС недоступна"
 
-#: data/ui/progress-line.blp:6 src/ui/flash-page.vala:167
+#: data/ui/progress-line.blp:6 src/ui/flash-page.vala:199
 msgid "Starting"
 msgstr "Начало"
 
@@ -433,7 +520,7 @@ msgid "Restore device?"
 msgstr "Восстановить устройство?"
 
 #: src/ui/device-card.vala:70 src/ui/image-page.vala:110
-#: src/ui/os-page.vala:376
+#: src/ui/os-page.vala:378
 msgid "Proceed"
 msgstr "Приступить"
 
@@ -443,7 +530,7 @@ msgid "Failed to restore device"
 msgstr "Не удалось восстановить устройство"
 
 #: src/ui/device-card.vala:89 src/ui/device-card.vala:107
-#: src/ui/device-card.vala:122 src/ui/flash-page.vala:537
+#: src/ui/device-card.vala:122 src/ui/flash-page.vala:570
 msgid "Error Details"
 msgstr "Детали ошибки"
 
@@ -451,135 +538,135 @@ msgstr "Детали ошибки"
 msgid "Device restored"
 msgstr "Устройство восстановлено"
 
-#: src/ui/flash-page.vala:123
+#: src/ui/flash-page.vala:105
 #, c-format
 msgid "Downloading image %s"
 msgstr "Загрузка образа %s"
 
-#: src/ui/flash-page.vala:199
+#: src/ui/flash-page.vala:231
 msgid "Image is already downloaded"
 msgstr "Образ уже загружен"
 
-#: src/ui/flash-page.vala:231
+#: src/ui/flash-page.vala:263
 msgid "Trying to reconnect"
 msgstr "Попытка переподключения"
 
-#: src/ui/flash-page.vala:275
+#: src/ui/flash-page.vala:307
 msgid "Downloading the image failed"
 msgstr "Не удалось загрузить образ"
 
-#: src/ui/flash-page.vala:277
+#: src/ui/flash-page.vala:309
 msgid "Checksum verification failed"
 msgstr "Не удалось проверить контрольную сумму"
 
-#: src/ui/flash-page.vala:279
+#: src/ui/flash-page.vala:311
 msgid "Preparing the device failed"
 msgstr "Не удалось подготовить устройство"
 
-#: src/ui/flash-page.vala:281
+#: src/ui/flash-page.vala:313
 msgid "Writing the image failed"
 msgstr "Не удалось записать образ"
 
-#: src/ui/flash-page.vala:283
+#: src/ui/flash-page.vala:315
 msgid "Verifying the write failed"
 msgstr "Не удалось верифицировать запись"
 
-#: src/ui/flash-page.vala:285
+#: src/ui/flash-page.vala:317
 msgid "An error occurred during writing process"
 msgstr "Произошла ошибка записи"
 
-#: src/ui/flash-page.vala:291
+#: src/ui/flash-page.vala:323
 msgid "Downloading"
 msgstr "Загрузка"
 
-#: src/ui/flash-page.vala:306
+#: src/ui/flash-page.vala:338
 msgid "Writing image"
 msgstr "Запись образа"
 
-#: src/ui/flash-page.vala:318 src/ui/status-line.vala:52
+#: src/ui/flash-page.vala:350 src/ui/status-line.vala:52
 msgid "Paused"
 msgstr "Пауза"
 
-#: src/ui/flash-page.vala:339
+#: src/ui/flash-page.vala:371
 msgid "The image was written successfully"
 msgstr "Образ записан успешно"
 
-#: src/ui/flash-page.vala:347
+#: src/ui/flash-page.vala:379
 msgid "Save As…"
 msgstr "Сохранить как…"
 
-#: src/ui/flash-page.vala:350
+#: src/ui/flash-page.vala:382
 msgid "Save Image"
 msgstr "Сохранить образ"
 
-#: src/ui/flash-page.vala:413
+#: src/ui/flash-page.vala:445
 msgid "Writing was canceled"
 msgstr "Запись отменена"
 
-#: src/ui/flash-page.vala:451
+#: src/ui/flash-page.vala:483
 msgid "Resume"
 msgstr "Продолжить"
 
-#: src/ui/flash-page.vala:451
+#: src/ui/flash-page.vala:483
 msgid "Pause"
 msgstr "Пауза"
 
-#: src/ui/flash-page.vala:481
+#: src/ui/flash-page.vala:513
 msgid "Cancel tailoring?"
 msgstr "Отменить прошивку?"
 
-#: src/ui/flash-page.vala:482
+#: src/ui/flash-page.vala:514
 msgid "The device may be left in an incomplete state and fail to boot."
 msgstr "Устройство может остаться в незавершенном состоянии и не загрузиться."
 
-#: src/ui/flash-page.vala:484
+#: src/ui/flash-page.vala:516
 msgid "Continue"
 msgstr "Продолжить"
 
-#: src/ui/flash-page.vala:485
+#: src/ui/flash-page.vala:517
 msgid "Cancel Anyway"
 msgstr "Все равно отменить"
 
-#: src/ui/flash-page.vala:493
+#: src/ui/flash-page.vala:525
 msgid "Cancel download?"
 msgstr "Отменить загрузку?"
 
-#: src/ui/flash-page.vala:494
+#: src/ui/flash-page.vala:526
 msgid "The device won't be affected."
 msgstr "Устройство не будет затронуто."
 
-#: src/ui/flash-page.vala:499
+#: src/ui/flash-page.vala:531
 msgid "Downloaded image will not be deleted."
 msgstr "Загруженный образ не будет удален."
 
-#: src/ui/image-page.vala:106 src/ui/os-page.vala:372
+#: src/ui/image-page.vala:106 src/ui/os-page.vala:374
 msgid "Tailor the Image?"
 msgstr "Прошить образ?"
 
-#: src/ui/image-page.vala:107 src/ui/os-page.vala:373
+#: src/ui/image-page.vala:107 src/ui/os-page.vala:375
 msgid "All device data will be erased!"
 msgstr "Все данные устройства будут удалены!"
 
-#: src/ui/os-page.vala:244 src/ui/os-page.vala:248 src/ui/os-page.vala:252
+#: src/ui/os-page.vala:246 src/ui/os-page.vala:250 src/ui/os-page.vala:254
 msgid "Not available"
 msgstr "Недоступно"
 
-#: src/ui/os-page.vala:294
+#: src/ui/os-page.vala:296
 #, c-format
 msgid "%.0f MHz"
 msgstr "%.0f МГц"
 
-#: src/ui/os-page.vala:296
+#: src/ui/os-page.vala:298
 #, c-format
 msgid "%.1f GHz"
 msgstr "%.1f ГГц"
 
-#: src/ui/os-page.vala:301
+#: src/ui/os-page.vala:303
 #, c-format
 msgid "%.0f MiB"
 msgstr "%.0f МиБ"
 
-#: src/ui/os-page.vala:303
+#: src/ui/os-page.vala:305
 #, c-format
 msgid "%.1f GiB"
 msgstr "%.1f ГиБ"
@@ -612,7 +699,7 @@ msgstr "Пропущена"
 msgid "Close"
 msgstr "Закрыть"
 
-#: src/ui/ui-service.vala:30
+#: src/ui/ui-service.vala:60
 msgid "Copy"
 msgstr "Скопировать"
 
@@ -639,19 +726,3 @@ msgstr[2] "%u разделов"
 #: src/usb/usb-mapper.vala:147
 msgid "No filesystem"
 msgstr "Без файловой системы"
-
-#~ msgid "Create Bootlable USB"
-#~ msgstr "Создать загрузочный USB"
-
-#~ msgid "OS Info"
-#~ msgstr "Информация ОС"
-
-#~ msgid "Verification failed: written data does not match source"
-#~ msgstr "Верификация не удалась: записанные данные не совпадают с источником"
-
-#, c-format
-#~ msgid "Image will be downloaded in %s"
-#~ msgstr "Образ будет загружен в %s"
-
-#~ msgid "Drive name"
-#~ msgstr "Название устройства"
