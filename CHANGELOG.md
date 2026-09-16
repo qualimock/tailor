@@ -7,6 +7,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Hotfix:
+
+- Flashing an OS detected from a local ISO file now writes that file directly
+- Fixed device staying "busy" after cancelling a flash
+
 ## [1.1.0] - 2026-09-15
 
 ### New - OS detection!
