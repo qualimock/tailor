@@ -49,7 +49,10 @@ namespace Tailor {
 		public MainWindow (Tailor.Application app, ServiceContext service) {
 			Object (application: app, service: service);
 
-			download_page.primary_os_title = app.settings.get_string ("primary-os-title");
+			download_page.primary_os_title = service.ui.get_primary_os_title (
+				app.settings.get_string ("primary-os"),
+				app.settings.get_string ("primary-os-title-fallback")
+			);
 		}
 	}
 }

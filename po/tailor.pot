@@ -675,11 +675,119 @@ msgstr ""
 msgid "Skipped"
 msgstr ""
 
-#: src/ui/ui-service.vala:29
+#: src/ui/ui-service.vala:31
+msgid "operating system"
+msgstr ""
+
+#: src/ui/ui-service.vala:32
+msgid "OS family"
+msgstr ""
+
+#: src/ui/ui-service.vala:34
+#, c-format
+msgid "ALT %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:35
+#, c-format
+msgid "AlmaLinux %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:36
+#, c-format
+msgid "Alpine Linux %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:37
+#, c-format
+msgid "Arch Linux %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:38
+#, c-format
+msgid "CentOS %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:39
+#, c-format
+msgid "Debian %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:40
+#, c-format
+msgid "Fedora %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:41
+#, c-format
+msgid "FreeBSD %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:42
+#, c-format
+msgid "FreeDOS %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:43
+#, c-format
+msgid "Guix System %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:44
+#, c-format
+msgid "Haiku %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:45
+#, c-format
+msgid "Manjaro %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:46
+#, c-format
+msgid "NetBSD %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:47
+#, c-format
+msgid "NixOS %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:48
+#, c-format
+msgid "OpenBSD %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:49
+#, c-format
+msgid "openSUSE %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:50
+#, c-format
+msgid "Rocky Linux %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:51
+#, c-format
+msgid "Slackware %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:52
+#, c-format
+msgid "Trisquel %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:53
+#, c-format
+msgid "Ubuntu %s"
+msgstr ""
+
+#: src/ui/ui-service.vala:59
 msgid "Close"
 msgstr ""
 
-#: src/ui/ui-service.vala:30
+#: src/ui/ui-service.vala:60
 msgid "Copy"
 msgstr ""
 

@@ -21,7 +21,37 @@
 namespace Tailor {
 
 	public class UiService : Object {
+
+		private static Gee.Map<string, string> primary_os_titles;
+
 		public signal void toast_requested (Adw.Toast toast);
+
+		static construct {
+			primary_os_titles = new Gee.HashMap<string, string> ();
+			var os = _("operating system");
+			var family = _("OS family");
+
+			primary_os_titles["alt"] = _("ALT %s").printf (family);
+			primary_os_titles["almalinux"] = _("AlmaLinux %s").printf (os);
+			primary_os_titles["alpinelinux"] = _("Alpine Linux %s").printf (os);
+			primary_os_titles["archlinux"] = _("Arch Linux %s").printf (family);
+			primary_os_titles["centos"] = _("CentOS %s").printf (os);
+			primary_os_titles["debian"] = _("Debian %s").printf (family);
+			primary_os_titles["fedora"] = _("Fedora %s").printf (family);
+			primary_os_titles["freebsd"] = _("FreeBSD %s").printf (family);
+			primary_os_titles["freedos"] = _("FreeDOS %s").printf (os);
+			primary_os_titles["guix-system"] = _("Guix System %s").printf (os);
+			primary_os_titles["haiku"] = _("Haiku %s").printf (os);
+			primary_os_titles["manjaro"] = _("Manjaro %s").printf (os);
+			primary_os_titles["netbsd"] = _("NetBSD %s").printf (os);
+			primary_os_titles["nixos"] = _("NixOS %s").printf (os);
+			primary_os_titles["openbsd"] = _("OpenBSD %s").printf (os);
+			primary_os_titles["opensuse"] = _("openSUSE %s").printf (family);
+			primary_os_titles["rocky"] = _("Rocky Linux %s").printf (os);
+			primary_os_titles["slackware"] = _("Slackware %s").printf (family);
+			primary_os_titles["trisquel"] = _("Trisquel %s").printf (os);
+			primary_os_titles["ubuntu"] = _("Ubuntu %s").printf (family);
+		}
 
 		public void show_details (Gtk.Widget parent, string title, string message) {
 			var dialog = new Adw.AlertDialog (title, message);
@@ -37,6 +67,11 @@ namespace Tailor {
 			});
 
 			dialog.present (parent);
+		}
+
+		public string get_primary_os_title (string primary_os_id, string fallback) {
+			var id = OsParser.normalize_family_id (primary_os_id);
+			return primary_os_titles.has_key (id) ? primary_os_titles[id] : fallback;
 		}
 	}
 }

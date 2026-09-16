@@ -6,10 +6,10 @@
 			<summary>Primary distribution</summary>
 			<description>Distribution to show as primary. See available distributions in osinfo-db.</description>
 		</key>
-		<key name="primary-os-title" type="s">
-			<default l10n="messages">''</default>
-			<summary>Primary distribution title</summary>
-			<description>Title above primary distribution list.</description>
+		<key name="primary-os-title-fallback" type="s">
+			<default l10n="messages">'OS images'</default>
+			<summary>Primary distribution title fallback</summary>
+			<description>Used in primary distribution list if primary-os is not found in the list.</description>
 		</key>
 	</schema>
 </schemalist>

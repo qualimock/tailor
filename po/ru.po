@@ -695,7 +695,115 @@ msgstr "Отменена"
 msgid "Skipped"
 msgstr "Пропущена"
 
-#: src/ui/ui-service.vala:29
+#: src/ui/ui-service.vala:31
+msgid "operating system"
+msgstr "Операционная система"
+
+#: src/ui/ui-service.vala:32
+msgid "OS family"
+msgstr "Семейство ОС"
+
+#: src/ui/ui-service.vala:34
+#, c-format
+msgid "ALT %s"
+msgstr "%s Альт"
+
+#: src/ui/ui-service.vala:35
+#, c-format
+msgid "AlmaLinux %s"
+msgstr "%s AlmaLinux"
+
+#: src/ui/ui-service.vala:36
+#, c-format
+msgid "Alpine Linux %s"
+msgstr "%s Alpine Linux"
+
+#: src/ui/ui-service.vala:37
+#, c-format
+msgid "Arch Linux %s"
+msgstr "%s Arch Linux"
+
+#: src/ui/ui-service.vala:38
+#, c-format
+msgid "CentOS %s"
+msgstr "%s CentOS"
+
+#: src/ui/ui-service.vala:39
+#, c-format
+msgid "Debian %s"
+msgstr "%s Debian"
+
+#: src/ui/ui-service.vala:40
+#, c-format
+msgid "Fedora %s"
+msgstr "%s Fedora"
+
+#: src/ui/ui-service.vala:41
+#, c-format
+msgid "FreeBSD %s"
+msgstr "%s FreeBSD"
+
+#: src/ui/ui-service.vala:42
+#, c-format
+msgid "FreeDOS %s"
+msgstr "%s FreeDOS"
+
+#: src/ui/ui-service.vala:43
+#, c-format
+msgid "Guix System %s"
+msgstr "%s Guix System"
+
+#: src/ui/ui-service.vala:44
+#, c-format
+msgid "Haiku %s"
+msgstr "%s Haiku"
+
+#: src/ui/ui-service.vala:45
+#, c-format
+msgid "Manjaro %s"
+msgstr "%s Manjaro"
+
+#: src/ui/ui-service.vala:46
+#, c-format
+msgid "NetBSD %s"
+msgstr "%s NetBSD"
+
+#: src/ui/ui-service.vala:47
+#, c-format
+msgid "NixOS %s"
+msgstr "%s NixOS"
+
+#: src/ui/ui-service.vala:48
+#, c-format
+msgid "OpenBSD %s"
+msgstr "%s OpenBSD"
+
+#: src/ui/ui-service.vala:49
+#, c-format
+msgid "openSUSE %s"
+msgstr "%s openSUSE"
+
+#: src/ui/ui-service.vala:50
+#, c-format
+msgid "Rocky Linux %s"
+msgstr "%s Rocky Linux"
+
+#: src/ui/ui-service.vala:51
+#, c-format
+msgid "Slackware %s"
+msgstr "%s Slackware"
+
+#: src/ui/ui-service.vala:52
+#, c-format
+msgid "Trisquel %s"
+msgstr "%s Trisquel"
+
+#: src/ui/ui-service.vala:53
+#, c-format
+msgid "Ubuntu %s"
+msgstr "%s Ubuntu"
+
+#: src/ui/ui-service.vala:59
 msgid "Close"
 msgstr "Закрыть"
 
