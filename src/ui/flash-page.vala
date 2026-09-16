@@ -71,16 +71,7 @@ namespace Tailor {
 			downloading = false;
 
 			build_flash_steps ();
-
-			try {
-				var info = image.query_info (
-					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
-				);
-
-				os_statuspage.badge = format_size (info.get_size ());
-			} catch (Error e) {
-				os_statuspage.badge_visible = false;
-			}
+			build_badge_from_file (image);
 
 			os_statuspage.title = "%s".printf (image.get_basename ());
 			os_statuspage.description = _("Local file");
@@ -103,19 +94,7 @@ namespace Tailor {
 
 			build_flash_steps ();
 
-			var title = new Gee.ArrayList<string> ();
-			title.add (family.name);
-
-			if (edition != null && edition.name != family.name)
-				title.add (edition.name);
-
-			if (version != null && version.has_number)
-				title.add (version.version);
-
-			if (version?.codename != null)
-				title.add (@"($(version.codename))");
-
-			os_statuspage.title = string.joinv (" ", title.to_array ());
+			os_statuspage.title = build_statuspage_title (family, edition, version);
 			os_statuspage.description = family.vendor;
 			os_statuspage.icon_name = ""; // TODO: add OS icons
 			os_statuspage.badge = image.arch;
@@ -138,6 +117,35 @@ namespace Tailor {
 			flash_steps += prepare_status;
 			flash_steps += write_status;
 			flash_steps += verify_status;
+		}
+
+		private string build_statuspage_title (OsFamily family, OsEdition? edition, OsVersion? version) {
+			var title = new Gee.ArrayList<string> ();
+			title.add (family.name);
+
+			if (edition != null && edition.name != family.name)
+				title.add (edition.name);
+
+			if (version != null && version.has_number)
+				title.add (version.version);
+
+			if (version?.codename != null)
+				title.add (@"($(version.codename))");
+
+			return string.joinv (" ", title.to_array ());
+		}
+
+		private void build_badge_from_file (File image_file) {
+			try {
+				var info = image_file.query_info (
+					FileAttribute.STANDARD_SIZE, FileQueryInfoFlags.NONE
+				);
+
+				os_statuspage.badge = format_size (info.get_size ());
+				os_statuspage.badge_visible = true;
+			} catch (Error e) {
+				os_statuspage.badge_visible = false;
+			}
 		}
 
 		private void reset () {
