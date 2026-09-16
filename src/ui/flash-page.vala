@@ -91,6 +91,7 @@ namespace Tailor {
 			device = selected_device;
 			delete_after_flashing = delete_download;
 			selected_image = image;
+			image_file = null;
 
 			build_flash_steps ();
 
@@ -102,6 +103,28 @@ namespace Tailor {
 
 			downloading = true;
 			download_status.title = _("Downloading image %s").printf (Path.get_basename (image.url));
+		}
+
+		public void configure_from_local_os (
+			OsFamily family,
+			OsEdition? edition,
+			OsVersion? version,
+			File image_file,
+			UsbDevice selected_device
+		) {
+			reset ();
+
+			device = selected_device;
+			this.image_file = image_file;
+			selected_image = null;
+			downloading = false;
+
+			build_flash_steps ();
+			build_badge_from_file (image_file);
+
+			os_statuspage.title = build_statuspage_title (family, edition, version);
+			os_statuspage.description = family.vendor;
+			os_statuspage.icon_name = ""; // TODO: add OS icons
 		}
 
 		private void build_flash_steps () {

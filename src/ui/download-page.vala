@@ -181,7 +181,7 @@ namespace Tailor {
 			var view = (Adw.NavigationView) get_ancestor (typeof (Adw.NavigationView));
 			var page = (OsPage) view.find_page ("os-page");
 
-			page.configure (row.family, row.edition);
+			page.configure (row.family, row.edition, null);
 			view.push (page);
 		}
 	}

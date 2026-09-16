@@ -67,7 +67,7 @@ namespace Tailor {
 
 
 							var page = (OsPage) view.find_page ("os-page");
-							page.configure (family, null);
+							page.configure (family, null, service.image_file);
 							view.push (page);
 						});
 					} catch (Error e) {

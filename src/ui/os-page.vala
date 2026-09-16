@@ -24,6 +24,7 @@ namespace Tailor {
 	public class OsPage : Adw.NavigationPage {
 
 		private ListStore device_store = new ListStore (typeof (UsbDevice));
+		private File? local_image_file = null;
 
 		private bool repopulating = false;
 
@@ -104,8 +105,9 @@ namespace Tailor {
 			populated.connect (update_os_info);
 		}
 
-		public void configure (OsFamily family, OsEdition? preferred_edition) {
+		public void configure (OsFamily family, OsEdition? preferred_edition, File? local_image_file) {
 			current_family = family;
+			this.local_image_file = local_image_file;
 			populate_editions (preferred_edition?.id);
 		}
 
@@ -380,12 +382,21 @@ namespace Tailor {
 			dialog.set_response_appearance ("proceed", Adw.ResponseAppearance.DESTRUCTIVE);
 
 			dialog.response["proceed"].connect (() => {
-				page.configure_from_os (
-					current_family,
-					selected_edition, selected_version, selected_image,
-					(UsbDevice) selection_device.selected_item,
-					delete_switch.active
-				);
+				if (local_image_file != null) {
+					page.configure_from_local_os (
+						current_family,
+						selected_edition, selected_version,
+						local_image_file,
+						(UsbDevice) selection_device.selected_item
+					);
+				} else {
+					page.configure_from_os (
+						current_family,
+						selected_edition, selected_version, selected_image,
+						(UsbDevice) selection_device.selected_item,
+						delete_switch.active
+					);
+				}
 
 				view.push (page);
 			});
