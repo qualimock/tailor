@@ -33,6 +33,7 @@ namespace Tailor {
 
 		private bool stalled = false;
 		private Cancellable? current_attempt_cancellable = null;
+		private uint last_status_code = 0;
 
 		public signal void completed (File temp_file);
 		public signal void skipped (File existing_file);
@@ -101,6 +102,7 @@ namespace Tailor {
 
 		private async void stream_with_retries () throws Error {
 			for (int attempt = 0; ; attempt++) {
+				last_status_code = 0;
 				var attempt_cancellable = new Cancellable ();
 				current_attempt_cancellable = attempt_cancellable;
 				var link_id = cancellable.connect (() => attempt_cancellable.cancel ());
@@ -116,7 +118,8 @@ namespace Tailor {
 					if (cancellable.is_cancelled ())
 						throw e;
 
-					if (!stalled)
+					if (e is IOError.NO_SPACE || e is IOError.PERMISSION_DENIED ||
+					   (last_status_code >= 400 && last_status_code < 500))
 						throw e;
 
 					stalled = false;
@@ -209,6 +212,7 @@ namespace Tailor {
 				msg.request_headers.append ("Range", @"bytes=$(bytes_written)-");
 
 			var input = yield session.send_async (msg, Priority.DEFAULT, attempt_cancellable);
+			last_status_code = msg.status_code;
 
 			if (bytes_written > 0) {
 				if (msg.status_code != Soup.Status.PARTIAL_CONTENT)
