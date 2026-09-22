@@ -24,6 +24,7 @@ namespace Tailor {
 
 		private UDisks.Block block;
 		private DBusObjectManager object_manager;
+		private int device_fd = -1;
 
 		public DeviceHandleLinux (UDisks.Block block, DBusObjectManager object_manager) {
 			this.block = block;
@@ -54,7 +55,8 @@ namespace Tailor {
 			IPauseGate pause_gate,
 			Cancellable cancellable
 		) throws Error {
-			var output = yield get_output (cancellable);
+			device_fd = yield open_device_rw (cancellable);
+			var output = new UnixOutputStream (device_fd, false);
 
 			try {
 				var checksum = yield stream (
@@ -64,11 +66,12 @@ namespace Tailor {
 					pause_gate,
 					cancellable
 				);
-				yield output.close_async (Priority.DEFAULT, cancellable);
+				Posix.fsync (device_fd);
 
 				return checksum;
 			} catch (Error e) {
-				yield output.close_async (Priority.DEFAULT, null);
+				Posix.close (device_fd);
+				device_fd = -1;
 
 				throw e;
 			}
@@ -80,19 +83,8 @@ namespace Tailor {
 			IPauseGate pause_gate,
 			Cancellable cancellable
 		) throws Error {
-			UnixFDList fd_list;
-			Variant out_fd;
-
-			yield block.call_open_for_backup (
-				new Variant ("a{sv}", null),
-				null,
-				cancellable,
-				out out_fd,
-				out fd_list
-			);
-
-			var fd = fd_list.get (out_fd.get_handle ());
-			var input = new UnixInputStream (fd, true);
+			Posix.lseek (device_fd, 0, Posix.SEEK_SET);
+			var input = new UnixInputStream (device_fd, true);
 
 			var device_checksum = new Checksum (ChecksumType.SHA256);
 			var buf = new uint8[1024 * 1024];
@@ -122,6 +114,7 @@ namespace Tailor {
 			}
 
 			yield input.close_async (Priority.DEFAULT, null);
+			device_fd = -1;
 
 			if (read_error != null)
 				throw read_error;
@@ -142,18 +135,25 @@ namespace Tailor {
 			return e.message.contains ("NotAuthorizedDismissed");
 		}
 
-		private async UnixOutputStream get_output (Cancellable cancellable) throws Error {
-			UnixFDList fd_list;
-			Variant out_fd;
-			yield block.call_open_for_restore (
-				new Variant ("a{sv}", null),
+		private async int open_device_rw (Cancellable cancellable) throws Error {
+			var proxy = (DBusProxy) block;
+
+			var options = new VariantBuilder (new VariantType ("a{sv}"));
+			options.add ("{sv}", "flags", new Variant.int32 (Posix.O_EXCL | Posix.O_SYNC));
+
+			UnixFDList out_fd_list;
+			var result = yield proxy.call_with_unix_fd_list (
+				"OpenDevice",
+				new Variant ("(sa{sv})", "rw", options),
+				DBusCallFlags.NONE,
+				-1,
 				null,
 				cancellable,
-				out out_fd,
-				out fd_list
+				out out_fd_list
 			);
-			var fd = fd_list.get (out_fd.get_handle ());
-			return new UnixOutputStream (fd, true);
+
+			Variant out_fd = result.get_child_value (0);
+			return out_fd_list.get (out_fd.get_handle ());
 		}
 
 		private async Checksum stream (

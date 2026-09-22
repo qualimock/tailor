@@ -22,6 +22,13 @@
 
 		<file preprocess="xml-stripblanks">icons/scalable/actions/drawer-symbolic.svg</file>
 		<file preprocess="xml-stripblanks">icons/scalable/actions/sad-computer-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/actions/help-about-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/actions/document-save-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/actions/edit-find-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/devices/media-optical-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/devices/drive-harddisk-usb-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/devices/drive-removable-media-symbolic.svg</file>
+		<file preprocess="xml-stripblanks">icons/scalable/devices/media-removable-symbolic.svg</file>
 
 		<file>@APP_ID@.metainfo.xml</file>
 	</gresource>
