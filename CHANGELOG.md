@@ -11,6 +11,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 - Use single FD for both writing and verifying. Some software could mount device between writing and verifying. Using single FD for both operations fixes it
 - Retry any connection issue, not only stalled
+- Bundle icons to application
 
 ## [1.1.1] - 2026-09-16
 
