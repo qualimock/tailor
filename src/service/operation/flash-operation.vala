@@ -119,7 +119,9 @@ namespace Tailor {
 				throw e;
 			}
 
-			yield input.close_async (Priority.DEFAULT, null);
+			try {
+				yield input.close_async (Priority.DEFAULT, null);
+			} catch (Error e) {}
 
 			verify_cancellable = new Cancellable ();
 			var verify_link_id = cancellable.connect (() => verify_cancellable.cancel ());
