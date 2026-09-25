@@ -78,6 +78,16 @@
 	</screenshots>
 
 	<releases>
+		<release version="1.1.2" date="2026-09-25">
+			<description>
+				<p>Fixes:</p>
+				<ul>
+					<li>Use single FD for both writing and verifying. Some software could mount device between writing and verifying. Using single FD for both operations fixes it</li>
+					<li>Retry any connection issue, not only stalled</li>
+					<li>Bundle icons to application</li>
+				</ul>
+			</description>
+		</release>
 		<release version="1.1.1" date="2026-09-16">
 			<description>
 				<p>New - primary OS translations:</p>
