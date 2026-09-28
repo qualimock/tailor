@@ -19,23 +19,21 @@
  */
 
 public static int main (string[] args) {
+	var locale_dir = Tailor.LOCALEDIR;
 #if WINDOWS
-	var exe_path_buffer = new uint8[260];
-	Win32.get_module_file_name (null, exe_path_buffer, exe_path_buffer.length);
-	var exe_path = (string) exe_path_buffer;
-	var bin_dir = exe_path.substring (0, exe_path.last_index_of ("\\"));
-	var root_dir = bin_dir.substring (0, bin_dir.last_index_of ("\\"));
+	var root_dir = GLib.Win32.get_package_installation_directory_of_module (null);
 
 	Environment.set_variable ("GSETTINGS_SCHEMA_DIR", root_dir + "\\share\\glib-2.0\\schemas", true);
 	Environment.set_variable ("GDK_PIXBUF_MODULEDIR", root_dir + "\\lib\\gdk-pixbuf-2.0\\2.10.0\\loaders", true);
 	Environment.set_variable ("GIO_MODULE_DIR", root_dir + "\\lib\\gio\\modules", true);
 	Environment.set_variable ("XDG_DATA_DIRS", root_dir + "\\share", true);
 	Environment.set_variable ("SSL_CERT_FILE", root_dir + "\\etc\\ssl\\certs\\ca-bundle.crt", true);
+	locale_dir = Path.build_filename (root_dir, "share", "locale");
 #endif
 
 	Environment.set_prgname (Tailor.ID);
 	Intl.setlocale (LocaleCategory.ALL, "");
-	Intl.bindtextdomain (Tailor.GETTEXT_PACKAGE, Tailor.LOCALEDIR);
+	Intl.bindtextdomain (Tailor.GETTEXT_PACKAGE, locale_dir);
 	Intl.bind_textdomain_codeset (Tailor.GETTEXT_PACKAGE, "UTF-8");
 	Intl.textdomain (Tailor.GETTEXT_PACKAGE);
 
