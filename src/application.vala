@@ -93,7 +93,7 @@ namespace Tailor {
 			if (main_window == null)
 				return;
 
-			var dialog = new Adw.AboutDialog.from_appdata ("org/altlinux/Tailor/%s.metainfo.xml".printf (Tailor.ID), VERSION) {
+			var dialog = new Adw.AboutDialog.from_appdata ("/org/altlinux/Tailor/%s.metainfo.xml".printf (Tailor.ID), VERSION) {
 				copyright = "© 2026 ALT Linux Team",
 				developers = {
 					_("Alexey “qualimock” Volkov") + " <qualimock@altlinux.org>",
