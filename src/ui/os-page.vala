@@ -264,6 +264,13 @@ namespace Tailor {
 				codename_label.label = version.codename ?? "";
 			}
 
+			if (local_image_file != null) {
+				checking = false;
+				available = true;
+				has_checksum = true;
+				return;
+			}
+
 			checking = true;
 			available = false;
 			has_checksum = false;
