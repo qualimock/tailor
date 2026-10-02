@@ -59,7 +59,10 @@ namespace Tailor {
 			Cancellable? cancellable
 		) throws Error {
 			try {
-				var msg = new Soup.Message ("GET", url);
+				Soup.Message? msg = new Soup.Message ("GET", url);
+				if (msg == null)
+					return null;
+
 				var input = yield session.send_async (msg, Priority.DEFAULT, cancellable);
 
 				if (msg.status_code != Soup.Status.OK)

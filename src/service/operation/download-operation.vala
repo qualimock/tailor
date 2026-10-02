@@ -205,7 +205,10 @@ namespace Tailor {
 		}
 
 		private async InputStream open_source (Cancellable attempt_cancellable) throws Error {
-			var msg = new Soup.Message ("GET", image.url);
+			Soup.Message? msg = new Soup.Message ("GET", image.url);
+			if (msg == null)
+				throw new IOError.INVALID_ARGUMENT ("Invalid image URL: %s", image.url);
+
 			msg.request_headers.append ("Accept", "*/*");
 
 			if (bytes_written > 0)

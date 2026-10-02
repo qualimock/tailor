@@ -29,7 +29,10 @@ namespace Tailor {
 		}
 
 		public async bool is_url_available (string url) {
-			var msg = new Soup.Message ("HEAD", url);
+			Soup.Message? msg = new Soup.Message ("HEAD", url);
+			if (msg == null)
+				return false;
+
 			try {
 				yield session.send_async (msg, Priority.DEFAULT, null);
 
