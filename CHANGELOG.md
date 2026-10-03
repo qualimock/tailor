@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+## [1.2.0] - 2026-10-03
+
 ### Project relocation
 
 Now Tailor is located at [ALT GNOME organization](https://altlinux.space/alt-gnome/Tailor).
@@ -102,7 +104,8 @@ Look for installer in release assets.
 
 First release of Tailor!
 
-[Unreleased]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.2...HEAD
+[Unreleased]: https://altlinux.space/alt-gnome/Tailor/compare/v1.2.0...HEAD
+[1.2.0]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.2...v1.2.0
 [1.1.2]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.1...v1.1.2
 [1.1.1]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.0...v1.1.1
 [1.1.0]: https://altlinux.space/alt-gnome/Tailor/compare/v1.0.0...v1.1.0

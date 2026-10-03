@@ -1,7 +1,7 @@
 project(
 	'Tailor',
 	['c', 'vala'],
-	version: '1.1.2',
+	version: '1.2.0',
 	meson_version: '>= 1.1',
 )
 

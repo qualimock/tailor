@@ -78,6 +78,22 @@
 	</screenshots>
 
 	<releases>
+		<release version="1.2.0" date="2026-10-03">
+			<description>
+				<p>Project relocation</p>
+				<p>Now Tailor is located at ALT GNOME organization: https://altlinux.space/alt-gnome/Tailor. Previous links are working and redirects you to the actual repository.</p>
+				<p>Safe unplugging:</p>
+				<p>Now Tailor ejects the device after writing, so it can be safely unplugged right away.</p>
+				<p>If the device can&#x27;t be ejected (e.g. it is used by another application), Tailor shows a banner with &#x27;Eject&#x27; button to try again.</p>
+				<p>Fixes:</p>
+				<ul>
+					<li>About dialog failed to load application info</li>
+					<li>Flashing an OS detected from a local ISO file no longer checks the download availability</li>
+					<li>Fixed crash on invalid image download URLs</li>
+					<li>Fixed translations on Windows</li>
+				</ul>
+			</description>
+		</release>
 		<release version="1.1.2" date="2026-09-25">
 			<description>
 				<p>Fixes:</p>
