@@ -60,7 +60,7 @@ if host_machine.system() == 'windows'
 		'--pkg=win32-storage',
 		'--define=WINDOWS',
 	]
-	platform_link_args = ['-lsetupapi']
+	platform_link_args = ['-lsetupapi', '-lcfgmgr32']
 
 	windres = find_program('windres', required: true)
 	svg_to_ico = find_program(meson.project_source_root() / 'build-aux' / 'windows' / 'svg-to-ico.py')
