@@ -32,7 +32,8 @@ namespace Tailor {
 			CHECKSUM,
 			PREPARING,
 			WRITING,
-			VERIFYING
+			VERIFYING,
+			EJECTING
 		}
 
 		protected Cancellable cancellable;
@@ -77,6 +78,7 @@ namespace Tailor {
 			case State.PREPARING: return _("Device preparation");
 			case State.WRITING: return _("Writing");
 			case State.VERIFYING: return _("Verification");
+			case State.EJECTING: return _("Ejecting");
 			default:
 				return _("Flashing");
 			}

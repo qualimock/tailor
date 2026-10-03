@@ -1,4 +1,4 @@
-[CCode (cheader_filename = "windows.h,setupapi.h,winioctl.h,sysinfoapi.h,dbt.h,shellapi.h")]
+[CCode (cheader_filename = "windows.h,setupapi.h,cfgmgr32.h,winioctl.h,sysinfoapi.h,dbt.h,shellapi.h")]
 namespace Win32 {
 
 	[CCode (cname = "INVALID_HANDLE_VALUE")]
@@ -95,12 +95,56 @@ namespace Win32 {
 		public uint32 cb_size;
 	}
 
+	[CCode (cname = "SP_DEVINFO_DATA", has_type_id = false)]
+	public struct DevInfoData {
+		[CCode (cname = "cbSize")]
+		public uint32 cb_size;
+		[CCode (cname = "ClassGuid")]
+		public Guid class_guid;
+		[CCode (cname = "DevInst")]
+		public uint32 dev_inst;
+		[CCode (cname = "Reserved")]
+		public size_t reserved;
+	}
+
 	[CCode (cname = "SetupDiDestroyDeviceInfoList")]
 	public static bool destroy_device_info_list (void* device_info_set);
+
+	[CCode (cname = "CR_SUCCESS")]
+	public const uint32 CR_SUCCESS;
+
+	[CCode (cname = "CM_Get_Parent")]
+	public static uint32 cm_get_parent (out uint32 parent, uint32 dev_inst, uint32 flags);
+
+	[CCode (cname = "PNP_VETO_TYPE", has_type_id = false)]
+	public enum PnpVetoType {
+		[CCode (cname = "PNP_VetoTypeUnknown")]
+		UNKNOWN
+	}
+
+	[CCode (cname = "CM_Request_Device_EjectA")]
+	public static uint32 cm_request_device_eject (
+		uint32 dev_inst,
+		out PnpVetoType veto_type,
+		[CCode (array_length = false)] uint8[] veto_name,
+		uint32 veto_name_length,
+		uint32 flags
+	);
 
 	[CCode (cname = "CreateFileA")]
 	public static void* create_file (
 		string file_name,
+		uint32 desired_access,
+		uint32 share_mode,
+		void* security_attributes,
+		uint32 creation_disposition,
+		uint32 flags_and_attributes,
+		void* template_file
+	);
+
+	[CCode (cname = "CreateFileW")]
+	public static void* create_file_w (
+		void* file_name,
 		uint32 desired_access,
 		uint32 share_mode,
 		void* security_attributes,

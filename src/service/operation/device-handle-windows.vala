@@ -254,6 +254,105 @@ namespace Tailor {
 			}
 		}
 
+		public async void eject (Cancellable cancellable) throws Error {
+			yield run_blocking (() => request_eject ());
+		}
+
+		private void request_eject () throws Error {
+			var device_number = get_device_number ();
+			if (device_number == null)
+				return;
+
+			var dev_inst = find_disk_dev_inst (device_number);
+			if (dev_inst == 0)
+				return;
+
+			uint32 parent;
+			if (Win32.cm_get_parent (out parent, dev_inst, 0) != Win32.CR_SUCCESS)
+				throw new IOError.FAILED ("CM_Get_Parent failed for %s".printf (device_path));
+
+			Win32.PnpVetoType veto_type;
+			var veto_name = new uint8[260];
+
+			var result = Win32.cm_request_device_eject (parent, out veto_type, veto_name, veto_name.length, 0);
+			if (result != Win32.CR_SUCCESS)
+				throw new IOError.FAILED ("CM_Request_Device_Eject failed, CONFIGRET=%u".printf (result));
+
+			if (veto_type != Win32.PnpVetoType.UNKNOWN)
+				throw new IOError.BUSY ("eject vetoed (type %d): %s".printf ((int) veto_type, (string) veto_name));
+		}
+
+		private uint32 find_disk_dev_inst (uint32 device_number) {
+			var device_info_set = Win32.get_class_devs (
+				&Win32.guid_devinterface_disk,
+				null,
+				null,
+				Win32.DeviceInfoFlags.PRESENT | Win32.DeviceInfoFlags.DEVICEINTERFACE
+			);
+
+			uint32 dev_inst = 0;
+
+			for (uint32 index = 0; dev_inst == 0; index++) {
+				var iface_data = Win32.DeviceInterfaceData ();
+				iface_data.cb_size = (uint32) sizeof (Win32.DeviceInterfaceData);
+
+				if (!Win32.enum_device_interfaces (device_info_set, null, &Win32.guid_devinterface_disk, index, ref iface_data))
+					break;
+
+				uint32 required_size;
+				Win32.get_device_interface_detail (device_info_set, &iface_data, null, 0, out required_size, null);
+				if (required_size == 0)
+					continue;
+
+				var detail_buffer = new uint8[required_size];
+				((Win32.DeviceInterfaceDetailData*) detail_buffer)->cb_size =
+					(uint32) sizeof (Win32.DeviceInterfaceDetailData);
+
+				var info_data = Win32.DevInfoData ();
+				info_data.cb_size = (uint32) sizeof (Win32.DevInfoData);
+
+				if (!Win32.get_device_interface_detail (device_info_set, &iface_data, detail_buffer, required_size, null, &info_data))
+					continue;
+
+				// DevicePath (UTF-16) starts right after the leading cbSize DWORD
+				var disk_handle = Win32.create_file_w (
+					(uint8*) detail_buffer + sizeof (uint32),
+					0,
+					Win32.FILE_SHARE_READ | Win32.FILE_SHARE_WRITE,
+					null,
+					Win32.OPEN_EXISTING,
+					0,
+					null
+				);
+
+				if (disk_handle == Win32.invalid_handle_value)
+					continue;
+
+				Win32.StorageDeviceNumber disk_number = {};
+				uint32 bytes_returned;
+
+				var ok = Win32.device_io_control (
+					disk_handle,
+					Win32.IOCTL_STORAGE_GET_DEVICE_NUMBER,
+					null,
+					0,
+					&disk_number,
+					(uint32) sizeof (Win32.StorageDeviceNumber),
+					out bytes_returned,
+					null
+				);
+
+				Win32.close_handle (disk_handle);
+
+				if (ok && disk_number.device_number == device_number)
+					dev_inst = info_data.dev_inst;
+			}
+
+			Win32.destroy_device_info_list (device_info_set);
+
+			return dev_inst;
+		}
+
 		public bool is_auth_dismissed (Error e) {
 			return false;
 		}

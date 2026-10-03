@@ -32,6 +32,7 @@ namespace Tailor {
 
 		public signal void completed ();
 		public signal void downloaded (File file, bool skipped);
+		public signal void eject_failed (string message);
 
 		public FlashOperation.with_file (
 			IDeviceHandle device_handle,
@@ -130,21 +131,31 @@ namespace Tailor {
 			try {
 				yield device_handle.verify (checksum, total_bytes, this, verify_cancellable);
 			} catch (Error e) {
-				if (verify_skipped) {
-					completed ();
+				if (!verify_skipped) {
+					if (!(e is IOError.CANCELLED) && !device_handle.is_auth_dismissed (e))
+						failed (_("%s: %s").printf (state_label (state), e.message));
+
 					return;
 				}
-
-				if (!(e is IOError.CANCELLED) && !device_handle.is_auth_dismissed (e))
-					failed (_("%s: %s").printf (state_label (state), e.message));
-
-				return;
 			} finally {
 				cancellable.disconnect (verify_link_id);
 				device_handle.disconnect (progress_id);
 			}
 
+			state = State.EJECTING;
+			yield eject_async ();
+
 			completed ();
+		}
+
+		public async bool eject_async () {
+			try {
+				yield device_handle.eject (new Cancellable ());
+				return true;
+			} catch (Error e) {
+				eject_failed (e.message);
+				return false;
+			}
 		}
 
 		public void skip_verification () {
