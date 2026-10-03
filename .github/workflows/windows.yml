@@ -126,7 +126,7 @@ jobs:
 
           tag="${{ steps.release.outputs.tag }}"
           file="$(ls Tailor-*-windows-x86_64-setup.exe)"
-          api="https://altlinux.space/api/v1/repos/qualimock/Tailor"
+          api="https://altlinux.space/api/v1/repos/alt-gnome/Tailor"
 
           release_id=""
           for i in $(seq 1 10); do

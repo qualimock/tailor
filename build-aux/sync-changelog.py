@@ -12,7 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 CHANGELOG = ROOT / "CHANGELOG.md"
 METAINFO = ROOT / "data" / "org.altlinux.Tailor.metainfo.xml.in.in"
 MESON_BUILD = ROOT / "meson.build"
-REPO_URL = "https://altlinux.space/qualimock/Tailor"
+REPO_URL = "https://altlinux.space/alt-gnome/Tailor"
 
 
 def split_unreleased(text: str):

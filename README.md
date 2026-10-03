@@ -40,7 +40,7 @@ flatpak-builder build-dir build-aux/flatpak/org.altlinux.Tailor.json
 
 A Windows installer (`.exe`, built via MSYS2/NSIS) is published on every
 release and nightly build - see
-[Releases](https://altlinux.space/qualimock/Tailor/releases).
+[Releases](https://altlinux.space/alt-gnome/Tailor/releases).
 
 You will need the following dependencies installed, along with a C
 compiler, `vala`, `meson`, and `ninja`:

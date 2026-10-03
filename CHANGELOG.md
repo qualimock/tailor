@@ -102,10 +102,10 @@ Look for installer in release assets.
 
 First release of Tailor!
 
-[Unreleased]: https://altlinux.space/qualimock/Tailor/compare/v1.1.2...HEAD
-[1.1.2]: https://altlinux.space/qualimock/Tailor/compare/v1.1.1...v1.1.2
-[1.1.1]: https://altlinux.space/qualimock/Tailor/compare/v1.1.0...v1.1.1
-[1.1.0]: https://altlinux.space/qualimock/Tailor/compare/v1.0.0...v1.1.0
-[1.0.0]: https://altlinux.space/qualimock/Tailor/compare/v0.1.1...v1.0.0
-[0.1.1]: https://altlinux.space/qualimock/Tailor/compare/v0.1.0...v0.1.1
-[0.1.0]: https://altlinux.space/qualimock/Tailor/releases/tag/v0.1.0
+[Unreleased]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.2...HEAD
+[1.1.2]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.1...v1.1.2
+[1.1.1]: https://altlinux.space/alt-gnome/Tailor/compare/v1.1.0...v1.1.1
+[1.1.0]: https://altlinux.space/alt-gnome/Tailor/compare/v1.0.0...v1.1.0
+[1.0.0]: https://altlinux.space/alt-gnome/Tailor/compare/v0.1.1...v1.0.0
+[0.1.1]: https://altlinux.space/alt-gnome/Tailor/compare/v0.1.0...v0.1.1
+[0.1.0]: https://altlinux.space/alt-gnome/Tailor/releases/tag/v0.1.0
