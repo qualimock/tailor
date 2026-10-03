@@ -7,6 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Project relocation
+
+Now Tailor is located at [ALT GNOME organization](https://altlinux.space/alt-gnome/Tailor).
+Previous links are working and redirects you to the actual repository.
+
+### Safe unplugging:
+
+Now Tailor ejects the device after writing, so it can be safely unplugged right away.
+
+If the device can't be ejected (e.g. it is used by another application), Tailor shows
+a banner with 'Eject' button to try again.
+
+### Fixes:
+
+- About dialog failed to load application info
+- Flashing an OS detected from a local ISO file no longer checks the download availability
+- Fixed crash on invalid image download URLs
+- Fixed translations on Windows
+
 ## [1.1.2] - 2026-09-25
 
 ### Fixes:
