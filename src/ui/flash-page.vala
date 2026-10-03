@@ -46,7 +46,19 @@ namespace Tailor {
 		[GtkChild] private unowned StatusLine write_status;
 		[GtkChild] private unowned StatusLine verify_status;
 
-		public ServiceContext service { get; construct set; }
+		private ServiceContext _service;
+		public ServiceContext service {
+			get { return _service; }
+			set {
+				if (_service != null)
+					_service.usb.device_removed.disconnect (on_device_removed);
+				_service = value;
+				if (value == null)
+					return;
+
+				value.usb.device_removed.connect (on_device_removed);
+			}
+		}
 		public bool started { get; private set; default = false; }
 		public bool downloading { get; private set; default = false; }
 		public bool flashing { get; private set; default = false; }
@@ -56,6 +68,7 @@ namespace Tailor {
 		public bool cancelled { get; private set; default = false; }
 		public bool paused { get; private set; default = false; }
 		public bool has_checksum { get; set; default = false; }
+		public bool eject_failed { get; private set; default = false; }
 
 		static construct {
 			typeof (StatusLine).ensure ();
@@ -180,6 +193,7 @@ namespace Tailor {
 			cancelled = false;
 			paused = false;
 			has_checksum = false;
+			eject_failed = false;
 
 			stop_pulse ();
 			progress_bar.fraction = 0;
@@ -231,6 +245,7 @@ namespace Tailor {
 					service.ui.toast_requested (new Adw.Toast (_("Image is already downloaded")));
 				}
 			});
+			operation.eject_failed.connect (on_eject_failed);
 			operation.completed.connect (on_completed);
 			operation.failed.connect (on_failed);
 			operation.notify["state"].connect (on_operation_state_changed);
@@ -346,6 +361,11 @@ namespace Tailor {
 				verifying = true;
 				break;
 
+			case Operation.State.EJECTING:
+				operation.title = _("Ejecting device");
+				verifying = false;
+				break;
+
 			case Operation.State.PAUSED:
 				progress_status.title = _("Paused");
 				terminate_current_flash_step (StatusState.PAUSED);
@@ -371,6 +391,15 @@ namespace Tailor {
 			flash_result_label.label = _("The image was written successfully");
 
 			cleanup_downloaded_image ();
+		}
+
+		private void on_eject_failed (string message) {
+			eject_failed = true;
+		}
+
+		private void on_device_removed (string object_path) {
+			if (device?.object_path == object_path)
+				eject_failed = false;
 		}
 
 		private void offer_save_downloaded_image () {
@@ -574,6 +603,12 @@ namespace Tailor {
 		private void skip_verify_step () {
 			operation?.skip_verification ();
 			terminate_current_flash_step (StatusState.SKIPPED);
+		}
+
+		[GtkCallback]
+		private void retry_eject () {
+			eject_failed = false;
+			operation.eject_async.begin ();
 		}
 	}
 }

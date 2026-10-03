@@ -131,6 +131,20 @@ namespace Tailor {
 			yield block.call_format (fstype, new Variant ("a{sv}", null), cancellable);
 		}
 
+		public async void eject (Cancellable cancellable) throws Error {
+			yield unmount (cancellable);
+
+			var drive = (object_manager.get_object (block.drive) as UDisks.Object)?.drive;
+			if (drive == null)
+				return;
+
+			var options = new Variant ("a{sv}", null);
+			if (drive.can_power_off)
+				yield drive.call_power_off (options, cancellable);
+			else if (drive.ejectable)
+				yield drive.call_eject (options, cancellable);
+		}
+
 		public bool is_auth_dismissed (Error e) {
 			return e.message.contains ("NotAuthorizedDismissed");
 		}

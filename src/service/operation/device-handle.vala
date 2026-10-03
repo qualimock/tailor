@@ -47,6 +47,10 @@ namespace Tailor {
 			Cancellable cancellable
 		) throws Error;
 
+		public abstract async void eject (
+			Cancellable cancellable
+		) throws Error;
+
 		public abstract bool is_auth_dismissed (Error e);
 	}
 }

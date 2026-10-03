@@ -24,6 +24,14 @@ template $TailorFlashPage : Adw.NavigationPage {
 			[top]
 			Adw.HeaderBar {}
 
+			[top]
+			Adw.Banner {
+				title: _("Failed to eject the device. Close any apps using it and try again");
+				button-label: _("Eject");
+				revealed: bind template.eject-failed;
+				button-clicked => $retry_eject ();
+			}
+
 			content: Adw.Clamp {
 				valign: center;
 				margin-top: 24;
