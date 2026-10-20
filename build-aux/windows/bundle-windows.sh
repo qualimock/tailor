@@ -24,6 +24,7 @@ cp -r /ucrt64/share/glib-2.0 "$STAGE_DIR/share/"
 
 echo "== staging osinfo-db"
 cp -r /ucrt64/share/osinfo "$STAGE_DIR/share/"
+cp -r /ucrt64/share/libosinfo "$STAGE_DIR/share/"
 
 echo "== staging icon themes"
 [ -d /ucrt64/share/icons/Adwaita ] && cp -r /ucrt64/share/icons/Adwaita "$STAGE_DIR/share/icons/"

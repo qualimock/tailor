@@ -34,6 +34,7 @@ namespace Tailor {
 			try {
 				yield provider.load ();
 			} catch (Error e) {
+				warning ("OS database failed to load: %s", e.message);
 				load_failed (e);
 				return;
 			}

@@ -25,6 +25,7 @@ a banner with 'Eject' button to try again.
 - Flashing an OS detected from a local ISO file no longer checks the download availability
 - Fixed crash on invalid image download URLs
 - Fixed translations on Windows
+- Fixed "OS database failed to load" on Windows
 
 ## [1.1.2] - 2026-09-25
 

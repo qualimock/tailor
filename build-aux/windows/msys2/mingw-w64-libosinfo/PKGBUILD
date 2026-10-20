@@ -36,6 +36,8 @@ source=(
   "0002-loader-don-t-use-libxml2-deprecated-APIs.patch"
   "0003-relocation.patch"
   "0004-fix-relpath-separators.patch"
+  "pci.ids"
+  "usb.ids"
 )
 sha256sums=(
   '3c52fb542d65d1ec5a10f87126d7513c2bd115eaa2f87fb91b15ba588708fc7b'
@@ -43,6 +45,8 @@ sha256sums=(
   '377d026134d8ae471fac25b192971205d896a1ebe8c0421e094e77827bd9fd33'
   'd3e45801c69181ffc79fd30b98262e8fd4952f6bcc5340a0adf685726afa6710'
   'c250558354da150b86b0e9cc63cd3ec7ed54f3f9f9675373736ce6d245c74eda'
+  '5061033a8c13354302ef9f01e8c439fa5221655aca4132dd85866efc52412634'
+  '98fac82cb8680953cf90fe5952237166b2b257d00358be3b03b193f7db858f1d'
 )
 
 prepare() {
@@ -80,6 +84,9 @@ check() {
 package() {
   cd "${srcdir}/build-${MSYSTEM}"
   DESTDIR="${pkgdir}" "${MINGW_PREFIX}/bin/ninja.exe" install
+
+  install -Dm644 "${srcdir}/pci.ids" "${pkgdir}${MINGW_PREFIX}/share/libosinfo/pci.ids"
+  install -Dm644 "${srcdir}/usb.ids" "${pkgdir}${MINGW_PREFIX}/share/libosinfo/usb.ids"
 
   find "${pkgdir}" -name "*.la" -delete
 }
