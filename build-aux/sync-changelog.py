@@ -5,6 +5,7 @@ and mirror it into the metainfo <releases> block as AppStream-safe XML."""
 import argparse
 import datetime
 import html
+import re
 import sys
 from pathlib import Path
 
@@ -13,6 +14,10 @@ CHANGELOG = ROOT / "CHANGELOG.md"
 METAINFO = ROOT / "data" / "org.altlinux.Tailor.metainfo.xml.in.in"
 MESON_BUILD = ROOT / "meson.build"
 REPO_URL = "https://altlinux.space/alt-gnome/Tailor"
+
+
+def to_xml_text(text):
+    return html.escape(re.sub(r"\[([^\]]+)\]\([^)]+\)", r"\1", text))
 
 
 def split_unreleased(text: str):
@@ -54,7 +59,7 @@ def markdown_to_appstream(body_lines):
 
     def flush_paragraph():
         if paragraph:
-            text = html.escape(" ".join(paragraph))
+            text = to_xml_text(" ".join(paragraph))
             xml.append(f"\t\t\t\t<p>{text}</p>")
             paragraph.clear()
 
@@ -62,7 +67,7 @@ def markdown_to_appstream(body_lines):
         if list_items:
             xml.append("\t\t\t\t<ul>")
             for item in list_items:
-                xml.append(f"\t\t\t\t\t<li>{html.escape(item)}</li>")
+                xml.append(f"\t\t\t\t\t<li>{to_xml_text(item)}</li>")
             xml.append("\t\t\t\t</ul>")
             list_items.clear()
 
@@ -76,7 +81,7 @@ def markdown_to_appstream(body_lines):
             flush_list()
             text = line.lstrip("#").strip()
             if text:
-                xml.append(f"\t\t\t\t<p>{html.escape(text)}</p>")
+                xml.append(f"\t\t\t\t<p>{to_xml_text(text)}</p>")
             continue
         if line.startswith(("-", "*")):
             flush_paragraph()
