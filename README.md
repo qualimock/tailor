@@ -6,6 +6,8 @@
 Tailor
 </h1>
 
+[![Please do not theme this app](https://stopthemingmy.app/badge.svg)](https://stopthemingmy.app)
+
 <p align="center">Create bootable drives</p>
 
 > [!NOTE]
