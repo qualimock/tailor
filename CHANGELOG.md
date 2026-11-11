@@ -7,6 +7,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Changes:
+
+- Use GNOME runtime version 51
+
+### Fixes:
+
+- Removed unnecessary `--device=all` Flatpak permission: device access goes through udisks2
+
 ## [1.2.0] - 2026-10-20
 
 ### Project relocation
