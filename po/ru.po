@@ -644,8 +644,8 @@ msgid "Tailor the Image?"
 msgstr "Прошить образ?"
 
 #: src/ui/image-page.vala:107 src/ui/os-page.vala:375
-msgid "All device data will be erased!"
-msgstr "Все данные устройства будут удалены!"
+msgid "All data on %s will be erased!"
+msgstr "Все данные на %s будут удалены!"
 
 #: src/ui/os-page.vala:246 src/ui/os-page.vala:250 src/ui/os-page.vala:254
 msgid "Not available"

@@ -377,9 +377,13 @@ namespace Tailor {
 			if (selection_device == null)
 				return;
 
+			var selected_device = selection_device.selected_item as UsbDevice;
+			if (selected_device == null)
+				return;
+
 			var dialog = new Adw.AlertDialog (
 				_("Tailor the Image?"),
-				_("All device data will be erased!")
+				_("All data on %s will be erased!").printf (selected_device.name)
 			);
 			dialog.add_response ("cancel", _("Cancel"));
 			dialog.add_response ("proceed", _("Proceed"));
@@ -394,13 +398,13 @@ namespace Tailor {
 						current_family,
 						selected_edition, selected_version,
 						local_image_file,
-						(UsbDevice) selection_device.selected_item
+						selected_device
 					);
 				} else {
 					page.configure_from_os (
 						current_family,
 						selected_edition, selected_version, selected_image,
-						(UsbDevice) selection_device.selected_item,
+						selected_device,
 						delete_switch.active
 					);
 				}
