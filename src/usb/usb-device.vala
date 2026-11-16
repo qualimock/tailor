@@ -29,6 +29,7 @@ namespace Tailor {
 		public uint64 size { get; set; }
 		public string size_display { get; set; }
 		public bool has_image { get; set; }
+		public string drive_serial { get; set; default = ""; }
 
 		public UsbDevice (string object_path) {
 			Object (object_path: object_path);

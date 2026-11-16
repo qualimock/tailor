@@ -45,10 +45,24 @@ namespace Tailor {
 			if (block == null)
 				throw new IOError.NOT_FOUND ("No block interface for: %s", device.object_path);
 
+			assert_same_drive (device, block);
+
 			return new DeviceHandleLinux (
 				block,
 				client.get_object_manager ()
 			);
+		}
+
+		private void assert_same_drive (UsbDevice device, UDisks.Block block) throws Error {
+			var drive_obj = (UDisks.Object?) client.get_object_manager ().get_object (block.drive);
+			var drive = drive_obj?.get_drive ();
+			if (drive == null)
+				throw new IOError.NOT_FOUND (_("Drive is no longer available"));
+
+			if (drive.serial != device.drive_serial || drive.size != device.size)
+				throw new IOError.FAILED (
+					_("The selected device has changed. Go back and select it again.")
+				);
 		}
 
 		private void on_object_added (DBusObject object) {

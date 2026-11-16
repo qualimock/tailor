@@ -62,6 +62,7 @@ namespace Tailor {
 			dto.filesystem = get_filesystem_label (block, stats.partition_count);
 			dto.has_image = get_has_image (block);
 			dto.size_display = get_drive_display_size (stats.used_bytes, drive.size);
+			dto.drive_serial = drive.serial;
 
 			return dto;
 		}
