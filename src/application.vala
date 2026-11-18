@@ -41,10 +41,11 @@ namespace Tailor {
 #if WINDOWS
 			Object (application_id: Tailor.ID,
 			        resource_base_path: "/org/altlinux/Tailor",
-			        flags: ApplicationFlags.NON_UNIQUE);
+			        flags: ApplicationFlags.HANDLES_OPEN | ApplicationFlags.NON_UNIQUE);
 #else
 			Object (application_id: Tailor.ID,
-			        resource_base_path: "/org/altlinux/Tailor");
+			        resource_base_path: "/org/altlinux/Tailor",
+			        flags: ApplicationFlags.HANDLES_OPEN);
 #endif
 		}
 
@@ -75,6 +76,13 @@ namespace Tailor {
 			usb_service.init_async.begin ();
 
 			main_window.present ();
+		}
+
+		public override void open (File[] files, string hint) {
+			activate ();
+
+			if (files.length > 0)
+				main_window.open_image_file (files[0]);
 		}
 
 		private void open_app_page () {

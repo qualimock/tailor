@@ -4,7 +4,7 @@ Name=Tailor@NAME_SUFFIX@
 Comment=Create bootable drives
 # Translators: keep number of ';'
 Keywords=tailor;tale;teilor;usb;flash;writer;bootable;drive;iso;img;disk;image;
-Exec=tailor
+Exec=tailor %f
 Icon=@APP_ID@
 Terminal=false
 Type=Application

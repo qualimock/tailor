@@ -9,7 +9,8 @@
         "--share=network",
         "--socket=wayland",
         "--socket=fallback-x11",
-        "--system-talk-name=org.freedesktop.UDisks2"
+        "--system-talk-name=org.freedesktop.UDisks2",
+        "--filesystem=host:ro"
     ],
     "cleanup": [
         "/include",

@@ -24,6 +24,7 @@ namespace Tailor {
 	public class MainWindow : Adw.ApplicationWindow {
 
 		[GtkChild] private unowned Adw.ToastOverlay toast_overlay;
+		[GtkChild] private unowned Adw.NavigationView navigation_view;
 		[GtkChild] private unowned DownloadPage download_page;
 
 		public ServiceContext service { get; construct; }
@@ -53,6 +54,23 @@ namespace Tailor {
 				app.settings.get_string ("primary-os"),
 				app.settings.get_string ("primary-os-title-fallback")
 			);
+		}
+
+		public void open_image_file (File file) {
+			service.image_file = file;
+
+			service.osinfo.detect_os.begin (file.get_path (), (obj, res) => {
+				var family = service.osinfo.detect_os.end (res);
+
+				if (family == null) {
+					navigation_view.push ((ImagePage) navigation_view.find_page ("image-page"));
+					return;
+				}
+
+				var page = (OsPage) navigation_view.find_page ("os-page");
+				page.configure (family, null, file);
+				navigation_view.push (page);
+			});
 		}
 	}
 }

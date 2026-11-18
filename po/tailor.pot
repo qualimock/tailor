@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: tailor\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-09-16 17:43+0300\n"
+"POT-Creation-Date: 2026-11-11 15:31+0300\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -34,12 +34,8 @@ msgid "tailor;tale;teilor;usb;flash;writer;bootable;drive;iso;img;disk;image;"
 msgstr ""
 
 #: data/org.altlinux.Tailor.metainfo.xml.in.in:5 data/ui/home-page.blp:5
-#: data/ui/main-window.blp:7 src/main.vala:42
+#: data/ui/main-window.blp:7 src/main.vala:40
 msgid "Tailor"
-msgstr ""
-
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:7
-msgid "Alexey Volkov"
 msgstr ""
 
 #: data/org.altlinux.Tailor.metainfo.xml.in.in:15
@@ -70,78 +66,151 @@ msgid "About dialog"
 msgstr ""
 
 #: data/org.altlinux.Tailor.metainfo.xml.in.in:83
-msgid "Hotfix:"
+msgid "Project relocation"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:84
+msgid ""
+"Now Tailor is located at ALT GNOME organization. Previous links are working "
+"and redirects you to the actual repository."
 msgstr ""
 
 #: data/org.altlinux.Tailor.metainfo.xml.in.in:85
+msgid "Safe unplugging:"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:86
+msgid ""
+"Now Tailor ejects the device after writing, so it can be safely unplugged "
+"right away."
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:87
+msgid ""
+"If the device can't be ejected (e.g. it is used by another application), "
+"Tailor shows a banner with 'Eject' button to try again."
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:88
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:100
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:112
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:133
+msgid "Fixes:"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:90
+msgid "About dialog failed to load application info"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:91
+msgid ""
+"Flashing an OS detected from a local ISO file no longer checks the download "
+"availability"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:92
+msgid "Fixed crash on invalid image download URLs"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:93
+msgid "Fixed translations on Windows"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:94
+msgid "Fixed \"OS database failed to load\" on Windows"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:102
+msgid ""
+"Use single FD for both writing and verifying. Some software could mount "
+"device between writing and verifying. Using single FD for both operations "
+"fixes it"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:103
+msgid "Retry any connection issue, not only stalled"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:104
+msgid "Bundle icons to application"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:110
+msgid "New - primary OS translations:"
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:111
+msgid ""
+"Now Tailor detects OS id in 'primary-os' field and put translatable primary "
+"OS title on DownloadPage. If id is not found, Tailor uses fallback 'OS "
+"images'."
+msgstr ""
+
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:114
 msgid ""
 "Flashing an OS detected from a local ISO file now writes that file directly"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:86
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:115
 msgid "Fixed device staying \"busy\" after cancelling a flash"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:92
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:121
 msgid "New - OS detection!"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:93
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:122
 msgid "Now Tailor can detect an operating system in your .iso file."
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:94
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:123
 msgid ""
 "Click 'Install from File' and select an image - if Tailor knows that OS, it "
 "will navigate you to OsPage to display OS information."
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:95
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:124
 msgid "Then create downloadable USB as before."
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:96
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:125
 msgid "Changes:"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:98
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:127
 msgid ""
 "Tailor can now be translated conveniently! You can see translation progress "
 "in Weblate"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:99
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:128
 msgid "Tailor got Nightly release"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:100
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:129
 msgid "Set default window size to 600x680"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:101
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:130
 msgid "New branding scheme in metainfo"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:102
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:131
 msgid "Updated screenshots"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:104
-msgid "Fixes:"
-msgstr ""
-
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:106
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:135
 msgid ""
 "Unknown versions are no longer displayed, e.g. for rolling-release distros "
 "like Arch"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:107
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:136
 msgid ""
 "OSes with single edition like GNU Guix does not display that single edition"
 msgstr ""
 
-#: data/org.altlinux.Tailor.metainfo.xml.in.in:108
+#: data/org.altlinux.Tailor.metainfo.xml.in.in:137
 msgid "FlashPage title is now build from non-empty parts"
 msgstr ""
 
@@ -226,45 +295,53 @@ msgstr ""
 msgid "Write"
 msgstr ""
 
-#: data/ui/flash-page.blp:46
+#: data/ui/flash-page.blp:29
+msgid "Failed to eject the device. Close any apps using it and try again"
+msgstr ""
+
+#: data/ui/flash-page.blp:30
+msgid "Eject"
+msgstr ""
+
+#: data/ui/flash-page.blp:54
 msgid "Installing"
 msgstr ""
 
-#: data/ui/flash-page.blp:72 src/ui/flash-page.vala:328
+#: data/ui/flash-page.blp:80 src/ui/flash-page.vala:343
 msgid "Verifying checksum"
 msgstr ""
 
-#: data/ui/flash-page.blp:78 src/ui/flash-page.vala:333
+#: data/ui/flash-page.blp:86 src/ui/flash-page.vala:348
 msgid "Preparing device"
 msgstr ""
 
-#: data/ui/flash-page.blp:84
+#: data/ui/flash-page.blp:92
 msgid "Writing image to device"
 msgstr ""
 
-#: data/ui/flash-page.blp:90 src/ui/flash-page.vala:344
+#: data/ui/flash-page.blp:98 src/ui/flash-page.vala:359
 msgid "Verifying installation"
 msgstr ""
 
-#: data/ui/flash-page.blp:103 src/ui/device-card.vala:69
-#: src/ui/image-page.vala:109 src/ui/os-page.vala:377
+#: data/ui/flash-page.blp:111 src/ui/device-card.vala:69
+#: src/ui/image-page.vala:109 src/ui/os-page.vala:384
 msgid "Cancel"
 msgstr ""
 
-#: data/ui/flash-page.blp:114
+#: data/ui/flash-page.blp:122
 msgid "Skip"
 msgstr ""
 
-#: data/ui/flash-page.blp:128 src/ui/device-card.vala:87
+#: data/ui/flash-page.blp:136 src/ui/device-card.vala:87
 #: src/ui/device-card.vala:105 src/ui/device-card.vala:120
 msgid "Details"
 msgstr ""
 
-#: data/ui/flash-page.blp:137
+#: data/ui/flash-page.blp:145
 msgid "Retry"
 msgstr ""
 
-#: data/ui/flash-page.blp:143
+#: data/ui/flash-page.blp:151
 msgid "Go Back"
 msgstr ""
 
@@ -276,7 +353,7 @@ msgstr ""
 msgid "Image"
 msgstr ""
 
-#: data/ui/image-page.blp:40 src/ui/flash-page.vala:77
+#: data/ui/image-page.blp:40 src/ui/flash-page.vala:90
 msgid "Local file"
 msgstr ""
 
@@ -368,7 +445,7 @@ msgstr ""
 msgid "Delete download after writing"
 msgstr ""
 
-#: data/ui/os-page.blp:299 src/ui/flash-page.vala:377
+#: data/ui/os-page.blp:299 src/ui/flash-page.vala:406
 msgid "Downloaded image will be kept in app cache"
 msgstr ""
 
@@ -384,7 +461,7 @@ msgstr ""
 msgid "OS not Available"
 msgstr ""
 
-#: data/ui/progress-line.blp:6 src/ui/flash-page.vala:199
+#: data/ui/progress-line.blp:6 src/ui/flash-page.vala:213
 msgid "Starting"
 msgstr ""
 
@@ -412,15 +489,15 @@ msgstr ""
 msgid "Download the required OS image directly in the application"
 msgstr ""
 
-#: src/application.vala:99
+#: src/application.vala:107
 msgid "Alexey “qualimock” Volkov"
 msgstr ""
 
-#: src/application.vala:102
+#: src/application.vala:110
 msgid "Viktoria “gingercat” Zubacheva"
 msgstr ""
 
-#: src/application.vala:104
+#: src/application.vala:112
 msgid "translator-credits"
 msgstr ""
 
@@ -440,46 +517,50 @@ msgstr ""
 msgid "Installer"
 msgstr ""
 
-#: src/service/operation/download-operation.vala:125
+#: src/service/operation/download-operation.vala:128
 msgid "Connection lost"
 msgstr ""
 
-#: src/service/operation/flash-operation.vala:117
-#: src/service/operation/flash-operation.vala:137
+#: src/service/operation/flash-operation.vala:118
+#: src/service/operation/flash-operation.vala:136
 #: src/service/operation/restore-operation.vala:46
 #, c-format
 msgid "%s: %s"
 msgstr ""
 
-#: src/service/operation/flash-operation.vala:180
+#: src/service/operation/flash-operation.vala:193
 msgid "Download did not produce a file"
 msgstr ""
 
-#: src/service/operation/flash-operation.vala:193
+#: src/service/operation/flash-operation.vala:206
 msgid "Checksum mismatch - the download can be corrupted"
 msgstr ""
 
-#: src/service/operation/operation.vala:75
+#: src/service/operation/operation.vala:76
 msgid "Download"
 msgstr ""
 
-#: src/service/operation/operation.vala:76
+#: src/service/operation/operation.vala:77
 msgid "Checksum verification"
 msgstr ""
 
-#: src/service/operation/operation.vala:77
+#: src/service/operation/operation.vala:78
 msgid "Device preparation"
 msgstr ""
 
-#: src/service/operation/operation.vala:78
+#: src/service/operation/operation.vala:79
 msgid "Writing"
 msgstr ""
 
-#: src/service/operation/operation.vala:79
+#: src/service/operation/operation.vala:80
 msgid "Verification"
 msgstr ""
 
 #: src/service/operation/operation.vala:81
+msgid "Ejecting"
+msgstr ""
+
+#: src/service/operation/operation.vala:83
 msgid "Flashing"
 msgstr ""
 
@@ -500,7 +581,7 @@ msgid "Restore device?"
 msgstr ""
 
 #: src/ui/device-card.vala:70 src/ui/image-page.vala:110
-#: src/ui/os-page.vala:378
+#: src/ui/os-page.vala:385
 msgid "Proceed"
 msgstr ""
 
@@ -510,7 +591,7 @@ msgid "Failed to restore device"
 msgstr ""
 
 #: src/ui/device-card.vala:89 src/ui/device-card.vala:107
-#: src/ui/device-card.vala:122 src/ui/flash-page.vala:570
+#: src/ui/device-card.vala:122 src/ui/flash-page.vala:599
 msgid "Error Details"
 msgstr ""
 
@@ -518,135 +599,139 @@ msgstr ""
 msgid "Device restored"
 msgstr ""
 
-#: src/ui/flash-page.vala:105
+#: src/ui/flash-page.vala:118
 #, c-format
 msgid "Downloading image %s"
 msgstr ""
 
-#: src/ui/flash-page.vala:231
+#: src/ui/flash-page.vala:245
 msgid "Image is already downloaded"
 msgstr ""
 
-#: src/ui/flash-page.vala:263
+#: src/ui/flash-page.vala:278
 msgid "Trying to reconnect"
 msgstr ""
 
-#: src/ui/flash-page.vala:307
+#: src/ui/flash-page.vala:322
 msgid "Downloading the image failed"
 msgstr ""
 
-#: src/ui/flash-page.vala:309
+#: src/ui/flash-page.vala:324
 msgid "Checksum verification failed"
 msgstr ""
 
-#: src/ui/flash-page.vala:311
+#: src/ui/flash-page.vala:326
 msgid "Preparing the device failed"
 msgstr ""
 
-#: src/ui/flash-page.vala:313
+#: src/ui/flash-page.vala:328
 msgid "Writing the image failed"
 msgstr ""
 
-#: src/ui/flash-page.vala:315
+#: src/ui/flash-page.vala:330
 msgid "Verifying the write failed"
 msgstr ""
 
-#: src/ui/flash-page.vala:317
+#: src/ui/flash-page.vala:332
 msgid "An error occurred during writing process"
 msgstr ""
 
-#: src/ui/flash-page.vala:323
+#: src/ui/flash-page.vala:338
 msgid "Downloading"
 msgstr ""
 
-#: src/ui/flash-page.vala:338
+#: src/ui/flash-page.vala:353
 msgid "Writing image"
 msgstr ""
 
-#: src/ui/flash-page.vala:350 src/ui/status-line.vala:52
+#: src/ui/flash-page.vala:365
+msgid "Ejecting device"
+msgstr ""
+
+#: src/ui/flash-page.vala:370 src/ui/status-line.vala:52
 msgid "Paused"
 msgstr ""
 
-#: src/ui/flash-page.vala:371
+#: src/ui/flash-page.vala:391
 msgid "The image was written successfully"
 msgstr ""
 
-#: src/ui/flash-page.vala:379
+#: src/ui/flash-page.vala:408
 msgid "Save As…"
 msgstr ""
 
-#: src/ui/flash-page.vala:382
+#: src/ui/flash-page.vala:411
 msgid "Save Image"
 msgstr ""
 
-#: src/ui/flash-page.vala:445
+#: src/ui/flash-page.vala:474
 msgid "Writing was canceled"
 msgstr ""
 
-#: src/ui/flash-page.vala:483
+#: src/ui/flash-page.vala:512
 msgid "Resume"
 msgstr ""
 
-#: src/ui/flash-page.vala:483
+#: src/ui/flash-page.vala:512
 msgid "Pause"
 msgstr ""
 
-#: src/ui/flash-page.vala:513
+#: src/ui/flash-page.vala:542
 msgid "Cancel tailoring?"
 msgstr ""
 
-#: src/ui/flash-page.vala:514
+#: src/ui/flash-page.vala:543
 msgid "The device may be left in an incomplete state and fail to boot."
 msgstr ""
 
-#: src/ui/flash-page.vala:516
+#: src/ui/flash-page.vala:545
 msgid "Continue"
 msgstr ""
 
-#: src/ui/flash-page.vala:517
+#: src/ui/flash-page.vala:546
 msgid "Cancel Anyway"
 msgstr ""
 
-#: src/ui/flash-page.vala:525
+#: src/ui/flash-page.vala:554
 msgid "Cancel download?"
 msgstr ""
 
-#: src/ui/flash-page.vala:526
+#: src/ui/flash-page.vala:555
 msgid "The device won't be affected."
 msgstr ""
 
-#: src/ui/flash-page.vala:531
+#: src/ui/flash-page.vala:560
 msgid "Downloaded image will not be deleted."
 msgstr ""
 
-#: src/ui/image-page.vala:106 src/ui/os-page.vala:374
+#: src/ui/image-page.vala:106 src/ui/os-page.vala:381
 msgid "Tailor the Image?"
 msgstr ""
 
-#: src/ui/image-page.vala:107 src/ui/os-page.vala:375
-msgid "All device data will be erased!"
+#: src/ui/image-page.vala:113 src/ui/os-page.vala:388
+msgid "All data on %s will be erased!"
 msgstr ""
 
 #: src/ui/os-page.vala:246 src/ui/os-page.vala:250 src/ui/os-page.vala:254
 msgid "Not available"
 msgstr ""
 
-#: src/ui/os-page.vala:296
+#: src/ui/os-page.vala:303
 #, c-format
 msgid "%.0f MHz"
 msgstr ""
 
-#: src/ui/os-page.vala:298
+#: src/ui/os-page.vala:305
 #, c-format
 msgid "%.1f GHz"
 msgstr ""
 
-#: src/ui/os-page.vala:303
+#: src/ui/os-page.vala:310
 #, c-format
 msgid "%.0f MiB"
 msgstr ""
 
-#: src/ui/os-page.vala:305
+#: src/ui/os-page.vala:312
 #, c-format
 msgid "%.1f GiB"
 msgstr ""
