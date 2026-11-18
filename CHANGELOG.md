@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 
 ## [Unreleased]
 
+### Features:
+
+- Open ISO images from a file manager via "Open With..."
+
 ### Changes:
 
 - Use GNOME runtime version 51
@@ -14,6 +18,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/).
 ### Fixes:
 
 - Removed unnecessary `--device=all` Flatpak permission: device access goes through udisks2
+- Confirmation dialog now names the selected device, and the flash target is captured before the dialog opens - changing the selection while the dialog is shown no longer affects the write
+- Drive identity (serial and size) is re-verified right before writing: if the device was replaced between selection and write, Tailor refuses to proceed
 
 ## [1.2.0] - 2026-10-20
 
